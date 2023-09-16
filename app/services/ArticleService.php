@@ -1,0 +1,57 @@
+<?php
+
+
+namespace App\services;
+
+
+use App\Models\Article;
+use Illuminate\Support\Facades\DB;
+
+class ArticleService
+{
+    private $VEDETTE_LIMIT = 3;
+    private $ARTICLES_LIMIT = 25;
+
+    public function vedette()
+    {
+        return DB::table('articles')
+            ->join('rubriques', 'articles.rubrique_id', 'rubriques.id')
+            ->join('users', 'articles.user_id', 'users.id')
+            ->select(
+                'articles.id',
+                'articles.title',
+                'articles.description',
+                'articles.slug',
+                'articles.image',
+                'articles.vedette',
+                'rubriques.name as rubrique',
+                'users.name as author',
+                'articles.created_at')
+            ->where('articles.vedette', true)
+            ->where('articles.status', true)
+            ->orderBy('articles.id', 'desc')
+            ->limit($this->VEDETTE_LIMIT)
+            ->get();
+    }
+
+    public function show($slug)
+    {
+        return DB::table('articles')
+            ->join('rubriques', 'articles.rubrique_id', 'rubriques.id')
+            ->join('users', 'articles.user_id', 'users.id')
+            ->select(
+                'articles.id',
+                'articles.title',
+                'articles.description',
+                'articles.slug',
+                'articles.image',
+                'articles.vedette',
+                'rubriques.name as rubrique',
+                'users.name as author',
+                'articles.created_at')
+            ->where('articles.vedette', true)
+            ->where('articles.status', true)
+            ->where('articles.slug', $slug)
+            ->first();
+    }
+}

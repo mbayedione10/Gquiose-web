@@ -15,6 +15,7 @@ class Question extends Model
         'name',
         'reponse',
         'option1',
+        'option2',
         'status',
         'thematique_id',
     ];

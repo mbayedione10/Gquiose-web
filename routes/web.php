@@ -30,7 +30,7 @@ use App\Http\Controllers\TypeStructureController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect(url('/admin'));
 });
 
 Auth::routes();

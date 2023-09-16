@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->string('name')->unique();
             $table->string('reponse');
             $table->string('option1');
+            $table->string('option2');
             $table->boolean('status');
             $table->unsignedBigInteger('thematique_id');
 

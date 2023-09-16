@@ -15,7 +15,9 @@
         "laravel/tinker": "^2.8",
         "livewire/livewire": "^2.11",
         "laravel/ui": "^4.0",
-        "filament/filament": "^2.0"
+        "filament/filament": "^2.0",
+        "spatie/laravel-sluggable": "^3.4",
+      "ext-http": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
