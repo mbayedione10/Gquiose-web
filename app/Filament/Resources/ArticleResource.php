@@ -48,7 +48,6 @@ class ArticleResource extends Resource
 
                 RichEditor::make('description')
                     ->label("Description")
-                    ->rules(['max:255', 'string'])
                     ->required()
                     ->placeholder('Description')
                     ->columnSpan([

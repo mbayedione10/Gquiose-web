@@ -4,7 +4,9 @@
 namespace App\services;
 
 
+use App\Exceptions\ResourceNotFoundException;
 use App\Models\Article;
+use App\Models\Rubrique;
 use Illuminate\Support\Facades\DB;
 
 class ArticleService
@@ -34,6 +36,25 @@ class ArticleService
             ->get();
     }
 
+    public function recent()
+    {
+        return DB::table('articles')
+            ->join('rubriques', 'articles.rubrique_id', 'rubriques.id')
+            ->join('users', 'articles.user_id', 'users.id')
+            ->select(
+                'articles.id',
+                'articles.title',
+                'articles.description',
+                'articles.slug',
+                'articles.image',
+                'articles.vedette',
+                'rubriques.name as rubrique',
+                'users.name as author',
+                'articles.created_at')
+            ->where('articles.status', true)
+            ->orderByDesc('id')
+            ->first();
+    }
     public function show($slug)
     {
         return DB::table('articles')
@@ -53,5 +74,33 @@ class ArticleService
             ->where('articles.status', true)
             ->where('articles.slug', $slug)
             ->first();
+    }
+
+    public function findByRubrique($rubriqueId)
+    {
+        $rubrique = Rubrique::whereId($rubriqueId)->first();
+
+        if ($rubriqueId == null)
+            throw new ResourceNotFoundException("La rubrique avec pour ID " .$rubriqueId. " n'existe pas");
+
+        return DB::table('articles')
+            ->join('rubriques', 'articles.rubrique_id', 'rubriques.id')
+            ->join('users', 'articles.user_id', 'users.id')
+            ->select(
+                'articles.id',
+                'articles.title',
+                'articles.description',
+                'articles.slug',
+                'articles.image',
+                'articles.vedette',
+                'rubriques.name as rubrique',
+                'users.name as author',
+                'articles.created_at')
+            ->where('articles.vedette', true)
+            ->where('articles.status', true)
+            ->where('rubrique_id', $rubriqueId)
+            ->orderBy('articles.id', 'desc')
+            ->limit($this->ARTICLES_LIMIT)
+            ->get();
     }
 }

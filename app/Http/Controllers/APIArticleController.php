@@ -6,6 +6,7 @@ use App\Exceptions\ResourceNotFoundException;
 use App\Http\Responses\ApiResponse as response;
 
 use App\services\ArticleService;
+use App\services\RubriqueService;
 
 class APIArticleController extends Controller
 {
@@ -21,11 +22,19 @@ class APIArticleController extends Controller
     }
 
 
-    public function index()
+    public function index(RubriqueService  $rubriqueService)
     {
-        $vedette = $this->articleService->vedette();
+        $vedettes = $this->articleService->vedette();
+        $recents = $this->articleService->recent();
+        $rubriques = $rubriqueService->all();
 
-        return response::success($vedette);
+        $data = [
+            'recents' => $recents,
+            'vedettes' => $vedettes,
+            'rubriques' => $rubriques,
+        ];
+
+        return response::success($data);
     }
 
     public function show($slug)

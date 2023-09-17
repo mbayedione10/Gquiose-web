@@ -20,6 +20,8 @@ Route::prefix('v1')
 
         Route::get('articles', [APIArticleController::class, 'index']);
         Route::get('articles/{slug}', [APIArticleController::class, 'show']);
+
+        Route::get('articles/categorie/{articleId}', [APIArticleController::class, 'showByRubrique']);
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
