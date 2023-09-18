@@ -53,7 +53,7 @@ class ArticleService
                 'articles.created_at')
             ->where('articles.status', true)
             ->orderByDesc('id')
-            ->first();
+            ->get();
     }
     public function show($slug)
     {
