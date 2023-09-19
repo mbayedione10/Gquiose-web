@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\ResourceNotFoundException;
 use App\Http\Responses\ApiResponse as response;
 
+use App\Models\Rubrique;
 use App\services\ArticleService;
 use App\services\RubriqueService;
 
@@ -45,5 +46,14 @@ class APIArticleController extends Controller
             throw  new ResourceNotFoundException("Cet article n'existe pas");
 
         return response::success($article);
+    }
+
+    public function showByRubrique($rubriqueId)
+    {
+
+        $articles= $this->articleService->findByRubrique($rubriqueId);
+
+        return response::success($articles);
+
     }
 }

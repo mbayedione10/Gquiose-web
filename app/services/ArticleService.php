@@ -80,7 +80,7 @@ class ArticleService
     {
         $rubrique = Rubrique::whereId($rubriqueId)->first();
 
-        if ($rubriqueId == null)
+        if ($rubrique == null)
             throw new ResourceNotFoundException("La rubrique avec pour ID " .$rubriqueId. " n'existe pas");
 
         return DB::table('articles')
@@ -96,7 +96,6 @@ class ArticleService
                 'rubriques.name as rubrique',
                 'users.name as author',
                 'articles.created_at')
-            ->where('articles.vedette', true)
             ->where('articles.status', true)
             ->where('rubrique_id', $rubriqueId)
             ->orderBy('articles.id', 'desc')
