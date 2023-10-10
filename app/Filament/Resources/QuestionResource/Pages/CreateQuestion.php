@@ -14,6 +14,6 @@ class CreateQuestion extends CreateRecord
 
     protected function getRedirectUrl(): string
     {
-        return ArticleResource::getUrl();
+        return QuestionResource::getUrl();
     }
 }

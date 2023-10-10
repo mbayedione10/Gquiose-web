@@ -18,6 +18,10 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')
     ->group(function(){
 
+        /*************************  CONFIG    ***************************/
+        Route::get('config', [APIArticleController::class, 'config']);
+
+        /*************************  ARTICLES    ***************************/
         Route::get('articles', [APIArticleController::class, 'index']);
         Route::get('articles/{slug}', [APIArticleController::class, 'show']);
 
