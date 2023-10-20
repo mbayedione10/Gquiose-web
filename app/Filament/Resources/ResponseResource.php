@@ -111,10 +111,12 @@ class ResponseResource extends Resource
 
                 Tables\Columns\TextColumn::make('question.name')
                     ->label("Question ")
-                    ->url(function (?Response $record){
-                        return QuestionResource::getUrl('view', $record->question_id);
-                    })
                     ->limit(50),
+
+                Tables\Columns\TextColumn::make('question.thematique.name')
+                    ->label("Thématique")
+                    ->limit(50),
+
 
                 Tables\Columns\TextColumn::make('reponse')
                     ->label("Réponse")
@@ -122,6 +124,7 @@ class ResponseResource extends Resource
                     ->limit(50),
 
                 Tables\Columns\IconColumn::make('isValid')
+                    ->label("Trouvée")
                     ->sortable()
                     ->boolean(),
 

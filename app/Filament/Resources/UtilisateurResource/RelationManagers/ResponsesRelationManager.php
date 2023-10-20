@@ -59,58 +59,24 @@ class ResponsesRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('question.name')->limit(50),
-                Tables\Columns\TextColumn::make('reponse')->limit(50),
-                Tables\Columns\IconColumn::make('isValid'),
-                Tables\Columns\TextColumn::make('utilisateur.nom')->limit(50),
-            ])
-            ->filters([
-                Tables\Filters\Filter::make('created_at')
-                    ->form([
-                        Forms\Components\DatePicker::make('created_from'),
-                        Forms\Components\DatePicker::make('created_until'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['created_from'],
-                                fn(
-                                    Builder $query,
-                                    $date
-                                ): Builder => $query->whereDate(
-                                    'created_at',
-                                    '>=',
-                                    $date
-                                )
-                            )
-                            ->when(
-                                $data['created_until'],
-                                fn(
-                                    Builder $query,
-                                    $date
-                                ): Builder => $query->whereDate(
-                                    'created_at',
-                                    '<=',
-                                    $date
-                                )
-                            );
-                    }),
+                Tables\Columns\TextColumn::make('question.name')
+                    ->label("Question ")
+                    ->limit(50),
 
-                MultiSelectFilter::make('question_id')->relationship(
-                    'question',
-                    'name'
-                ),
+                Tables\Columns\TextColumn::make('question.thematique.name')
+                    ->label("Thématique")
+                    ->limit(50),
 
-                MultiSelectFilter::make('utilisateur_id')->relationship(
-                    'utilisateur',
-                    'nom'
-                ),
-            ])
-            ->headerActions([Tables\Actions\CreateAction::make()])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([Tables\Actions\DeleteBulkAction::make()]);
+
+                Tables\Columns\TextColumn::make('reponse')
+                    ->label("Réponse")
+                    ->searchable()
+                    ->limit(50),
+
+                Tables\Columns\IconColumn::make('isValid')
+                    ->label("Trouvée")
+                    ->sortable()
+                    ->boolean(),
+            ]);
     }
 }

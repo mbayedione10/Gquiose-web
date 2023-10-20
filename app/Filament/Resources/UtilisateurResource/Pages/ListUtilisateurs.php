@@ -11,4 +11,13 @@ class ListUtilisateurs extends ListRecords
     use HasDescendingOrder;
 
     protected static string $resource = UtilisateurResource::class;
+
+    protected static ?string $title = "Liste des utilisateurs";
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            UtilisateurResource\Widgets\UtilisateurOverview::class
+        ];
+    }
 }

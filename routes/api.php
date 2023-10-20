@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\APIArticleController;
 use App\Http\Controllers\APIAuthController;
+use App\Http\Controllers\APIQuizController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -38,6 +39,11 @@ Route::prefix('v1')
         Route::get('articles/{slug}', [APIArticleController::class, 'show']);
 
         Route::get('articles/categorie/{articleId}', [APIArticleController::class, 'showByRubrique']);
+
+        /*************************  SYNC Quiz    ***************************/
+
+        Route::post('sync-quiz', [APIQuizController::class, 'sync']);
+
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
