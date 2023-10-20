@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\APIArticleController;
+use App\Http\Controllers\APIAuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +18,17 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')
     ->group(function(){
+
+        /*************************  AUTH    ***************************/
+
+        Route::post('login', [APIAuthController::class, 'login']);
+
+        Route::post('register', [APIAuthController::class, 'register']);
+
+        Route::post('send-code-update-password', [APIAuthController::class, 'codePasswordUpdate']);
+        Route::post('update-password', [APIAuthController::class, 'updatePassword']);
+
+        Route::post('code-confirmation', [APIAuthController::class, 'codeConfirmation']);
 
         /*************************  CONFIG    ***************************/
         Route::get('config', [APIArticleController::class, 'config']);
