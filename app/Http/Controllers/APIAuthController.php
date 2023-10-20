@@ -130,6 +130,8 @@ class APIAuthController extends Controller
 
         if ($codeConfirmation != null) {
             $utilisateur = $codeConfirmation->utilisateur;
+            $utilisateur->status = true;
+            $utilisateur->save();
 
             $data = [
                 'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'phone', 'email', 'dob', 'sexe'])
