@@ -23,4 +23,11 @@ class ListQuestions extends ListRecords
                 ->icon('heroicon-o-plus-circle')
         ];
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            QuestionResource\Widgets\QuestionOverview::class,
+        ];
+    }
 }

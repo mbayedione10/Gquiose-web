@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ThematiqueResource\Pages;
 
+use App\Filament\Resources\ThematiqueChartResource\Widgets\QuestionPerThematiqueChart;
 use Filament\Pages\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use App\Filament\Traits\HasDescendingOrder;
@@ -21,6 +22,14 @@ class ListThematiques extends ListRecords
             CreateAction::make()
                 ->label("Nouvelle thématique")
                 ->icon('heroicon-o-plus-circle')
+        ];
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            QuestionPerThematiqueChart::class,
+            //ThematiqueResource\Widgets\TrueResponsePerThematiqueChart::class
         ];
     }
 }

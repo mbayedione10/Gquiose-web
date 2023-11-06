@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\ThematiqueChartResource\Widgets\QuestionPerThematiqueChart;
+use App\Filament\Resources\ThematiqueResource\Widgets\TrueResponsePerThematiqueChart;
 use App\Models\Thematique;
 use Filament\{Tables, Forms};
 use Filament\Resources\{Form, Table, Resource};
@@ -87,6 +89,7 @@ class ThematiqueResource extends Resource
         ];
     }
 
+
     public static function getPages(): array
     {
         return [
@@ -94,6 +97,14 @@ class ThematiqueResource extends Resource
             'create' => Pages\CreateThematique::route('/create'),
             'view' => Pages\ViewThematique::route('/{record}'),
             'edit' => Pages\EditThematique::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+          QuestionPerThematiqueChart::class,
+          TrueResponsePerThematiqueChart::class
         ];
     }
 }

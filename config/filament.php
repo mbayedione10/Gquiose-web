@@ -1,5 +1,7 @@
 <?php
 
+use App\Filament\Resources\QuestionResource\Widgets\QuestionOverview;
+use App\Filament\Resources\UtilisateurResource\Widgets\UtilisateurOverview;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Http\Middleware\MirrorConfigToSubpackages;
@@ -106,6 +108,7 @@ return [
         'path' => app_path('Filament/Pages'),
         'register' => [
             Pages\Dashboard::class,
+
         ],
     ],
 
@@ -140,7 +143,8 @@ return [
         'path' => app_path('Filament/Widgets'),
         'register' => [
             Widgets\AccountWidget::class,
-            //Widgets\FilamentInfoWidget::class,
+            UtilisateurOverview::class,
+            QuestionOverview::class,
         ],
     ],
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\QuestionResource\Widgets\QuestionOverview;
 use App\Models\Question;
 use App\Models\Thematique;
 use Filament\{Tables, Forms};
@@ -10,10 +11,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
-use Filament\Tables\Filters\SelectFilter;
-use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\QuestionResource\Pages;
 
 class QuestionResource extends Resource
@@ -196,6 +194,13 @@ class QuestionResource extends Resource
             'create' => Pages\CreateQuestion::route('/create'),
             'view' => Pages\ViewQuestion::route('/{record}'),
             'edit' => Pages\EditQuestion::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            QuestionOverview::class,
         ];
     }
 }
