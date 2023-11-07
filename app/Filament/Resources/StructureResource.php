@@ -3,6 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Models\Structure;
+use App\Models\TypeStructure;
+use App\Models\Ville;
 use Filament\{Tables, Forms};
 use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Grid;
@@ -44,7 +46,6 @@ class StructureResource extends Resource
                         ]),
 
                     RichEditor::make('description')
-                        ->rules(['max:255', 'string'])
                         ->nullable()
                         ->placeholder('Description')
                         ->columnSpan([
@@ -96,6 +97,42 @@ class StructureResource extends Resource
                         ->relationship('typeStructure', 'name')
                         ->searchable()
                         ->placeholder('Type Structure')
+                        ->createOptionForm([
+                            TextInput::make('name')
+                                ->rules(['max:255', 'string'])
+                                ->required()
+                                ->unique(
+                                    'type_structures',
+                                    'name',
+                                    fn(?TypeStructure $record) => $record
+                                )
+                                ->placeholder('Name')
+                                ->columnSpan([
+                                    'default' => 12,
+                                    'md' => 12,
+                                    'lg' => 12,
+                                ]),
+
+                            Forms\Components\FileUpload::make('icon')
+                                ->maxSize(512)
+                                ->image()
+                                ->required()
+                                ->placeholder('Icon')
+                                ->columnSpan([
+                                    'default' => 12,
+                                    'md' => 12,
+                                    'lg' => 12,
+                                ]),
+
+                            Toggle::make('status')
+                                ->rules(['boolean'])
+                                ->required()
+                                ->columnSpan([
+                                    'default' => 12,
+                                    'md' => 12,
+                                    'lg' => 12,
+                                ]),
+                        ])
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,
@@ -117,6 +154,31 @@ class StructureResource extends Resource
                         ->relationship('ville', 'name')
                         ->searchable()
                         ->placeholder('Ville')
+                        ->createOptionForm([
+                            TextInput::make('name')
+                                ->rules(['max:255', 'string'])
+                                ->required()
+                                ->unique(
+                                    'villes',
+                                    'name',
+                                    fn(?Ville $record) => $record
+                                )
+                                ->placeholder('Name')
+                                ->columnSpan([
+                                    'default' => 12,
+                                    'md' => 12,
+                                    'lg' => 12,
+                                ]),
+
+                            Toggle::make('status')
+                                ->rules(['boolean'])
+                                ->required()
+                                ->columnSpan([
+                                    'default' => 12,
+                                    'md' => 12,
+                                    'lg' => 12,
+                                ]),
+                        ])
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,

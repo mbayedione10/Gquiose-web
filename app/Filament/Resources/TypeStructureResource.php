@@ -36,7 +36,7 @@ class TypeStructureResource extends Resource
                         ->unique(
                             'type_structures',
                             'name',
-                            fn(?Model $record) => $record
+                            fn(?TypeStructure $record) => $record
                         )
                         ->placeholder('Name')
                         ->columnSpan([
@@ -45,8 +45,9 @@ class TypeStructureResource extends Resource
                             'lg' => 12,
                         ]),
 
-                    TextInput::make('icon')
-                        ->rules(['max:255', 'string'])
+                    Forms\Components\FileUpload::make('icon')
+                        ->maxSize(512)
+                        ->image()
                         ->required()
                         ->placeholder('Icon')
                         ->columnSpan([

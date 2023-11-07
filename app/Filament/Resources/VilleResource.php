@@ -34,7 +34,7 @@ class VilleResource extends Resource
                         ->unique(
                             'villes',
                             'name',
-                            fn(?Model $record) => $record
+                            fn(?Ville $record) => $record
                         )
                         ->placeholder('Name')
                         ->columnSpan([
