@@ -22,6 +22,7 @@ class APIStructureController extends Controller
                 'structures.longitude',
                 'structures.phone',
                 'type_structures.name as type',
+                'type_structures.icon as icon',
                 'villes.name as ville',
                 'structures.adresse',
             )
