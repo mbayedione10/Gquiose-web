@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ThematiqueChartResource\Widgets\QuestionPerThematiqueChart;
+use App\Filament\Resources\ThematiqueChartResource\Widgets\QuestionThematiqueChart;
 use App\Filament\Resources\ThematiqueResource\Widgets\TrueResponsePerThematiqueChart;
 use App\Models\Thematique;
 use Filament\{Tables, Forms};
@@ -103,7 +103,7 @@ class ThematiqueResource extends Resource
     public static function getWidgets(): array
     {
         return [
-          QuestionPerThematiqueChart::class,
+          //QuestionThematiqueChart::class,
           TrueResponsePerThematiqueChart::class
         ];
     }

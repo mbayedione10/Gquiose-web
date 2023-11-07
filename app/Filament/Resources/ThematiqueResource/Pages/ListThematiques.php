@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\ThematiqueResource\Pages;
 
-use App\Filament\Resources\ThematiqueChartResource\Widgets\QuestionPerThematiqueChart;
+use App\Filament\Resources\ThematiqueChartResource\Widgets\QuestionThematiqueChart;
 use Filament\Pages\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use App\Filament\Traits\HasDescendingOrder;
@@ -28,7 +28,7 @@ class ListThematiques extends ListRecords
     protected function getFooterWidgets(): array
     {
         return [
-            QuestionPerThematiqueChart::class,
+            //QuestionThematiqueChart::class,
             //ThematiqueResource\Widgets\TrueResponsePerThematiqueChart::class
         ];
     }
