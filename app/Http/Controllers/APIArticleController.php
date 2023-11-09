@@ -77,8 +77,8 @@ class APIArticleController extends Controller
             ->get();
 
         $informations = Information::where('status', true)
-            ->select('id', 'image')
-            ->get();
+            ->select('id', 'image', "rendez_vous")
+            ->first();
 
         $data = [
             'informations' => $informations,

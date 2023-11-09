@@ -9,7 +9,7 @@ class Information extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["image", "status"];
+    protected $fillable = ["image", "rendez_vous", "status"];
 
     protected $casts = [
         'status' => 'boolean'

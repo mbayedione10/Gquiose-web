@@ -25,13 +25,19 @@ class InformationResource extends Resource
             ->schema([
                 Forms\Components\Card::make()
                     ->schema([
+
+                        Forms\Components\TextInput::make("rendez_vous")
+                            ->required()
+                            ->placeholder("L'URL de prise de rendez-vous")
+                            ->label("Rendez-vous"),
+
                         Forms\Components\FileUpload::make('image')
                             ->required()
-                        ->image()
-                        ->maxSize(512),
+                            ->image()
+                            ->maxSize(512),
 
                         Forms\Components\Toggle::make('status')
-                        ->label("Activé")
+                            ->label("Activé")
                     ])
             ]);
     }
@@ -42,6 +48,9 @@ class InformationResource extends Resource
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
                     ->label("Image"),
+
+                Tables\Columns\TextColumn::make('rendez_vous')
+                    ->label("Rendez-vous"),
 
                 Tables\Columns\ToggleColumn::make('status')
                     ->label("Status")
