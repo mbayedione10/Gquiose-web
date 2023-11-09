@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\ResourceNotFoundException;
 use App\Http\Responses\ApiResponse as response;
 
+use App\Models\Information;
 use App\Models\Question;
 use App\Models\Rubrique;
 use App\services\ArticleService;
@@ -75,7 +76,12 @@ class APIArticleController extends Controller
             ->where('questions.status', true)
             ->get();
 
+        $informations = Information::where('status', true)
+            ->select('image')
+            ->get();
+
         $data = [
+            'informations' => $informations,
             'quiz' => $quiz
         ];
 

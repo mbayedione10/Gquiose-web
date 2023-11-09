@@ -205,36 +205,32 @@ class StructureResource extends Resource
             ->poll('60s')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->toggleable()
-                    ->searchable(true, null, true)
-                    ->limit(50),
-                Tables\Columns\TextColumn::make('description')
-                    ->toggleable()
+
                     ->searchable()
                     ->limit(50),
-                Tables\Columns\TextColumn::make('latitude')
-                    ->toggleable()
-                    ->searchable(true, null, true),
-                Tables\Columns\TextColumn::make('longitude')
-                    ->toggleable()
-                    ->searchable(true, null, true),
+
+                Tables\Columns\TextColumn::make('description')
+                    ->html()
+                    ->searchable()
+                    ->limit(50),
+
                 Tables\Columns\TextColumn::make('phone')
-                    ->toggleable()
-                    ->searchable(true, null, true)
+                    ->searchable()
                     ->limit(50),
+
                 Tables\Columns\TextColumn::make('typeStructure.name')
-                    ->toggleable()
                     ->limit(50),
-                Tables\Columns\IconColumn::make('status')
-                    ->toggleable()
-                    ->boolean(),
+
                 Tables\Columns\TextColumn::make('ville.name')
-                    ->toggleable()
+
                     ->limit(50),
                 Tables\Columns\TextColumn::make('adresse')
-                    ->toggleable()
-                    ->searchable(true, null, true)
+                    ->searchable()
                     ->limit(50),
+
+                Tables\Columns\ToggleColumn::make('status'),
+
+
             ])
             ->filters([
                 DateRangeFilter::make('created_at'),
