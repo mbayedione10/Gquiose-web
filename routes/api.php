@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\APIAlertController;
 use App\Http\Controllers\APIArticleController;
 use App\Http\Controllers\APIAuthController;
 use App\Http\Controllers\APIQuizController;
@@ -46,6 +47,9 @@ Route::prefix('v1')
 
         /*************************  SYNC STRUCTURE    ***************************/
         Route::get('structures', [APIStructureController::class, 'list']);
+
+        /*************************  SYNC ALERTE    ***************************/
+        Route::post('alert-sync', [APIAlertController::class, 'sync']);
 
 
 

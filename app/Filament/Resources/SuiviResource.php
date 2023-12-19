@@ -19,6 +19,8 @@ class SuiviResource extends Resource
     protected static ?string $model = Suivi::class;
 
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $navigationLabel = "Suivis";
