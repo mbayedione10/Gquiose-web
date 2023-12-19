@@ -23,4 +23,9 @@ class Utilisateur extends Model
     {
         return $this->hasMany(Response::class);
     }
+
+    public function getNameAttribute()
+    {
+        return $this->prenom. " " .$this->nom;
+    }
 }
