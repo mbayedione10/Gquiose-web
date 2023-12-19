@@ -26,6 +26,22 @@ class AlerteResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-bell';
     protected static ?int $navigationSort = 10;
 
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return false;
+    }
+
     public static function form(Form $form): Form
     {
         return $form->schema([
@@ -46,39 +62,8 @@ class AlerteResource extends Resource
                             'lg' => 12,
                         ]),
 
-                    RichEditor::make('description')
-                        ->rules(['max:255', 'string'])
-                        ->required()
-                        ->placeholder('Description')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
 
-                    TextInput::make('latitude')
-                        ->rules(['numeric'])
-                        ->nullable()
-                        ->numeric()
-                        ->placeholder('Latitude')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
-
-                    TextInput::make('longitude')
-                        ->rules(['numeric'])
-                        ->nullable()
-                        ->numeric()
-                        ->placeholder('Longitude')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
-
-                    Select::make('type_alerte_id')
+                    Select::make('type')
                         ->rules(['exists:type_alertes,id'])
                         ->required()
                         ->relationship('typeAlerte', 'name')
@@ -125,41 +110,30 @@ class AlerteResource extends Resource
                     ->toggleable()
                     ->searchable(true, null, true)
                     ->limit(50),
-                Tables\Columns\TextColumn::make('description')
-                    ->toggleable()
+
+
+                Tables\Columns\TextColumn::make("utilisateur.name")
+                    ->label("Signalée par ")
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make("type")
+                    ->label("type")
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('etat')
                     ->searchable()
                     ->limit(50),
-                Tables\Columns\TextColumn::make('latitude')
-                    ->toggleable()
-                    ->searchable(true, null, true),
-                Tables\Columns\TextColumn::make('longitude')
-                    ->toggleable()
-                    ->searchable(true, null, true),
-                Tables\Columns\TextColumn::make('typeAlerte.name')
-                    ->toggleable()
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->searchable()
+                    ->date("d F Y H:i")
                     ->limit(50),
-                Tables\Columns\TextColumn::make('etat')
-                    ->toggleable()
-                    ->searchable(true, null, true)
-                    ->limit(50),
-                Tables\Columns\TextColumn::make('ville.name')
-                    ->toggleable()
-                    ->limit(50),
+
+
             ])
             ->filters([
-                DateRangeFilter::make('created_at'),
 
-                SelectFilter::make('type_alerte_id')
-                    ->relationship('typeAlerte', 'name')
-                    ->indicator('TypeAlerte')
-                    ->multiple()
-                    ->label('TypeAlerte'),
-
-                SelectFilter::make('ville_id')
-                    ->relationship('ville', 'name')
-                    ->indicator('Ville')
-                    ->multiple()
-                    ->label('Ville'),
             ]);
     }
 
