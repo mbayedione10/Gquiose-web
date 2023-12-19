@@ -108,12 +108,12 @@ class AlerteResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('ref')
                     ->toggleable()
-                    ->searchable(true, null, true)
+                    ->searchable()
                     ->limit(50),
 
 
                 Tables\Columns\TextColumn::make("utilisateur.name")
-                    ->label("Signalée par ")
+                    ->label("Signalée par")
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make("type")
@@ -122,6 +122,12 @@ class AlerteResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('etat')
+                    ->label("État")
+                    ->color(fn (string $state): string => match ($state) {
+                        'Non approveée' => 'warning',
+                        'Approvée' => 'success',
+                        'Rejeter' => 'danger',
+                    })
                     ->searchable()
                     ->limit(50),
 
