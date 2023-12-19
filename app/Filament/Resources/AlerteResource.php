@@ -124,9 +124,9 @@ class AlerteResource extends Resource
                 Tables\Columns\BadgeColumn::make('etat')
                     ->label("État")
                     ->colors([
-                        'warning' => 'Non approveée',
-                        'success' => 'Approvée',
-                        'danger' => 'Rejeter',
+                        'warning' => static fn ($state): bool => $state === 'Non approuvée',
+                        'success' => static fn ($state): bool => $state === 'Approvée',
+                        'danger' => static fn ($state): bool => $state === 'Rejeter',
                     ])
                     ->searchable()
                     ->limit(50),
