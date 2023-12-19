@@ -121,7 +121,7 @@ class AlerteResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('etat')
+                Tables\Columns\BadgeColumn::make('etat')
                     ->label("État")
                     ->colors([
                         'warning' => 'Non approveée',
