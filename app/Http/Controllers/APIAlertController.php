@@ -32,11 +32,17 @@ class APIAlertController extends Controller
         $alerte = new Alerte();
         $alerte->ref = uniqid();
         $alerte->utilisateur_id = $user->id;
-        $alerte->type = $request['type_id'];
+        $alerte->type = $request['type'];
         $alerte->etat = "Non approuvée";
         $alerte->save();
 
-        return ApiResponse::success();
+        $data = [
+            "ref" => $alerte->ref,
+            "type" => $alerte->type,
+            "etat" => $alerte->etat,
+        ];
+
+        return ApiResponse::success($data);
 
     }
 }
