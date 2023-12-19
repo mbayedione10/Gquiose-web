@@ -123,11 +123,11 @@ class AlerteResource extends Resource
 
                 Tables\Columns\TextColumn::make('etat')
                     ->label("État")
-                    ->color(fn (string $state): string => match ($state) {
-                        'Non approveée' => 'warning',
-                        'Approvée' => 'success',
-                        'Rejeter' => 'danger',
-                    })
+                    ->colors([
+                        'warning' => 'Non approveée',
+                        'success' => 'Approvée',
+                        'danger' => 'Rejeter',
+                    ])
                     ->searchable()
                     ->limit(50),
 
