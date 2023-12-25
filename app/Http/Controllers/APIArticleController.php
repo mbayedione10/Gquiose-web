@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\ResourceNotFoundException;
 use App\Http\Responses\ApiResponse as response;
 
+use App\Models\Conseil;
 use App\Models\Information;
 use App\Models\Question;
 use App\Models\Rubrique;
@@ -80,9 +81,12 @@ class APIArticleController extends Controller
             ->select('id', 'image', "rendez_vous")
             ->first();
 
+        $conseils = Conseil::select("message")->get();
+
         $data = [
             'informations' => $informations,
-            'quiz' => $quiz
+            'quiz' => $quiz,
+            'conseils' => $conseils,
         ];
 
         return response::success($data);
