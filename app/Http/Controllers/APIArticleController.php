@@ -81,7 +81,7 @@ class APIArticleController extends Controller
             ->select('id', 'image', "rendez_vous")
             ->first();
 
-        $conseils = Conseil::select("message")->get();
+        $conseils = Conseil::select("id", "message")->get();
 
         $data = [
             'informations' => $informations,
