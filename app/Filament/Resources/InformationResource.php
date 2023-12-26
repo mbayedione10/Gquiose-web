@@ -31,6 +31,11 @@ class InformationResource extends Resource
                             ->placeholder("L'URL de prise de rendez-vous")
                             ->label("Rendez-vous"),
 
+                        Forms\Components\TextInput::make("structure_url")
+                            ->nullable()
+                            ->placeholder("L'URL de prise des structures sanitaires")
+                            ->label("Structures sanitaires"),
+
                         Forms\Components\FileUpload::make('image')
                             ->required()
                             ->image()
@@ -52,8 +57,10 @@ class InformationResource extends Resource
                 Tables\Columns\TextColumn::make('rendez_vous')
                     ->label("Rendez-vous"),
 
-                Tables\Columns\ToggleColumn::make('status')
-                    ->label("Status")
+                Tables\Columns\TextColumn::make('structure_url')
+                    ->label("Structure sanitaire"),
+
+
             ])
             ->filters([
                 //
