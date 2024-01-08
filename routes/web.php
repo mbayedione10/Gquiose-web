@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\DeleteAccountController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
@@ -33,26 +35,7 @@ Route::get('/', function () {
     return redirect(url('/admin'));
 });
 
-Auth::routes();
+Route::get('remove-my-account', [DeleteAccountController::class, 'form'])->name('remove.form');
 
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::post('remove-my-account', [DeleteAccountController::class, 'remove'])->name('remove.account');
 
-Route::prefix('/')
-    ->middleware('auth')
-    ->group(function () {
-        Route::resource('users', UserController::class);
-        Route::resource('permissions', PermissionController::class);
-        Route::resource('roles', RoleController::class);
-        Route::resource('thematiques', ThematiqueController::class);
-        Route::resource('questions', QuestionController::class);
-        Route::resource('responses', ResponseController::class);
-        Route::resource('rubriques', RubriqueController::class);
-        Route::resource('articles', ArticleController::class);
-        Route::resource('type-alertes', TypeAlerteController::class);
-        Route::resource('alertes', AlerteController::class);
-        Route::resource('villes', VilleController::class);
-        Route::resource('type-structures', TypeStructureController::class);
-        Route::resource('structures', StructureController::class);
-        Route::resource('suivis', SuiviController::class);
-        Route::resource('utilisateurs', UtilisateurController::class);
-    });
