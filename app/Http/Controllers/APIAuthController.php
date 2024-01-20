@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Responses\ApiResponse as response;
 use App\Mail\NotificationEmail;
+use App\Mail\SendCodeEmail;
 use App\Models\Code;
 use App\Models\Utilisateur;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -145,17 +147,17 @@ class APIAuthController extends Controller
 
     }
 
-    /*public function codePasswordUpdate(Request $request)
+    public function codePasswordUpdate(Request $request)
     {
 
         $response = "Failed";
         if (isset($request['email'])) {
 
-            $client = Client::where('email', $request['email'])->first();
+            $client = Utilisateur::where('email', $request['email'])->first();
 
             if ($client != null) {
-                $title = "Password update";
-                $content = "You will find below your confirmation code to update your password, know that it will expire in the next 15 minutes.";
+                $title = "Mise à jour du mot de passe";
+                $content = "Vous trouverez ci-dessous votre code de confirmation pour mettre à jour votre mot de passe, sachez qu'il expirera dans les 15 prochaines minutes.";
 
                 $this->sendEmailCodeConfirmation($request['email'], $title, $content);
 
@@ -175,7 +177,7 @@ class APIAuthController extends Controller
             $password = $request['password'];
 
 
-            $client = Client::where('email', $email)->first();
+            $client = Utilisateur::where('email', $email)->first();
 
             if ($client != null) {
                 $client->password = bcrypt($password);
@@ -204,5 +206,5 @@ class APIAuthController extends Controller
             ->send(new SendCodeEmail($title, $content, $code));
     }
 
-   */
+
 }
