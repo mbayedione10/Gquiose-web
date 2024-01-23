@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\AlerteResource\Widgets\AlertOverview;
 use App\Models\Alerte;
-use Filament\{Tables, Forms};
+use Illuminate\Console\View\Components\Alert;
+use Filament\{Notifications\Notification, Tables, Forms};
 use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Card;
@@ -117,7 +119,7 @@ class AlerteResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make("type")
-                    ->label("type")
+                    ->label("Type")
                     ->searchable()
                     ->sortable(),
 
@@ -125,22 +127,107 @@ class AlerteResource extends Resource
                     ->label("État")
                     ->colors([
                         'warning' => static fn ($state): bool => $state === 'Non approuvée',
-                        'success' => static fn ($state): bool => $state === 'Approvée',
-                        'danger' => static fn ($state): bool => $state === 'Rejeter',
+                        'success' => static fn ($state): bool => $state === 'Confirmée',
+                        'danger' => static fn ($state): bool => $state === 'Rejetée',
                     ])
                     ->searchable()
                     ->limit(50),
 
+                Tables\Columns\TextColumn::make('description')
+                    ->label("Information")
+                    ->searchable(),
+
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label("Signalée ")
                     ->searchable()
                     ->date("d F Y H:i")
                     ->limit(50),
 
 
             ])
+            ->actions([
+                Tables\Actions\Action::make('confirmation')
+                    ->label("Confirmez")
+                    ->requiresConfirmation()
+                    ->icon('heroicon-o-check')
+                    ->color('success')
+                    ->visible(function (Alerte $record){
+                        return $record->etat == "Non approuvée";
+                    })
+                    ->modalHeading("Confirmation")
+                    ->modalSubheading("Voulez-vous vraiement confirmer cette alerte ?")
+                    ->action(function (Alerte $record){
+
+                        $record->etat = "Confirmée";
+                        $record->save();
+
+                        Notification::make()
+                            ->title("Information")
+                            ->body("L'alerte qui a pour référence **" .$record->ref. "** vient d'être confirmée")
+                            ->send();
+                    }),
+
+                Tables\Actions\Action::make('rejeter')
+                    ->label("Rejetez")
+                    ->requiresConfirmation()
+                    ->icon('heroicon-o-x')
+                    ->color('danger')
+                    ->visible(function (Alerte $record){
+                        return $record->etat == "Non approuvée";
+                    })
+                    ->modalHeading("Confirmation")
+                    ->modalSubheading("Voulez-vous vraiment rejeter cette alerte ?")
+                    ->action(function (Alerte $record){
+
+                        $record->etat = "Rejetée";
+                        $record->save();
+
+                        Notification::make()
+                            ->title("Information")
+                            ->success()
+                            ->body("L'alerte qui a pour référence **" .$record->ref. "** vient d'être rejetée")
+                            ->send();
+                    }),
+
+                Tables\Actions\Action::make('description')
+                    ->label("Ajouter des détails")
+                    ->requiresConfirmation()
+                    ->icon('heroicon-o-plus-circle')
+                    ->modalHeading("Détails")
+                    ->modalSubheading("Rajouter toutes les informations concernant cette alerte ")
+                    ->form([
+                        Forms\Components\Textarea::make('description')
+                            ->label("Information")
+                            ->placeholder("Saisissez ici les informations")
+                            ->default(function (Alerte $record){
+                                return $record->description;
+                            })
+                            ->required()
+                    ])
+                    ->action(function (Alerte $record, array $data){
+
+                        $record->description = $data['description'];
+                        $record->save();
+
+                        Notification::make()
+                            ->title("Information")
+                            ->success()
+                            ->body("Une nouvelle information vient d'être rajoutée")
+                            ->send();
+                    }),
+
+
+            ])
             ->filters([
 
             ]);
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            AlertOverview::class
+        ];
     }
 
     public static function getRelations(): array

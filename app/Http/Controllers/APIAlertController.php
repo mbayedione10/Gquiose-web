@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Responses\ApiResponse;
+use App\Mail\NotificationEmail;
 use App\Models\Alerte;
+use App\Models\Information;
 use App\Models\Utilisateur;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Mail;
 
 class APIAlertController extends Controller
 {
@@ -35,6 +38,25 @@ class APIAlertController extends Controller
         $alerte->type = $request['type'];
         $alerte->etat = "Non approuvée";
         $alerte->save();
+
+        $info = Information::first();
+
+        if ($info != null && $info->email_alerte != null)
+        {
+            $objet = "Nouvelle alerte signalée";
+            $greeting = "Bonjour ";
+            $content = "Une nouvelle alerte vient d'être signalée. \n\n";
+            $content .= "Ref: " .$alerte->ref."\n\n";
+            $content .= "Type: " .$alerte->type."\n\n";
+            $content .= "Utilisateur: " .$user->name.  "\n\n";
+            $content .= "Numéro de téléphone: " .$user->phone.  "\n\n";
+            $content .= "Courriel: " .$user->email.  "\n\n";
+
+            Mail::to($info->email_alerte)
+                ->send(new NotificationEmail($greeting, $objet, $content));
+        }
+
+
 
         $data = [
             "ref" => $alerte->ref,
