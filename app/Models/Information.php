@@ -11,6 +11,7 @@ class Information extends Model
 
     protected $fillable = ["image", "rendez_vous", "structure_url", 'email_alerte', "status"];
 
+
     protected $casts = [
         'status' => 'boolean'
     ];
