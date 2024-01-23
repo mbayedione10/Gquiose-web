@@ -155,6 +155,7 @@ class APIAuthController extends Controller
 
             $client = Utilisateur::where('email', $request['email'])->first();
 
+
             if ($client != null) {
                 $title = "Mise à jour du mot de passe";
                 $content = "Vous trouverez ci-dessous votre code de confirmation pour mettre à jour votre mot de passe, sachez qu'il expirera dans les 15 prochaines minutes.";
@@ -195,10 +196,13 @@ class APIAuthController extends Controller
     {
         $code = rand(10000, 99999);
 
+        $utilisateur = Utilisateur::whereEmail($email)->first();
+
         $codeSms = new Code();
         $codeSms->code = $code;
         $codeSms->email = $email;
-        $codeSms->date = Carbon::now();
+        $codeSms->utilisateur_id = $utilisateur->id;
+        //$codeSms->date = Carbon::now();
 
         $codeSms->save();
 

@@ -5,6 +5,6 @@
 
     ## Confirmation code: {{ $code }}
 
-    Thanks,<br>
+    L'Équipe,<br>
     {{ config('app.name') }}
 @endcomponent
