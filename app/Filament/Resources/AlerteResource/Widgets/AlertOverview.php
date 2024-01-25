@@ -19,7 +19,7 @@ class AlertOverview extends BaseWidget
                 ->descriptionColor('success')
                 ->description("Totale des alertes confirmées"),
 
-            Card::make("Non confirmées", Alerte::where('etat', 'Non confirmées')->count())
+            Card::make("Non confirmées", Alerte::where('etat', 'Rejetée')->count())
                 ->descriptionColor('danger')
                 ->description("Totale des alertes non encore confirmées"),
 

@@ -31,6 +31,15 @@ class QuestionOverview extends BaseWidget
                 ->description("Nombre de réponses")
                 ->icon("heroicon-o-question-mark-circle"),
 
+
+            Card::make('Bonnes réponses', Response::where('isValid', 1)->count())
+                ->description("Nombre de bonnes réponses")
+                ->icon("heroicon-o-question-mark-circle"),
+
+            Card::make('Mauvaises réponses', Response::where('isValid', 0)->count())
+                ->description("Nombre de mauvaises réponses")
+                ->icon("heroicon-o-question-mark-circle"),
+
             Card::make('Joueurs', $playersToday)
                 ->description("Nombre de joueurs aujourd'hui")
                 ->icon("heroicon-o-users"),

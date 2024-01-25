@@ -21,6 +21,7 @@ class Alerte extends Model
         'ville_id',
     ];
 
+
     protected $searchableFields = ['*'];
 
     public function utilisateur()

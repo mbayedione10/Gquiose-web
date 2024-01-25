@@ -1,5 +1,6 @@
 <?php
 
+use App\Filament\Resources\AlerteResource\Widgets\AlertOverview;
 use App\Filament\Resources\QuestionResource\Widgets\QuestionOverview;
 use App\Filament\Resources\UtilisateurResource\Widgets\UtilisateurOverview;
 use Filament\Http\Middleware\Authenticate;
@@ -145,6 +146,7 @@ return [
             Widgets\AccountWidget::class,
             UtilisateurOverview::class,
             QuestionOverview::class,
+            AlertOverview::class,
         ],
     ],
 
