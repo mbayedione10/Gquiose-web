@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\UtilisateurResource\Widgets\UtilisateurBonneReponseChart;
+use App\Filament\Resources\UtilisateurResource\Widgets\UtilisateurMauvaiseReponseChart;
 use App\Filament\Resources\UtilisateurResource\Widgets\UtilisateurOverview;
 use App\Filament\Resources\UtilisateurResource\Widgets\ViewUtilisateurOverview;
 use App\Models\Utilisateur;
@@ -88,6 +90,7 @@ class UtilisateurResource extends Resource
                     TextInput::make('sexe')
                         ->rules(['max:255', 'string'])
                         ->required()
+                        ->visible(false)
                         ->placeholder('Sexe')
                         ->columnSpan([
                             'default' => 12,
@@ -144,6 +147,7 @@ class UtilisateurResource extends Resource
     public static function getRelations(): array
     {
         return [
+            UtilisateurResource\RelationManagers\AlertesRelationManager::class,
             UtilisateurResource\RelationManagers\ResponsesRelationManager::class,
         ];
     }
@@ -153,6 +157,8 @@ class UtilisateurResource extends Resource
         return [
             UtilisateurOverview::class,
             ViewUtilisateurOverview::class,
+            UtilisateurBonneReponseChart::class,
+            UtilisateurMauvaiseReponseChart::class
         ];
     }
 

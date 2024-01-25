@@ -28,4 +28,9 @@ class Utilisateur extends Model
     {
         return $this->prenom. " " .$this->nom;
     }
+
+    public function alertes()
+    {
+        return $this->hasMany(Alerte::class);
+    }
 }

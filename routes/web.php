@@ -35,6 +35,8 @@ Route::get('/', function () {
     return redirect(url('/admin'));
 });
 
+Route::redirect('/login', '/admin/login')->name('login');
+
 Route::get('remove-my-account', [DeleteAccountController::class, 'form'])->name('remove.form');
 
 Route::post('remove-my-account', [DeleteAccountController::class, 'remove'])->name('remove.account');

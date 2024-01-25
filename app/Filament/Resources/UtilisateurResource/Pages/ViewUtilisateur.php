@@ -9,10 +9,18 @@ class ViewUtilisateur extends ViewRecord
 {
     protected static string $resource = UtilisateurResource::class;
 
-    protected function getFooterWidgets(): array
+    protected function getHeaderWidgets(): array
     {
         return [
             UtilisateurResource\Widgets\ViewUtilisateurOverview::class
+        ];
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            UtilisateurResource\Widgets\UtilisateurBonneReponseChart::class,
+            UtilisateurResource\Widgets\UtilisateurMauvaiseReponseChart::class,
         ];
     }
 }

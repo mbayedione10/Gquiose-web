@@ -109,7 +109,7 @@ class AlerteResource extends Resource
             ->poll('60s')
             ->columns([
                 Tables\Columns\TextColumn::make('ref')
-                    ->toggleable()
+
                     ->searchable()
                     ->limit(50),
 
