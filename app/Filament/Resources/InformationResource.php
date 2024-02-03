@@ -26,12 +26,12 @@ class InformationResource extends Resource
                 Forms\Components\Card::make()
                     ->schema([
 
-                        Forms\Components\TextInput::make('email_alerte')
+                        Forms\Components\TagsInput::make('email_alerte')
                             ->label("Courriel de notification")
                             ->placeholder("Saisir le courriel de notification")
                             ->helperText("Ce courriel recevra un email lorsqu'une alerte est signalée")
-                            ->nullable()
-                            ->email(),
+                            ->helperText("Taper la touche Entrez pour ajouter un courriel")
+                            ->nullable(),
 
                         Forms\Components\TextInput::make("rendez_vous")
                             ->required()
@@ -61,9 +61,9 @@ class InformationResource extends Resource
                 Tables\Columns\ImageColumn::make('image')
                     ->label("Image"),
 
-                Tables\Columns\TextColumn::make('email_alerte')
+                Tables\Columns\TagsColumn::make('email_alerte')
                     ->searchable()
-                    ->label("Image de notification"),
+                    ->label("Notification"),
 
                 Tables\Columns\TextColumn::make('rendez_vous')
                     ->label("Rendez-vous"),

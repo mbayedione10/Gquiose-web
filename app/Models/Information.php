@@ -13,6 +13,7 @@ class Information extends Model
 
 
     protected $casts = [
-        'status' => 'boolean'
+        'status' => 'boolean',
+        'email_alerte' => 'array',
     ];
 }

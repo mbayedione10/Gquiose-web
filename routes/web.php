@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DeleteAccountController;
+use App\Models\Information;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
@@ -30,6 +31,17 @@ use App\Http\Controllers\TypeStructureController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::get('test', function (){
+    $info = Information::first();
+
+    $emails = $info->email_alerte;
+    $first = $emails[0];
+
+    $others = array_slice($emails, 1);
+
+    dd($first, $others);
+});
 
 Route::get('/', function () {
     return redirect(url('/admin'));

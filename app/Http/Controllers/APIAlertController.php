@@ -26,10 +26,10 @@ class APIAlertController extends Controller
             return ApiResponse::error("Cet utilisateur n'existe pas");
 
 
-        $types = [ "Mutilation génitale", "Viol", "Mariage précoce"];
+        $types = [ "Mutilation génitale", "Viol", "Mariage précoce", "Autres"];
 
         if (!in_array($request['type'], $types))
-            return ApiResponse::error("Le type n'est correct", Response::HTTP_BAD_REQUEST);
+            return ApiResponse::error("Le type n'est pas correct", Response::HTTP_BAD_REQUEST);
 
 
         $alerte = new Alerte();
@@ -52,7 +52,13 @@ class APIAlertController extends Controller
             $content .= "Numéro de téléphone: " .$user->phone.  "\n\n";
             $content .= "Courriel: " .$user->email.  "\n\n";
 
-            Mail::to($info->email_alerte)
+            $emails = $info->email_alerte;
+            $first = $emails[0];
+
+            $others = array_slice($emails, 1);
+
+            Mail::to($first)
+                ->cc($others)
                 ->send(new NotificationEmail($greeting, $objet, $content));
         }
 
