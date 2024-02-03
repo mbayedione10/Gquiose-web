@@ -50,14 +50,14 @@ class ResponsesRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('thematique.name')
+                Tables\Columns\TextColumn::make('question.thematique.name')
                     ->label("Thématique")
                     ->url(function (?Response  $record){
                         return ThematiqueResource::getUrl('view', $record->question->thematique_id);
                     })
                     ->limit(50),
 
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('question.name')
                     ->label("Question")
                     ->searchable()
                     ->limit(50),
