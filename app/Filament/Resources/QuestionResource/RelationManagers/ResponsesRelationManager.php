@@ -4,6 +4,7 @@ namespace App\Filament\Resources\QuestionResource\RelationManagers;
 
 use App\Filament\Resources\ThematiqueResource;
 use App\Models\Question;
+use App\Models\Response;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Resources\{Form, Table};
@@ -51,8 +52,8 @@ class ResponsesRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('thematique.name')
                     ->label("Thématique")
-                    ->url(function (?Question  $record){
-                        return ThematiqueResource::getUrl('view', $record->thematique_id);
+                    ->url(function (?Response  $record){
+                        return ThematiqueResource::getUrl('view', $record->question->thematique_id);
                     })
                     ->limit(50),
 
