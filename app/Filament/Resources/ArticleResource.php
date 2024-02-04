@@ -111,6 +111,17 @@ class ArticleResource extends Resource
                         'lg' => 12,
                     ]),
 
+                TextInput::make('video_url')
+                    ->label("Vidéo")
+                    ->rules(['max:255', 'string'])
+                    ->required()
+                    ->placeholder("L'URL de la vidéo YouTube")
+                    ->columnSpan([
+                        'default' => 12,
+                        'md' => 12,
+                        'lg' => 12,
+                    ]),
+
                 Toggle::make('status')
                     ->rules(['boolean'])
                     ->label("Publier")
