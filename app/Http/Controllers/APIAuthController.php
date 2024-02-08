@@ -54,7 +54,7 @@ class APIAuthController extends Controller
 
         $nom = $request['nom'];
         $prenom = $request['prenom'];
-        $sexe = $request['sexe'];
+        //$sexe = $request['sexe'];
         $phone = $request['phone'];
         $email = $request['email'];
         $dob = $request['dob'];
@@ -67,7 +67,7 @@ class APIAuthController extends Controller
 
         $data = array();
 
-        if (empty($nom) || empty($prenom) || empty($sexe) || empty($phone) || empty($dob) || empty($email) || empty($password) || empty($passwordConfirmed)) {
+        if (empty($nom) || empty($prenom)  || empty($phone) || empty($dob) || empty($email) || empty($password) || empty($passwordConfirmed)) {
             $message = 'Les champs sont obligatoires';
         } else {
             if ($password != $passwordConfirmed)
@@ -85,7 +85,7 @@ class APIAuthController extends Controller
                     $client->prenom = $prenom;
                     $client->email = $email;
                     $client->phone = $phone;
-                    $client->sexe = $phone;
+                    //$client->sexe = $phone;
                     $client->dob = $dob;
                     $client->password = bcrypt($password);
                     $client->status = false;
@@ -105,7 +105,7 @@ class APIAuthController extends Controller
                         ->send(new NotificationEmail($greeting, $objet, $content));
 
                     $data = [
-                        'utilisateur' => $client->only(['id', 'nom', 'prenom', 'phone', 'email', 'dob', 'sexe'])
+                        'utilisateur' => $client->only(['id', 'nom', 'prenom', 'phone', 'email', 'dob'])
                     ];
 
                     return response::success($data);
