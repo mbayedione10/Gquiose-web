@@ -86,7 +86,7 @@ class APIArticleController extends Controller
 
         $structures = Structure::where('structures.status', true)
             ->join('villes', 'structures.ville_id', 'villes.id')
-            ->select('structures.name', 'structures.description', 'structures.latitude',
+            ->select('structures.id', 'structures.name', 'structures.description', 'structures.latitude',
                 'structures.longitude', 'structures.phone', 'villes.name as ville', 'structures.adresse', 'structures.offre')
             ->get();
 
