@@ -17,10 +17,10 @@ class Structure extends Model
         'latitude',
         'longitude',
         'phone',
-        'type_structure_id',
-        'status',
         'ville_id',
+        'status',
         'adresse',
+        'offre',
     ];
 
     protected $searchableFields = ['*'];

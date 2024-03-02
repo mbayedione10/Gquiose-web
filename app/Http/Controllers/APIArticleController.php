@@ -9,6 +9,7 @@ use App\Models\Conseil;
 use App\Models\Information;
 use App\Models\Question;
 use App\Models\Rubrique;
+use App\Models\Structure;
 use App\services\ArticleService;
 use App\services\RubriqueService;
 use Illuminate\Support\Facades\DB;
@@ -83,10 +84,17 @@ class APIArticleController extends Controller
 
         $conseils = Conseil::select("id", "message")->get();
 
+        $structures = Structure::where('structures.status', true)
+            ->join('villes', 'structures.ville_id', 'villes.id')
+            ->select('structures.name', 'structures.description', 'structures.latitude',
+                'structures.longitude', 'structures.phone', 'villes.name as ville', 'structures.adresse', 'structures.offre')
+            ->get();
+
         $data = [
             'informations' => $informations,
             'quiz' => $quiz,
             'conseils' => $conseils,
+            'structures' => $structures,
         ];
 
         return response::success($data);

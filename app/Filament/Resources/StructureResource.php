@@ -35,64 +35,12 @@ class StructureResource extends Resource
         return $form->schema([
             Card::make()->schema([
                 Grid::make(['default' => 0])->schema([
-                    TextInput::make('name')
-                        ->rules(['max:255', 'string'])
-                        ->required()
-                        ->placeholder('Name')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
 
-                    RichEditor::make('description')
-                        ->nullable()
-                        ->placeholder('Description')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
-
-                    TextInput::make('latitude')
-                        ->rules(['numeric'])
-                        ->required()
-                        ->numeric()
-                        ->placeholder('Latitude')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
-
-                    TextInput::make('longitude')
-                        ->rules(['numeric'])
-                        ->required()
-                        ->numeric()
-                        ->placeholder('Longitude')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
-
-                    TextInput::make('phone')
-                        ->rules(['max:255', 'string'])
-                        ->required()
-                        ->unique(
-                            'structures',
-                            'phone',
-                            fn(?Model $record) => $record
-                        )
-                        ->placeholder('Phone')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
 
                     Select::make('type_structure_id')
+                        ->label("Type de structure")
                         ->rules(['exists:type_structures,id'])
+                        ->label("Choisir un type de structure")
                         ->required()
                         ->relationship('typeStructure', 'name')
                         ->searchable()
@@ -139,9 +87,37 @@ class StructureResource extends Resource
                             'lg' => 12,
                         ]),
 
-                    Toggle::make('status')
-                        ->rules(['boolean'])
+                    TextInput::make('name')
+                        ->rules(['max:255', 'string'])
+                        ->label("Nom de la structure")
                         ->required()
+                        ->placeholder('Nom de la structure')
+                        ->columnSpan([
+                            'default' => 12,
+                            'md' => 12,
+                            'lg' => 12,
+                        ]),
+
+                    Forms\Components\Textarea::make('description')
+                        ->nullable()
+                        ->label("Description de la structure")
+                        ->placeholder('Description de la structure')
+                        ->columnSpan([
+                            'default' => 12,
+                            'md' => 12,
+                            'lg' => 12,
+                        ]),
+
+                    TextInput::make('phone')
+                        ->rules(['max:255', 'string'])
+                        ->label("Téléphone")
+                        ->required()
+                        ->unique(
+                            'structures',
+                            'phone',
+                            fn(?Model $record) => $record
+                        )
+                        ->placeholder('Numéro de téléphone')
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,
@@ -194,6 +170,40 @@ class StructureResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
+
+                    TextInput::make('latitude')
+                        ->label("Latitude")
+                        ->required()
+                        ->numeric()
+                        ->placeholder('Latitude')
+                        ->columnSpan([
+                            'default' => 12,
+                            'md' => 12,
+                            'lg' => 12,
+                        ]),
+
+                    TextInput::make('longitude')
+                        ->label("Longitude")
+                        ->required()
+                        ->numeric()
+                        ->placeholder('Longitude')
+                        ->columnSpan([
+                            'default' => 12,
+                            'md' => 12,
+                            'lg' => 12,
+                        ]),
+
+
+                    Toggle::make('status')
+                        ->rules(['boolean'])
+                        ->required()
+                        ->columnSpan([
+                            'default' => 12,
+                            'md' => 12,
+                            'lg' => 12,
+                        ]),
+
+
                 ]),
             ]),
         ]);
@@ -205,16 +215,17 @@ class StructureResource extends Resource
             ->poll('60s')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-
+                    ->label("Structure")
                     ->searchable()
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('description')
-                    ->html()
+                    ->label("Offre")
                     ->searchable()
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('phone')
+                    ->label("Téléphone")
                     ->searchable()
                     ->limit(50),
 
@@ -222,8 +233,10 @@ class StructureResource extends Resource
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('ville.name')
-
+                    ->label("Ville")
+                    ->sortable()
                     ->limit(50),
+
                 Tables\Columns\TextColumn::make('adresse')
                     ->searchable()
                     ->limit(50),
