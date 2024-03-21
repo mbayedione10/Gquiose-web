@@ -114,7 +114,7 @@ class ArticleResource extends Resource
                 TextInput::make('video_url')
                     ->label("Vidéo")
                     ->rules(['max:255', 'string'])
-                    ->required()
+                    ->nullable()
                     ->placeholder("L'URL de la vidéo YouTube")
                     ->columnSpan([
                         'default' => 12,
