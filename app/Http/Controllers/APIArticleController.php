@@ -6,6 +6,7 @@ use App\Exceptions\ResourceNotFoundException;
 use App\Http\Responses\ApiResponse as response;
 
 use App\Models\Conseil;
+use App\Models\Faq;
 use App\Models\Information;
 use App\Models\Question;
 use App\Models\Rubrique;
@@ -90,11 +91,16 @@ class APIArticleController extends Controller
                 'structures.longitude', 'structures.phone', 'villes.name as ville', 'structures.adresse', 'structures.offre')
             ->get();
 
+        $faqs = Faq::where('status', true)
+            ->select('question', 'reponse')
+            ->get();
+
         $data = [
             'informations' => $informations,
             'quiz' => $quiz,
             'conseils' => $conseils,
             'structures' => $structures,
+            'faqs' => $faqs,
         ];
 
         return response::success($data);
