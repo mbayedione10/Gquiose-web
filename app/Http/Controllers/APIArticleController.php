@@ -92,7 +92,7 @@ class APIArticleController extends Controller
             ->get();
 
         $faqs = Faq::where('status', true)
-            ->select('question', 'reponse')
+            ->select('id', 'question', 'reponse')
             ->get();
 
         $data = [
