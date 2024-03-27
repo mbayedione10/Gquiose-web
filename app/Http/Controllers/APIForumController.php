@@ -82,11 +82,13 @@ class APIForumController extends Controller
         $chats = DB::table('chats')
             ->join('utilisateurs', 'chats.utilisateur_id', 'utilisateurs.id')
             ->join('messages', 'chats.message_id', 'messages.id')
-            ->select('chats.id as chatId', 'chats.message')
+            ->select('chats.id as chatId', 'chats.message as message', 'chats.message_id as messageId', 'chats.utilisateur_id as utilisateurId')
+            ->get();
 
 
         $data = [
             'messages' => $messages,
+            'chats' => $chats,
         ];
 
         return ApiResponse::success($data);
