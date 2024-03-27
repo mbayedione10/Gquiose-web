@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ThematiqueChartResource\Widgets\QuestionThematiqueChart;
 use App\Filament\Resources\ThematiqueResource\Widgets\TrueResponsePerThematiqueChart;
 use App\Models\Thematique;
+use App\Models\Theme;
 use Filament\{Tables, Forms};
 use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Grid;
@@ -36,9 +37,9 @@ class ThematiqueResource extends Resource
                     ->rules(['max:255', 'string'])
                     ->required()
                     ->unique(
-                        'thematiques',
+                        'themes',
                         'name',
-                        fn(?Thematique $record) => $record
+                        fn(?Theme $record) => $record
                     )
                     ->placeholder('Nom de la thématique')
                     ->columnSpan([

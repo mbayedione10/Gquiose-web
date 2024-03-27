@@ -3,6 +3,7 @@
 use App\Http\Controllers\APIAlertController;
 use App\Http\Controllers\APIArticleController;
 use App\Http\Controllers\APIAuthController;
+use App\Http\Controllers\APIForumController;
 use App\Http\Controllers\APIQuizController;
 use App\Http\Controllers\APIStructureController;
 use Illuminate\Http\Request;
@@ -51,6 +52,15 @@ Route::prefix('v1')
 
         /*************************  SYNC ALERTE    ***************************/
         Route::post('alert-sync', [APIAlertController::class, 'sync']);
+
+        /*************************  SYNC MESSAGE    ***************************/
+        Route::post('message-sync', [APIForumController::class, 'syncMessage']);
+
+        /*************************  SYNC CHAT    ***************************/
+        Route::post('chat-sync', [APIForumController::class, 'syncChat']);
+
+        /*************************  FORUM    ***************************/
+        Route::get('forum', [APIForumController::class, 'forum']);
 
 
 

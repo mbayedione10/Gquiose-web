@@ -11,6 +11,7 @@ use App\Models\Information;
 use App\Models\Question;
 use App\Models\Rubrique;
 use App\Models\Structure;
+use App\Models\Theme;
 use App\services\ArticleService;
 use App\services\RubriqueService;
 use Illuminate\Support\Facades\DB;
@@ -95,12 +96,17 @@ class APIArticleController extends Controller
             ->select('id', 'question', 'reponse')
             ->get();
 
+        $themes = Theme::where('status', true)
+                ->select('id', 'name')
+                ->get();
+
         $data = [
             'informations' => $informations,
             'quiz' => $quiz,
             'conseils' => $conseils,
             'structures' => $structures,
             'faqs' => $faqs,
+            'themes' => $themes,
         ];
 
         return response::success($data);
