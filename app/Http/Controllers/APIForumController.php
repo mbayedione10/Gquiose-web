@@ -37,6 +37,12 @@ class APIForumController extends Controller
         $message->status = true;
         $message->save();
 
+        $chat = new Chat();
+        $chat->message = $message->question;
+        $chat->utilisateur_id = $utilisateur->id;
+        $chat->message_id = $message->id;
+        $chat->save();
+
         return  ApiResponse::success($message);
     }
 
