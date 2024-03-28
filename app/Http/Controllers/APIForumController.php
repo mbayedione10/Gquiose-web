@@ -7,6 +7,7 @@ use App\Models\Chat;
 use App\Models\Message;
 use App\Models\Theme;
 use App\Models\Utilisateur;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -30,8 +31,8 @@ class APIForumController extends Controller
         if ($utilisateur == null) return  ApiResponse::error("Aucun utilisteur avec cet ID");
 
         $message = new Message();
-        $message->utilisateur_id = $utilisateurId;
-        $message->theme_id = $themeId;
+        $message->utilisateur_id = $utilisateur->id;
+        $message->theme_id = $theme->id;
         $message->question = $question;
         $message->status = true;
         $message->save();
@@ -62,7 +63,10 @@ class APIForumController extends Controller
         $chat->utilisateur_id = $utilisateurId;
         $chat->message = $msg;
         $chat->status = true;
+
         $chat->save();
+
+
 
         return  ApiResponse::success($chat);
     }
