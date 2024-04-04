@@ -46,7 +46,7 @@ class InformationResource extends Resource
                         Forms\Components\FileUpload::make('image')
                             ->required()
                             ->image()
-                            ->maxSize(512),
+                            ->maxSize(1024),
 
                         Forms\Components\Toggle::make('status')
                             ->label("Activé")
