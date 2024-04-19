@@ -73,10 +73,19 @@ class APIAuthController extends Controller
             if ($password != $passwordConfirmed)
                 $message = 'Les mots de passe ne concordent pas';
             else {
-                $client = Utilisateur::where('email', $email)->first();
+                $client = Utilisateur::where('email', $email)
+                    ->first();
 
-                if ($client != null)
-                    $message = "Cette adresse email est deja utilisé";
+                $checkPhone = Utilisateur::where('phone', $phone)
+                    ->first();
+
+                if ($client != null || $checkPhone != null)
+                {
+                    if ($client != null)
+                        $message = "Cette adresse email est deja utilisé";
+                    else
+                        $message = "Ce numéro de téléphone est deja utilisé";
+                }
                 else {
                     $fullname = $prenom . ' ' . $nom;
 
