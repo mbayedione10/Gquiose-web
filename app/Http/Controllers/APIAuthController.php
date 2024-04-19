@@ -73,52 +73,62 @@ class APIAuthController extends Controller
             if ($password != $passwordConfirmed)
                 $message = 'Les mots de passe ne concordent pas';
             else {
-                $client = Utilisateur::where('email', $email)
-                    ->first();
 
-                $checkPhone = Utilisateur::where('phone', $phone)
-                    ->first();
-
-                if ($client != null || $checkPhone != null)
+                if (!$this->checkEmail($email))
                 {
-                    if ($client != null)
-                        $message = "Cette adresse email est deja utilisé";
-                    else
-                        $message = "Ce numéro de téléphone est deja utilisé";
+                    $message = "Cette adresse email n'est pas une adresse valide";
                 }
-                else {
-                    $fullname = $prenom . ' ' . $nom;
+                else
+                {
+                    $client = Utilisateur::where('email', $email)
+                        ->first();
 
-                    $client = new Utilisateur();
-                    $client->nom = $nom;
-                    $client->prenom = $prenom;
-                    $client->email = $email;
-                    $client->phone = $phone;
-                    //$client->sexe = $phone;
-                    $client->dob = $dob;
-                    $client->password = bcrypt($password);
-                    $client->status = false;
-                    $client->save();
+                    $checkPhone = Utilisateur::where('phone', $phone)
+                        ->first();
 
-                    $code = new Code();
-                    $code->code = rand(10000, 99999);
-                    $code->utilisateur_id = $client->id;
-                    $code->email = $client->email;
-                    $code->save();
+                    if ($client != null || $checkPhone != null)
+                    {
+                        if ($client != null)
+                            $message = "Cette adresse email est deja utilisé";
+                        else
+                            $message = "Ce numéro de téléphone est deja utilisé";
+                    }
+                    else {
+                        $fullname = $prenom . ' ' . $nom;
 
-                    $objet = "Activation de compte";
-                    $greeting = "Bonjour " . $fullname;
-                    $content = "Votre code de confirmation est: " . $code->code;
+                        $client = new Utilisateur();
+                        $client->nom = $nom;
+                        $client->prenom = $prenom;
+                        $client->email = $email;
+                        $client->phone = $phone;
+                        //$client->sexe = $phone;
+                        $client->dob = $dob;
+                        $client->password = bcrypt($password);
+                        $client->status = false;
+                        $client->save();
 
-                    Mail::to($email)
-                        ->send(new NotificationEmail($greeting, $objet, $content));
+                        $code = new Code();
+                        $code->code = rand(10000, 99999);
+                        $code->utilisateur_id = $client->id;
+                        $code->email = $client->email;
+                        $code->save();
 
-                    $data = [
-                        'utilisateur' => $client->only(['id', 'nom', 'prenom', 'phone', 'email', 'dob'])
-                    ];
+                        $objet = "Activation de compte";
+                        $greeting = "Bonjour " . $fullname;
+                        $content = "Votre code de confirmation est: " . $code->code;
 
-                    return response::success($data);
+                        Mail::to($email)
+                            ->send(new NotificationEmail($greeting, $objet, $content));
+
+                        $data = [
+                            'utilisateur' => $client->only(['id', 'nom', 'prenom', 'phone', 'email', 'dob'])
+                        ];
+
+                        return response::success($data);
+                    }
                 }
+
+
             }
 
             return response::error($message, \Illuminate\Http\Response::HTTP_BAD_REQUEST);
@@ -127,6 +137,12 @@ class APIAuthController extends Controller
 
         return response::error($message, \Illuminate\Http\Response::HTTP_BAD_REQUEST);
 
+    }
+
+    function checkEmail($email) {
+        $find1 = strpos($email, '@');
+        $find2 = strpos($email, '.');
+        return ($find1 !== false && $find2 !== false && $find2 > $find1);
     }
 
     public function codeConfirmation(Request $request)
