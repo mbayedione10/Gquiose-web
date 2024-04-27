@@ -84,7 +84,7 @@ class APIForumController extends Controller
             ->join('themes', 'messages.theme_id', 'themes.id')
             ->join('utilisateurs', 'messages.utilisateur_id', 'utilisateurs.id')
             ->select('messages.id as id', 'messages.question', 'utilisateurs.id as utilisateurId',
-            'utilisateurs.prenom as utilisateur', 'themes.id as themeId', 'themes.name as theme', 'messages.created_at as date')
+            'utilisateurs.prenom as utilisateur', 'themes.id as themeId', 'themes.name as theme', 'messages.created_at as date', 'messages.status as status')
             ->where('messages.status', true)
             ->get();
 
@@ -97,6 +97,7 @@ class APIForumController extends Controller
                 'chats.utilisateur_id as utilisateurId',
                 'utilisateurs.prenom as utilisateurName',
                 'chats.created_at as date',
+                'chats.status as status',
             )
             ->get();
 

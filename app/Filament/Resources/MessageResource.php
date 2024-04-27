@@ -14,6 +14,7 @@ use Filament\Resources\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use function Symfony\Component\Translation\t;
 
 class MessageResource extends Resource
 {
@@ -106,6 +107,10 @@ class MessageResource extends Resource
                                 'md' => 12,
                                 'lg' => 12,
                             ]),
+
+                        Forms\Components\Toggle::make('status')
+                            ->label("Statut")
+                            ->default(true)
                     ])
             ]);
     }
