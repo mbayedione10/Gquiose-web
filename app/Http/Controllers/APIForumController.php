@@ -85,7 +85,6 @@ class APIForumController extends Controller
             ->join('utilisateurs', 'messages.utilisateur_id', 'utilisateurs.id')
             ->select('messages.id as id', 'messages.question', 'utilisateurs.id as utilisateurId',
             'utilisateurs.prenom as utilisateur', 'themes.id as themeId', 'themes.name as theme', 'messages.created_at as date', 'messages.status as status')
-            ->where('messages.status', true)
             ->get();
 
 
