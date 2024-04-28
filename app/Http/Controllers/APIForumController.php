@@ -97,6 +97,7 @@ class APIForumController extends Controller
                 'utilisateurs.prenom as utilisateurName',
                 'chats.created_at as date',
                 'chats.status as status',
+                'chats.anonyme as anomyme',
             )
             ->get();
 
