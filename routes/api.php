@@ -6,6 +6,7 @@ use App\Http\Controllers\APIAuthController;
 use App\Http\Controllers\APIForumController;
 use App\Http\Controllers\APIQuizController;
 use App\Http\Controllers\APIStructureController;
+use App\Http\Controllers\APIVideoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -61,6 +62,9 @@ Route::prefix('v1')
 
         /*************************  FORUM    ***************************/
         Route::get('forum', [APIForumController::class, 'forum']);
+
+        /*************************  VIDEO    ***************************/
+        Route::get('videos', [APIVideoController::class, 'videos']);
 
 
 
