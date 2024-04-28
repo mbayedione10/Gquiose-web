@@ -54,7 +54,7 @@ class APIForumController extends Controller
         $msg = $request['message'];
         $anonyme = $request['anomyme'];
 
-        if (!isset($messageId) || !isset($utilisateurId) || !isset($msg) || isset($anonyme))
+        if (!isset($messageId) || !isset($utilisateurId) || !isset($msg) || !isset($anonyme))
             return ApiResponse::error("Les champs messageId, utilisateur et message sont obligatoires");
 
         $message = Message::where('id', $messageId)->first();
