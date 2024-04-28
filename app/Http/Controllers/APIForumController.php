@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Responses\ApiResponse;
+use App\Models\Censure;
 use App\Models\Chat;
 use App\Models\Message;
 use App\Models\Theme;
@@ -57,6 +58,11 @@ class APIForumController extends Controller
         if (!isset($messageId) || !isset($utilisateurId) || !isset($msg) || !isset($anonyme))
             return ApiResponse::error("Les champs messageId, utilisateur et message sont obligatoires");
 
+        $censures = Censure::pluck('name')->toArray();
+
+        if ($this->containsWord($censures, $msg))
+            return ApiResponse::error("Ton message contient un ou plusieurs mots censuré");
+
         $message = Message::where('id', $messageId)->first();
 
         if ($message == null) return  ApiResponse::error("Aucun message avec cet ID");
@@ -110,5 +116,19 @@ class APIForumController extends Controller
         ];
 
         return ApiResponse::success($data);
+    }
+
+    function containsWord($list, $word) {
+        $cleanedWord = preg_replace("/[^a-zA-Z0-9]/", '', $word);
+        $cleanedWord = strtolower($cleanedWord);
+
+        foreach ($list as $item) {
+            $cleanedItem = preg_replace("/[^a-zA-Z0-9]/", '', $item);
+            $cleanedItem = strtolower($cleanedItem);
+            if ($cleanedItem === $cleanedWord) {
+                return true;
+            }
+        }
+        return false;
     }
 }
