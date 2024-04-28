@@ -110,7 +110,11 @@ class MessageResource extends Resource
 
                         Forms\Components\Toggle::make('status')
                             ->label("Statut")
-                            ->default(true)
+                            ->default(true),
+
+                        Forms\Components\Toggle::make('anonyme')
+                            ->label("Anonyme")
+                            ->default(false)
                     ])
             ]);
     }
