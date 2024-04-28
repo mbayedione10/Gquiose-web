@@ -101,7 +101,7 @@ class APIArticleController extends Controller
                 ->select('id', 'name')
                 ->get();
 
-        $censures = Censure::select('name')
+        $censures = Censure::select('id','name')
             ->get();
 
         $data = [
