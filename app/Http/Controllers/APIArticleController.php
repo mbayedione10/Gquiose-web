@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\ResourceNotFoundException;
 use App\Http\Responses\ApiResponse as response;
 
+use App\Models\Censure;
 use App\Models\Conseil;
 use App\Models\Faq;
 use App\Models\Information;
@@ -100,6 +101,9 @@ class APIArticleController extends Controller
                 ->select('id', 'name')
                 ->get();
 
+        $censures = Censure::select('name')
+            ->get();
+
         $data = [
             'informations' => $informations,
             'quiz' => $quiz,
@@ -107,6 +111,7 @@ class APIArticleController extends Controller
             'structures' => $structures,
             'faqs' => $faqs,
             'themes' => $themes,
+            'censures' => $censures,
         ];
 
         return response::success($data);
