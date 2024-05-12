@@ -60,6 +60,9 @@ Route::prefix('v1')
         /*************************  SYNC CHAT    ***************************/
         Route::post('chat-sync', [APIForumController::class, 'syncChat']);
 
+        /*************************  DELETE CHAT    ***************************/
+        Route::post('chat-delete/{id}', [APIForumController::class, 'delete']);
+
         /*************************  FORUM    ***************************/
         Route::get('forum', [APIForumController::class, 'forum']);
 

@@ -51,7 +51,7 @@ class InformationResource extends Resource
 
                         Forms\Components\FileUpload::make('splash')
                             ->label("Image de démarrage")
-                            ->required()
+                            ->nullable()
                             ->image()
                             ->maxSize(1024),
 

@@ -85,6 +85,18 @@ class APIForumController extends Controller
         return  ApiResponse::success($chat);
     }
 
+    public function delete($id)
+    {
+        $chat = Chat::where('id', $id)->first();
+
+        if($chat == null)
+            return ApiResponse::error("Ce message n'existe pas");
+
+        $chat->delete();
+
+        return  ApiResponse::success($chat);
+    }
+
 
     public function forum()
     {
@@ -131,4 +143,6 @@ class APIForumController extends Controller
         }
         return false;
     }
+
+
 }
