@@ -82,7 +82,7 @@ class APIArticleController extends Controller
             ->get();
 
         $informations = Information::where('status', true)
-            ->select('id', 'image', "rendez_vous", "structure_url")
+            ->select('id', 'image', "rendez_vous", "structure_url", 'splash')
             ->first();
 
         $conseils = Conseil::select("id", "message")->get();

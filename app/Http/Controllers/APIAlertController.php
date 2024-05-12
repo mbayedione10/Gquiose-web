@@ -49,6 +49,10 @@ class APIAlertController extends Controller
             $content = "Une nouvelle alerte vient d'être signalée. \n\n";
             $content .= "Ref: " .$alerte->ref."\n\n";
             $content .= "Type: " .$alerte->type."\n\n";
+
+            if ($alerte->description != null)
+                $content .= "Description: " .$alerte->description."\n\n";
+
             $content .= "Utilisateur: " .$user->name.  "\n\n";
             $content .= "Numéro de téléphone: " .$user->phone.  "\n\n";
             $content .= "Courriel: " .$user->email.  "\n\n";

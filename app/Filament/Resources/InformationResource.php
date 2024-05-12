@@ -44,6 +44,13 @@ class InformationResource extends Resource
                             ->label("Structures sanitaires"),
 
                         Forms\Components\FileUpload::make('image')
+                            ->label("Bannière")
+                            ->required()
+                            ->image()
+                            ->maxSize(1024),
+
+                        Forms\Components\FileUpload::make('splash')
+                            ->label("Image de démarrage")
                             ->required()
                             ->image()
                             ->maxSize(1024),
