@@ -77,6 +77,16 @@ class AlerteResource extends Resource
                             'lg' => 12,
                         ]),
 
+                    TextInput::make('description')
+                        ->label("Description")
+                        ->required()
+                        ->placeholder("Description de l'alerte")
+                        ->columnSpan([
+                            'default' => 12,
+                            'md' => 12,
+                            'lg' => 12,
+                        ]),
+
                     TextInput::make('etat')
                         ->rules(['max:255', 'string'])
                         ->required()
@@ -123,6 +133,12 @@ class AlerteResource extends Resource
                     ->searchable()
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make('description')
+                    ->label("Description")
+                    ->searchable(),
+
+
+
                 Tables\Columns\BadgeColumn::make('etat')
                     ->label("État")
                     ->colors([
@@ -133,9 +149,7 @@ class AlerteResource extends Resource
                     ->searchable()
                     ->limit(50),
 
-                Tables\Columns\TextColumn::make('description')
-                    ->label("Information")
-                    ->searchable(),
+
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label("Signalée ")
