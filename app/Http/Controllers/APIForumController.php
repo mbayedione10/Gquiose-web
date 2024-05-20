@@ -42,6 +42,8 @@ class APIForumController extends Controller
         $chat->message = $message->question;
         $chat->utilisateur_id = $utilisateur->id;
         $chat->message_id = $message->id;
+        $chat->status = true;
+        $chat->anonyme = false;
         $chat->save();
 
         return  ApiResponse::success($message);
