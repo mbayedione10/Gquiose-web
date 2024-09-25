@@ -10,7 +10,9 @@ class APIVideoController extends Controller
 {
     public function videos()
     {
-        $videos = Video::select('id', 'name', 'url')->get();
+        $videos = Video::select('id', 'name', 'url')
+            ->orderBy('id', 'desc')
+            ->get();
 
         $data = [
             'videos' => $videos
