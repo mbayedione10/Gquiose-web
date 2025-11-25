@@ -69,6 +69,14 @@ Route::prefix('v1')
         /*************************  VIDEO    ***************************/
         Route::get('videos', [APIVideoController::class, 'videos']);
 
+        // Routes pour les évaluations
+        Route::prefix('evaluations')->group(function () {
+            Route::get('/questions', [App\Http\Controllers\APIEvaluationController::class, 'getQuestions']);
+            Route::post('/submit', [App\Http\Controllers\APIEvaluationController::class, 'submit']);
+            Route::get('/statistics', [App\Http\Controllers\APIEvaluationController::class, 'statistics']);
+            Route::get('/user/{userId}', [App\Http\Controllers\APIEvaluationController::class, 'userEvaluations']);
+        });
+
 
 
 });
