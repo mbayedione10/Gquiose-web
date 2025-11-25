@@ -30,5 +30,19 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+     // API SMS pour vérification
+    'sms' => [
+        'provider' => env('SMS_PROVIDER', 'twilio'), // twilio, vonage, aws_sns, local
+        'twilio' => [
+            'sid' => env('TWILIO_SID'),
+            'token' => env('TWILIO_TOKEN'),
+            'from' => env('TWILIO_FROM'),
+        ],
+        'vonage' => [
+            'key' => env('VONAGE_KEY'),
+            'secret' => env('VONAGE_SECRET'),
+            'from' => env('VONAGE_FROM'),
+        ],
+    ],
 
 ];

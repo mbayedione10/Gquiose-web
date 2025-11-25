@@ -11,12 +11,32 @@ class Utilisateur extends Model
     use HasFactory;
     use Searchable;
 
-    protected $fillable = ['nom', 'prenom', 'email', 'phone', 'sexe', 'status'];
+    protected $fillable = [
+        'nom', 
+        'prenom', 
+        'email', 
+        'phone', 
+        'sexe', 
+        'status',
+        'dob',
+        'password',
+        'provider',
+        'provider_id',
+        'photo',
+        'email_verified_at'
+    ];
 
     protected $searchableFields = ['*'];
 
     protected $casts = [
         'status' => 'boolean',
+        'email_verified_at' => 'datetime',
+        'dob' => 'date',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
     ];
 
     public function responses()
