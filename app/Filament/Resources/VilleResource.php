@@ -23,14 +23,13 @@ class VilleResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static bool $shouldRegisterNavigation = false;
-
     public static function form(Form $form): Form
     {
         return $form->schema([
             Card::make()->schema([
                 Grid::make(['default' => 0])->schema([
                     TextInput::make('name')
+                        ->label('Nom de la ville')
                         ->rules(['max:255', 'string'])
                         ->required()
                         ->unique(
@@ -38,7 +37,8 @@ class VilleResource extends Resource
                             'name',
                             fn(?Ville $record) => $record
                         )
-                        ->placeholder('Name')
+                        ->placeholder('Ex: Conakry, Labé, Kankan, etc.')
+                        ->helperText('Entrez le nom de la ville')
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,
@@ -46,8 +46,11 @@ class VilleResource extends Resource
                         ]),
 
                     Toggle::make('status')
+                        ->label('Statut actif')
                         ->rules(['boolean'])
                         ->required()
+                        ->default(true)
+                        ->helperText('Activer ou désactiver cette ville')
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,
@@ -64,14 +67,54 @@ class VilleResource extends Resource
             ->poll('60s')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nom de la ville')
                     ->toggleable()
                     ->searchable(true, null, true)
-                    ->limit(50),
+                    ->limit(50)
+                    ->sortable(),
+                    
                 Tables\Columns\IconColumn::make('status')
+                    ->label('Statut')
                     ->toggleable()
-                    ->boolean(),
+                    ->boolean()
+                    ->sortable(),
+                    
+                Tables\Columns\TextColumn::make('structures_count')
+                    ->label('Structures')
+                    ->counts('structures')
+                    ->badge()
+                    ->color('success')
+                    ->toggleable(),
+                    
+                Tables\Columns\TextColumn::make('alertes_count')
+                    ->label('Alertes')
+                    ->counts('alertes')
+                    ->badge()
+                    ->color('warning')
+                    ->toggleable(),
+                    
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Date de création')
+                    ->date('d/m/Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([DateRangeFilter::make('created_at')]);
+            ->filters([
+                DateRangeFilter::make('created_at'),
+                Tables\Filters\TernaryFilter::make('status')
+                    ->label('Statut')
+                    ->placeholder('Toutes')
+                    ->trueLabel('Actives')
+                    ->falseLabel('Inactives'),
+            ])
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make(),
+            ])
+            ->defaultSort('name', 'asc');
     }
 
     public static function getRelations(): array

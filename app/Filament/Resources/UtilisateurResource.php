@@ -87,18 +87,73 @@ class UtilisateurResource extends Resource
                             'lg' => 12,
                         ]),
 
-                    TextInput::make('sexe')
-                        ->rules(['max:255', 'string'])
-                        ->required()
-                        ->visible(false)
-                        ->placeholder('Sexe')
+                    Forms\Components\Select::make('sexe')
+                        ->options([
+                            'M' => 'Masculin',
+                            'F' => 'Féminin',
+                        ])
+                        ->placeholder('Sélectionner le sexe')
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,
                             'lg' => 12,
                         ]),
 
+                    Forms\Components\DatePicker::make('dob')
+                        ->label('Date de naissance')
+                        ->placeholder('Date de naissance')
+                        ->columnSpan([
+                            'default' => 12,
+                            'md' => 12,
+                            'lg' => 12,
+                        ]),
+
+                    Forms\Components\Select::make('ville_id')
+                        ->relationship('ville', 'name')
+                        ->label('Ville')
+                        ->searchable()
+                        ->placeholder('Sélectionner une ville')
+                        ->columnSpan([
+                            'default' => 12,
+                            'md' => 12,
+                            'lg' => 12,
+                        ]),
+
+                    Forms\Components\FileUpload::make('photo')
+                        ->image()
+                        ->directory('photos-utilisateurs')
+                        ->columnSpan([
+                            'default' => 12,
+                            'md' => 12,
+                            'lg' => 12,
+                        ]),
+
+                    TextInput::make('platform')
+                        ->label('Plateforme (iOS/Android)')
+                        ->disabled()
+                        ->placeholder('Ex: android, ios')
+                        ->helperText('Plateforme depuis laquelle l\'utilisateur s\'est inscrit')
+                        ->visibleOn('edit')
+                        ->columnSpan([
+                            'default' => 12,
+                            'md' => 6,
+                            'lg' => 6,
+                        ]),
+
+                    TextInput::make('provider')
+                        ->label('Méthode de connexion')
+                        ->disabled()
+                        ->placeholder('Ex: google, facebook')
+                        ->helperText('Fournisseur d\'authentification sociale')
+                        ->visibleOn('edit')
+                        ->columnSpan([
+                            'default' => 12,
+                            'md' => 6,
+                            'lg' => 6,
+                        ]),
+
                     Toggle::make('status')
+                        ->label('Actif')
                         ->rules(['boolean'])
                         ->required()
                         ->columnSpan([
@@ -133,15 +188,66 @@ class UtilisateurResource extends Resource
                     ->searchable()
                     ->limit(50),
 
+                Tables\Columns\TextColumn::make('ville.name')
+                    ->label("Ville")
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('dob')
+                    ->label("Date de naissance")
+                    ->date('d/m/Y')
+                    ->sortable()
+                    ->toggleable(),
+
+                Tables\Columns\ImageColumn::make('photo')
+                    ->label("Photo")
+                    ->circular()
+                    ->toggleable(),
+
                 Tables\Columns\IconColumn::make('status')
                     ->label("Statut")
                     ->boolean(),
 
+                Tables\Columns\BadgeColumn::make('platform')
+                    ->label("Plateforme")
+                    ->colors([
+                        'success' => 'android',
+                        'info' => 'ios',
+                    ])
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\BadgeColumn::make('provider')
+                    ->label("Méthode")
+                    ->colors([
+                        'warning' => fn ($state) => $state !== null,
+                    ])
+                    ->formatStateUsing(fn (?string $state): string => $state ?: 'Email')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label("Inscription")
                     ->date('d F Y H:i')
+                    ->sortable()
             ])
-            ->filters([DateRangeFilter::make('created_at')]);
+            ->filters([
+                DateRangeFilter::make('created_at'),
+                Tables\Filters\TernaryFilter::make('status')
+                    ->label('Statut')
+                    ->placeholder('Tous')
+                    ->trueLabel('Actifs')
+                    ->falseLabel('Inactifs'),
+            ])
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make(),
+            ])
+            ->defaultSort('created_at', 'desc');
     }
 
     public static function getRelations(): array
