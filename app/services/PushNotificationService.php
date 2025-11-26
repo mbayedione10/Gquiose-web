@@ -121,9 +121,23 @@ class PushNotificationService
     }
 
     /**
-     * Envoyer notification à un appareil via FCM
+     * Router les notifications par plateforme
      */
     protected function sendToDevice(Utilisateur $user, PushNotification $notification)
+    {
+        // Route to correct service based on platform
+        if ($user->platform === 'ios') {
+            return $this->sendToApple($user, $notification);
+        }
+
+        // Default to Android/FCM
+        return $this->sendToAndroid($user, $notification);
+    }
+
+    /**
+     * Envoyer notification Android via FCM
+     */
+    protected function sendToAndroid(Utilisateur $user, PushNotification $notification)
     {
         $payload = [
             'to' => $user->fcm_token,
@@ -156,7 +170,7 @@ class PushNotificationService
 
         } catch (\Exception $e) {
             Log::error('Erreur envoi notification push: ' . $e->getMessage());
-            
+
             return [
                 'sent' => false,
                 'delivered' => false,
@@ -169,11 +183,60 @@ class PushNotificationService
      */
     protected function sendToApple(Utilisateur $user, PushNotification $notification)
     {
-        // TODO: Implémenter l'envoi via APNs
-        // Nécessite certificat Apple et configuration supplémentaire
-        return [
-            'sent' => false,
-            'delivered' => false,
-        ];
+        try {
+            $config = config('services.apns');
+
+            // Create APNs client with JWT authentication
+            $authProvider = \Pushok\AuthProvider\Token::create([
+                'key_id' => $config['key_id'],
+                'team_id' => $config['team_id'],
+                'app_bundle_id' => $config['bundle_id'],
+                'private_key_path' => $config['key_path'],
+            ]);
+
+            $production = config('services.apns.environment', 'production') === 'production';
+            $client = new \Pushok\Client($authProvider, $production);
+
+            // Build APNs payload
+            $payload = \Pushok\Payload::create()
+                ->setAlert([
+                    'title' => $notification->title,
+                    'body' => $notification->message,
+                ])
+                ->setBadge(1)
+                ->setSound('default')
+                ->setMutableContent(true)
+                ->setCustomValue('notification_id', $notification->id)
+                ->setCustomValue('type', $notification->type)
+                ->setCustomValue('action', $notification->action)
+                ->setCustomValue('image', $notification->image);
+
+            // Create notification
+            $deviceNotification = new \Pushok\Notification($payload, $user->fcm_token);
+
+            // Send
+            $response = $client->push($deviceNotification);
+
+            return [
+                'sent' => true,
+                'delivered' => $response->getStatusCode() === 200,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('APNs error: ' . $e->getMessage(), [
+                'user_id' => $user->id,
+                'notification_id' => $notification->id,
+            ]);
+
+            // Handle invalid token
+            if (strpos($e->getMessage(), 'BadDeviceToken') !== false) {
+                $user->update(['fcm_token' => null]);
+            }
+
+            return [
+                'sent' => false,
+                'delivered' => false,
+            ];
+        }
     }
 }

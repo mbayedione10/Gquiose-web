@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PushNotificationResource\Widgets;
 
+use App\Models\PushNotification;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Card;
 
