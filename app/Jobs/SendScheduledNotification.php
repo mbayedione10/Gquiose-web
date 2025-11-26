@@ -27,6 +27,11 @@ class SendScheduledNotification implements ShouldQueue
 
         if ($notification && $notification->status === 'pending') {
             $service->sendNotification($notification);
+            
+            $notification->update([
+                'status' => 'sent',
+                'sent_at' => now(),
+            ]);
         }
     }
 }
