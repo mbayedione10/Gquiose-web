@@ -3,120 +3,125 @@
 namespace App\Http\Controllers;
 
 use App\Http\Responses\ApiResponse as response;
-use App\Mail\NotificationEmail;
 use App\Mail\SendCodeEmail;
 use App\Models\Code;
 use App\Models\Utilisateur;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class APIAuthController extends Controller
 {
+    /**
+     * Connexion classique email/mot de passe
+     */
     public function login(Request $request)
     {
-        $email = $request['email'];
-        $password = $request['password'];
+        $email    = $request->input('email');
+        $password = $request->input('password');
+        $fcmToken = $request->input('fcm_token');
+        $platform = $request->input('platform'); // android ou ios
 
         $client = Utilisateur::where('email', $email)->first();
 
-        if ($client != null) {
-            if (Hash::check($password, $client->password)) {
-                if ($client->status) {
-                    $data = [
-                        'utilisateur' => $client->only(['id', 'nom', 'prenom', 'phone', 'email', 'dob', 'sexe'])
-                    ];
-                    return response::success($data);
-                }
-            }
+        if (!$client || !Hash::check($password, $client->password)) {
+            return response::error('Les informations sont incorrectes', 400);
         }
 
-        $message = "Les informations sont incorrectes";
-        return response::error($message, \Illuminate\Http\Response::HTTP_BAD_REQUEST);
+        if (!$client->status) {
+            return response::error('Votre compte n\'est pas encore activé', 403);
+        }
+
+        // Mise à jour du token FCM et de la plateforme
+        if ($fcmToken) {
+            $client->fcm_token = $fcmToken;
+        }
+        if ($platform && in_array($platform, ['android', 'ios'])) {
+            $client->platform = $platform;
+        }
+        $client->save();
+
+        $data = [
+            'utilisateur' => $client->only([
+                'id', 'nom', 'prenom', 'phone', 'email', 'dob',
+                'sexe', 'photo', 'ville_id', 'status'
+            ])
+        ];
+
+        return response::success($data);
     }
 
     public function register(Request $request)
     {
-        // Déterminer le type d'inscription
-        $inscriptionType = $request->input('type', 'phone'); // phone, email, social
+        $type = $request->input('type', 'phone');
 
         try {
-            if ($inscriptionType === 'phone') {
-                return $this->registerByPhone($request);
-            } elseif ($inscriptionType === 'email') {
-                return $this->registerByEmail($request);
-            } elseif ($inscriptionType === 'social') {
-                return $this->registerBySocial($request);
-            }
-
-            return response::error('Type d\'inscription invalide', \Illuminate\Http\Response::HTTP_BAD_REQUEST);
+            return match ($type) {
+                'phone'  => $this->registerByPhone($request),
+                'email'  => $this->registerByEmail($request),
+                'social' => $this->registerBySocial($request),
+                default  => response::error('Type d\'inscription invalide', 400),
+            };
         } catch (\Exception $e) {
-            \Log::error('Erreur inscription: ' . $e->getMessage());
-            return response::error('Une erreur est survenue lors de l\'inscription', \Illuminate\Http\Response::HTTP_INTERNAL_SERVER_ERROR);
+            Log::error('Erreur inscription: ' . $e->getMessage());
+            return response::error('Une erreur est survenue lors de l\'inscription', 500);
         }
     }
+
+    // ← IL MANQUAIT CETTE ACCOLADE DANS LA VERSION PRÉCÉDENTE !
 
     private function registerByPhone(Request $request)
     {
         $validated = $request->validate([
-            'phone' => 'required|string|unique:utilisateurs,phone|regex:/^\+224[0-9]{9}$/',
-            'sexe' => 'required|in:M,F,Autre',
-            'age' => 'required|integer|min:13|max:100',
-            'password' => 'required|string|min:8|confirmed',
-            'password_confirmation' => 'required|string',
-            'nom' => 'nullable|string|max:255',
-            'prenom' => 'nullable|string|max:255',
+            'phone'                => 'required|string|unique:utilisateurs,phone|regex:/^\+224[0-9]{9}$/',
+            'sexe'                 => 'required|in:M,F,Autre',
+            'age'                  => 'required|integer|min:13|max:100',
+            'password'             => 'required|string|min:8|confirmed',
+            'password_confirmation'=> 'required',
+            'nom'                  => 'nullable|string|max:255',
+            'prenom'               => 'nullable|string|max:255',
+            'fcm_token'            => 'nullable|string',
+            'platform'             => 'required|in:android,ios',
+            'ville_id'             => 'nullable|exists:villes,id',
         ], [
-            'phone.required' => 'Le numéro de téléphone est obligatoire',
-            'phone.unique' => 'Ce numéro de téléphone est déjà utilisé',
             'phone.regex' => 'Le format du numéro doit être +224XXXXXXXXX',
-            'sexe.required' => 'Le sexe est obligatoire',
-            'sexe.in' => 'Le sexe doit être M, F ou Autre',
-            'age.required' => 'L\'âge est obligatoire',
-            'age.min' => 'Vous devez avoir au moins 13 ans',
-            'password.required' => 'Le mot de passe est obligatoire',
-            'password.min' => 'Le mot de passe doit contenir au moins 8 caractères',
-            'password.confirmed' => 'Les mots de passe ne concordent pas',
+            'phone.unique' => 'Ce numéro est déjà utilisé',
         ]);
 
-        \DB::beginTransaction();
-
+        DB::beginTransaction();
         try {
-            // Calculer date de naissance approximative
             $dob = now()->subYears($validated['age'])->format('Y-m-d');
 
-            $utilisateur = new Utilisateur();
-            $utilisateur->nom = $validated['nom'] ?? '';
-            $utilisateur->prenom = $validated['prenom'] ?? '';
-            $utilisateur->phone = $validated['phone'];
-            $utilisateur->sexe = $validated['sexe'];
-            $utilisateur->dob = $dob;
-            $utilisateur->password = bcrypt($validated['password']);
-            $utilisateur->status = false;
-            $utilisateur->save();
+            $utilisateur = Utilisateur::create([
+                'nom'        => $validated['nom'] ?? '',
+                'prenom'     => $validated['prenom'] ?? '',
+                'phone'      => $validated['phone'],
+                'sexe'       => $validated['sexe'],
+                'dob'        => $dob,
+                'password'   => bcrypt($validated['password']),
+                'status'     => false,
+                'fcm_token'  => $validated['fcm_token'] ?? null,
+                'platform'   => $validated['platform'],
+                'ville_id'   => $validated['ville_id'] ?? null,
+            ]);
 
-            // Générer code SMS à 4 chiffres
-            $code = new Code();
-            $code->code = rand(1000, 9999);
-            $code->utilisateur_id = $utilisateur->id;
-            $code->phone = $utilisateur->phone;
-            $code->created_at = now();
-            $code->save();
+            Code::create([
+                'code'           => rand(1000, 9999),
+                'utilisateur_id' => $utilisateur->id,
+                'phone'          => $utilisateur->phone,
+            ]);
 
-            // TODO: Envoyer SMS via API (à configurer avec le prestataire SMS)
-            // $this->sendSMS($utilisateur->phone, "Votre code GquiOse : {$code->code}. Valide 10 minutes.");
+            DB::commit();
 
-            \DB::commit();
-
-            $data = [
+            return response::success([
                 'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'phone', 'sexe', 'dob']),
-                'message' => 'Un code de vérification a été envoyé à votre numéro'
-            ];
-
-            return response::success($data);
+                'message'     => 'Un code de vérification a été envoyé à votre numéro'
+            ]);
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             throw $e;
         }
     }
@@ -124,55 +129,53 @@ class APIAuthController extends Controller
     private function registerByEmail(Request $request)
     {
         $validated = $request->validate([
-            'email' => 'required|email|unique:utilisateurs,email|max:255',
-            'sexe' => 'required|in:M,F,Autre',
-            'age' => 'required|integer|min:13|max:100',
-            'password' => 'required|string|min:8|confirmed',
-            'password_confirmation' => 'required|string',
-            'nom' => 'nullable|string|max:255',
-            'prenom' => 'nullable|string|max:255',
+            'email'                => 'required|email|unique:utilisateurs,email',
+            'sexe'                 => 'required|in:M,F,Autre',
+            'age'                  => 'required|integer|min:13|max:100',
+            'password'             => 'required|string|min:8|confirmed',
+            'password_confirmation'=> 'required',
+            'nom'                  => 'nullable|string|max:255',
+            'prenom'               => 'nullable|string|max:255',
+            'fcm_token'            => 'nullable|string',
+            'platform'             => 'required|in:android,ios',
+            'ville_id'             => 'nullable|exists:villes,id',
         ]);
 
-        \DB::beginTransaction();
-
+        DB::beginTransaction();
         try {
             $dob = now()->subYears($validated['age'])->format('Y-m-d');
 
-            $utilisateur = new Utilisateur();
-            $utilisateur->nom = $validated['nom'] ?? '';
-            $utilisateur->prenom = $validated['prenom'] ?? '';
-            $utilisateur->email = $validated['email'];
-            $utilisateur->sexe = $validated['sexe'];
-            $utilisateur->dob = $dob;
-            $utilisateur->password = bcrypt($validated['password']);
-            $utilisateur->status = false;
-            $utilisateur->save();
+            $utilisateur = Utilisateur::create([
+                'nom'        => $validated['nom'] ?? '',
+                'prenom'     => $validated['prenom'] ?? '',
+                'email'      => $validated['email'],
+                'sexe'       => $validated['sexe'],
+                'dob'        => $dob,
+                'password'   => bcrypt($validated['password']),
+                'status'     => false,
+                'fcm_token'  => $validated['fcm_token'] ?? null,
+                'platform'   => $validated['platform'],
+                'ville_id'   => $validated['ville_id'] ?? null,
+            ]);
 
-            // Générer code email à 5 chiffres
-            $code = new Code();
-            $code->code = rand(10000, 99999);
-            $code->utilisateur_id = $utilisateur->id;
-            $code->email = $utilisateur->email;
-            $code->created_at = now();
-            $code->save();
+            $code = Code::create([
+                'code'           => rand(10000, 99999),
+                'utilisateur_id' => $utilisateur->id,
+                'email'          => $utilisateur->email,
+            ]);
 
             $fullname = trim($utilisateur->prenom . ' ' . $utilisateur->nom) ?: 'Utilisateur';
-            $objet = "Activation de compte GquiOse";
-            $greeting = "Bonjour " . $fullname;
-            $content = "Votre code de confirmation est: " . $code->code . ". Il est valide pendant 10 minutes.";
 
-            Mail::to($utilisateur->email)->send(new NotificationEmail($greeting, $objet, $content));
+            Mail::to($utilisateur->email)->send(new SendCodeEmail($code->code, $fullname));
 
-            \DB::commit();
+            DB::commit();
 
-            $data = [
-                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'email', 'sexe', 'dob']),
-                'message' => 'Un code de vérification a été envoyé à votre email'
-            ];
-
-            return response::success($data);
+            return response::success([
+                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'email', 'sexe', 'dob', 'ville_id']),
+                'message'     => 'Un code de vérification a été envoyé à votre email'
+            ]);
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             throw $e;
         }
     }
@@ -180,51 +183,50 @@ class APIAuthController extends Controller
     private function registerBySocial(Request $request)
     {
         $validated = $request->validate([
-            'provider' => 'required|in:google,facebook',
+            'provider'    => 'required|in:google,facebook,apple',
             'provider_id' => 'required|string',
-            'email' => 'required|email',
-            'nom' => 'nullable|string|max:255',
-            'prenom' => 'nullable|string|max:255',
-            'photo' => 'nullable|url',
-            'sexe' => 'required|in:M,F,Autre',
-            'age' => 'required|integer|min:13|max:100',
+            'email'       => 'required|email',
+            'nom'         => 'nullable|string|max:255',
+            'prenom'      => 'nullable|string|max:255',
+            'photo'       => 'nullable|url',
+            'sexe'        => 'required|in:M,F,Autre',
+            'age'         => 'required|integer|min:13|max:100',
+            'fcm_token'   => 'nullable|string',
+            'platform'    => 'required|in:android,ios',
+            'ville_id'    => 'nullable|exists:villes,id',
         ]);
 
-        \DB::beginTransaction();
-
+        DB::beginTransaction();
         try {
-            // Vérifier si l'utilisateur existe déjà
-            $utilisateur = Utilisateur::where('email', $validated['email'])->first();
-
-            if ($utilisateur) {
-                \DB::commit();
-                return response::error('Un compte existe déjà avec cet email', \Illuminate\Http\Response::HTTP_CONFLICT);
+            if (Utilisateur::where('email', $validated['email'])->exists()) {
+                return response::error('Un compte existe déjà avec cet email', 409);
             }
 
             $dob = now()->subYears($validated['age'])->format('Y-m-d');
 
-            $utilisateur = new Utilisateur();
-            $utilisateur->nom = $validated['nom'] ?? '';
-            $utilisateur->prenom = $validated['prenom'] ?? '';
-            $utilisateur->email = $validated['email'];
-            $utilisateur->sexe = $validated['sexe'];
-            $utilisateur->dob = $dob;
-            $utilisateur->provider = $validated['provider'];
-            $utilisateur->provider_id = $validated['provider_id'];
-            $utilisateur->photo = $validated['photo'] ?? null;
-            $utilisateur->status = true; // Compte social activé directement
-            $utilisateur->save();
+            $utilisateur = Utilisateur::create([
+                'nom'         => $validated['nom'] ?? '',
+                'prenom'      => $validated['prenom'] ?? '',
+                'email'       => $validated['email'],
+                'sexe'       => $validated['sexe'],
+                'dob'         => $dob,
+                'provider'    => $validated['provider'],
+                'provider_id' => $validated['provider_id'],
+                'photo'       => $validated['photo'] ?? null,
+                'fcm_token'   => $validated['fcm_token'] ?? null,
+                'platform'    => $validated['platform'],
+                'ville_id'    => $validated['ville_id'] ?? null,
+                'status'      => true,
+            ]);
 
-            \DB::commit();
+            DB::commit();
 
-            $data = [
-                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'email', 'sexe', 'dob', 'photo']),
-                'message' => 'Compte créé avec succès'
-            ];
-
-            return response::success($data);
+            return response::success([
+                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'email', 'sexe', 'dob', 'photo', 'ville_id']),
+                'message'     => 'Compte créé avec succès'
+            ]);
         } catch (\Exception $e) {
-            \DB::rollBack();
+            DB::rollBack();
             throw $e;
         }
     }
@@ -232,70 +234,131 @@ class APIAuthController extends Controller
     public function codeConfirmation(Request $request)
     {
         $validated = $request->validate([
-            'identifier' => 'required|string', // email ou phone
-            'code' => 'required|string|size:4',
-        ], [
-            'identifier.required' => 'L\'identifiant est obligatoire',
-            'code.required' => 'Le code est obligatoire',
-            'code.size' => 'Le code doit contenir 4 chiffres',
+            'identifier' => 'required|string',
+            'code'       => 'required|string|digits_between:4,5',
         ]);
 
-        // Détecter si c'est un email ou un phone
         $isEmail = filter_var($validated['identifier'], FILTER_VALIDATE_EMAIL);
-        $field = $isEmail ? 'email' : 'phone';
+        $field   = $isEmail ? 'email' : 'phone';
 
-        // Vérifier les tentatives (max 3 par jour)
         $cacheKey = 'code_attempts_' . $validated['identifier'];
-        $attempts = \Cache::get($cacheKey, 0);
+        $attempts = Cache::get($cacheKey, 0);
 
         if ($attempts >= 3) {
-            return response::error('Trop de tentatives. Veuillez réessayer dans 24 heures.', \Illuminate\Http\Response::HTTP_TOO_MANY_REQUESTS);
+            return response::error('Trop de tentatives. Réessayez dans 24h.', 429);
         }
 
-        $codeConfirmation = Code::where($field, $validated['identifier'])
+        $codeRecord = Code::where($field, $validated['identifier'])
             ->where('code', $validated['code'])
-            ->where('created_at', '>=', now()->subMinutes(10)) // Code valide 10 minutes
-            ->orderByDesc('id')
+            ->where('created_at', '>=', now()->subMinutes(10))
+            ->latest()
             ->first();
 
-        if (!$codeConfirmation) {
-            // Incrémenter les tentatives
-            \Cache::put($cacheKey, $attempts + 1, now()->addDay());
-            
-            $remainingAttempts = 3 - ($attempts + 1);
-            $message = $remainingAttempts > 0 
-                ? "Code incorrect. Il vous reste {$remainingAttempts} tentative(s)."
-                : "Code incorrect. Trop de tentatives. Veuillez réessayer dans 24 heures.";
-
-            return response::error($message, \Illuminate\Http\Response::HTTP_BAD_REQUEST);
+        if (!$codeRecord) {
+            Cache::put($cacheKey, $attempts + 1, now()->addDay());
+            $remaining = 3 - ($attempts + 1);
+            $msg = $remaining > 0
+                ? "Code incorrect. Il vous reste {$remaining} tentative(s)."
+                : "Trop de tentatives. Réessayez dans 24h.";
+            return response::error($msg, 400);
         }
 
-        // Code valide - activer le compte
-        \DB::beginTransaction();
+        DB::beginTransaction();
         try {
-            $utilisateur = $codeConfirmation->utilisateur;
+            $utilisateur = $codeRecord->utilisateur;
             $utilisateur->status = true;
-            $utilisateur->email_verified_at = now();
+            if ($isEmail) {
+                $utilisateur->email_verified_at = now();
+            } else {
+                $utilisateur->phone_verified_at = now();
+            }
             $utilisateur->save();
 
-            // Supprimer le code utilisé
-            $codeConfirmation->delete();
+            $codeRecord->delete();
+            Cache::forget($cacheKey);
 
-            // Réinitialiser les tentatives
-            \Cache::forget($cacheKey);
+            DB::commit();
 
-            \DB::commit();
-
-            $data = [
-                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'phone', 'email', 'dob', 'sexe']),
-                'message' => 'Compte activé avec succès'
-            ];
-
-            return response::success($data);
+            return response::success([
+                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'phone', 'email', 'dob', 'sexe', 'photo', 'ville_id']),
+                'message'     => 'Compte activé avec succès'
+            ]);
         } catch (\Exception $e) {
-            \DB::rollBack();
-            \Log::error('Erreur activation compte: ' . $e->getMessage());
-            return response::error('Une erreur est survenue', \Illuminate\Http\Response::HTTP_INTERNAL_SERVER_ERROR);
+            DB::rollBack();
+            Log::error('Erreur activation: ' . $e->getMessage());
+            return response::error('Une erreur est survenue', 500);
         }
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $validated = $request->validate([
+            'utilisateur_id' => 'required|exists:utilisateurs,id',
+            'nom'            => 'nullable|string|max:255',
+            'prenom'         => 'nullable|string|max:255',
+            'phone'          => 'nullable|string|unique:utilisateurs,phone,' . $request->utilisateur_id,
+            'sexe'           => 'nullable|in:M,F,Autre',
+            'dob'            => 'nullable|date',
+            'ville_id'       => 'nullable|exists:villes,id',
+            'photo'          => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+        ]);
+
+        $utilisateur = Utilisateur::findOrFail($validated['utilisateur_id']);
+
+        $utilisateur->fill(collect($validated)->except(['utilisateur_id', 'photo'])->toArray());
+
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('photos-utilisateurs', 'public');
+            $utilisateur->photo = $path;
+        }
+
+        $utilisateur->save();
+
+        return response::success([
+            'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'phone', 'email', 'dob', 'sexe', 'photo', 'ville_id']),
+            'message'     => 'Profil mis à jour avec succès'
+        ]);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $validated = $request->validate([
+            'utilisateur_id'           => 'required|exists:utilisateurs,id',
+            'old_password'             => 'required|string',
+            'new_password'             => 'required|string|min:8|confirmed',
+            'new_password_confirmation'=> 'required',
+        ]);
+
+        $utilisateur = Utilisateur::findOrFail($validated['utilisateur_id']);
+
+        if (!Hash::check($validated['old_password'], $utilisateur->password)) {
+            return response::error('Ancien mot de passe incorrect', 400);
+        }
+
+        $utilisateur->password = bcrypt($validated['new_password']);
+        $utilisateur->save();
+
+        return response::success(['message' => 'Mot de passe modifié']);
+    }
+
+    public function deleteAccount(Request $request)
+    {
+        $validated = $request->validate([
+            'utilisateur_id' => 'required|exists:utilisateurs,id',
+            'password'       => 'required|string',
+        ]);
+
+        $utilisateur = Utilisateur::findOrFail($validated['utilisateur_id']);
+
+        if (!Hash::check($validated['password'], $utilisateur->password)) {
+            return response::error('Mot de passe incorrect', 400);
+        }
+
+        $utilisateur->responses()->delete();
+        $utilisateur->alertes()->delete();
+        $utilisateur->notificationPreferences()->delete();
+        $utilisateur->delete();
+
+        return response::success(['message' => 'Compte supprimé avec succès']);
     }
 }

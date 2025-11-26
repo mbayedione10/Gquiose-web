@@ -36,6 +36,10 @@ Route::prefix('v1')
 
         Route::post('code-confirmation', [APIAuthController::class, 'codeConfirmation']);
 
+        Route::post('update-profile', [APIAuthController::class, 'updateProfile']);
+        Route::post('change-password', [APIAuthController::class, 'changePassword']);
+        Route::post('delete-account', [APIAuthController::class, 'deleteAccount']);
+
         /*************************  CONFIG    ***************************/
         Route::get('config', [APIArticleController::class, 'config']);
 
