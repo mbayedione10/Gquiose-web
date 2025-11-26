@@ -55,4 +55,22 @@ return [
         'key_path' => storage_path('app/apns/AuthKey.p8'),
     ],
 
+    // Social Authentication
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+    ],
+
+    'facebook' => [
+        'app_id' => env('FACEBOOK_APP_ID'),
+        'app_secret' => env('FACEBOOK_APP_SECRET'),
+    ],
+
+    'apple' => [
+        'bundle_id' => env('APPLE_BUNDLE_ID'),
+        'team_id' => env('APPLE_TEAM_ID'),
+        'key_id' => env('APPLE_KEY_ID'),
+        'key_path' => storage_path('app/apple/AuthKey_*.p8'),
+    ],
+
 ];

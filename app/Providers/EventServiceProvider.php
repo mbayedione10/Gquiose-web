@@ -24,6 +24,21 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\NewArticlePublished::class => [
             \App\Listeners\SendArticleNotification::class,
         ],
+        \App\Events\NewQuizPublished::class => [
+            \App\Listeners\SendQuizNotification::class,
+        ],
+        \App\Events\NewVideoPublished::class => [
+            \App\Listeners\SendVideoNotification::class,
+        ],
+        \App\Events\NewHealthCenterAdded::class => [
+            \App\Listeners\SendHealthCenterNotification::class,
+        ],
+        \App\Events\MessageReplied::class => [
+            \App\Listeners\SendReplyNotification::class,
+        ],
+        \App\Events\UserMentioned::class => [
+            \App\Listeners\SendMentionNotification::class,
+        ],
     ];
 
     /**

@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MessageReplied;
+use App\Events\UserMentioned;
 use App\Http\Responses\ApiResponse;
 use App\Models\Censure;
 use App\Models\Chat;
 use App\Models\Message;
 use App\Models\Theme;
 use App\Models\Utilisateur;
+use App\Services\MentionDetector;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -46,6 +49,18 @@ class APIForumController extends Controller
         $chat->anonyme = false;
         $chat->save();
 
+        // Detect and notify mentions in new message
+        $mentions = app(MentionDetector::class)->extractMentions($question);
+        foreach ($mentions as $mentionedUser) {
+            event(new UserMentioned(
+                $mentionedUser,
+                $utilisateur,
+                $question,
+                'message',
+                $message->id
+            ));
+        }
+
         return  ApiResponse::success($message);
     }
 
@@ -82,7 +97,24 @@ class APIForumController extends Controller
 
         $chat->save();
 
+        // Trigger reply notification (only for non-anonymous replies)
+        if (!$anonyme) {
+            event(new MessageReplied($chat, $message));
+        }
 
+        // Detect and notify mentions (only for non-anonymous chats)
+        if (!$anonyme) {
+            $mentions = app(MentionDetector::class)->extractMentions($msg);
+            foreach ($mentions as $mentionedUser) {
+                event(new UserMentioned(
+                    $mentionedUser,
+                    $utilisateur,
+                    $msg,
+                    'chat',
+                    $chat->id
+                ));
+            }
+        }
 
         return  ApiResponse::success($chat);
     }

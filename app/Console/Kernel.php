@@ -14,6 +14,10 @@ class Kernel extends ConsoleKernel
     {
         // Vérifier les notifications programmées toutes les minutes
         $schedule->command('notifications:send-scheduled')->everyMinute();
+
+        // Envoyer un conseil santé chaque lundi à 9h00 (GMT Guinée)
+        $schedule->command('notifications:send-weekly-health-tips')
+            ->weeklyOn(1, '09:00');
     }
 
     /**

@@ -28,17 +28,20 @@ Route::prefix('v1')
         /*************************  AUTH    ***************************/
 
         Route::post('login', [APIAuthController::class, 'login']);
-
         Route::post('register', [APIAuthController::class, 'register']);
-
-        Route::post('send-code-update-password', [APIAuthController::class, 'codePasswordUpdate']);
-        Route::post('update-password', [APIAuthController::class, 'updatePassword']);
-
         Route::post('code-confirmation', [APIAuthController::class, 'codeConfirmation']);
 
-        Route::post('update-profile', [APIAuthController::class, 'updateProfile']);
-        Route::post('change-password', [APIAuthController::class, 'changePassword']);
-        Route::post('delete-account', [APIAuthController::class, 'deleteAccount']);
+        // Password reset
+        Route::post('send-password-reset-code', [APIAuthController::class, 'sendPasswordResetCode']);
+        Route::post('reset-password', [APIAuthController::class, 'resetPassword']);
+
+        // Routes protégées par authentification
+        Route::middleware('auth:sanctum')->group(function () {
+            Route::post('logout', [APIAuthController::class, 'logout']);
+            Route::post('update-profile', [APIAuthController::class, 'updateProfile']);
+            Route::post('change-password', [APIAuthController::class, 'changePassword']);
+            Route::post('delete-account', [APIAuthController::class, 'deleteAccount']);
+        });
 
         /*************************  CONFIG    ***************************/
         Route::get('config', [APIArticleController::class, 'config']);
