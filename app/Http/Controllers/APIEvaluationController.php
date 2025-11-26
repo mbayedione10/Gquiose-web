@@ -66,6 +66,22 @@ class APIEvaluationController extends Controller
             ], 422);
         }
 
+        // Verify all required questions are answered
+        $questionIds = array_column($request->reponses, 'question_id');
+        $requiredQuestions = QuestionEvaluation::where('status', true)
+            ->where('obligatoire', true)
+            ->pluck('id')
+            ->toArray();
+        
+        $missingRequired = array_diff($requiredQuestions, $questionIds);
+        if (!empty($missingRequired)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Toutes les questions obligatoires doivent être répondues.',
+                'missing_questions' => $missingRequired,
+            ], 422);
+        }
+
         try {
             DB::beginTransaction();
 
