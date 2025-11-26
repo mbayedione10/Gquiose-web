@@ -44,5 +44,15 @@ return [
             'from' => env('VONAGE_FROM'),
         ],
     ],
+    'fcm' => [
+        'server_key' => env('FCM_SERVER_KEY'),
+    ],
+
+    'apns' => [
+        'key_id' => env('APNS_KEY_ID'),
+        'team_id' => env('APNS_TEAM_ID'),
+        'bundle_id' => env('APNS_BUNDLE_ID'),
+        'key_path' => storage_path('app/apns/AuthKey.p8'),
+    ],
 
 ];

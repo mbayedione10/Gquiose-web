@@ -13,6 +13,8 @@ return new class extends Migration
             $table->string('provider')->nullable()->after('password');
             $table->string('provider_id')->nullable()->after('provider');
             $table->string('photo')->nullable()->after('provider_id');
+            $table->text('fcm_token')->nullable()->after('photo');
+            $table->enum('platform', ['android', 'ios'])->nullable()->after('fcm_token');
             $table->timestamp('email_verified_at')->nullable()->after('status');
             
             $table->index(['provider', 'provider_id']);
@@ -28,7 +30,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('utilisateurs', function (Blueprint $table) {
-            $table->dropColumn(['provider', 'provider_id', 'photo', 'email_verified_at']);
+            $table->dropColumn(['provider', 'provider_id', 'photo', 'fcm_token', 'platform', 'email_verified_at']);
         });
 
         Schema::table('codes', function (Blueprint $table) {
