@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Notifications;
+namespace App\Services;
 
 use App\Models\PushNotification;
 use App\Models\Utilisateur;
@@ -8,6 +8,54 @@ use Illuminate\Support\Facades\Log;
 
 class PushNotificationService
 {
+    /**
+     * Envoie une notification automatiquement aux utilisateurs ciblés.
+     *
+     * @param PushNotification $notification
+     * @return void
+     */
+    public function sendNotification(PushNotification $notification)
+    {
+        // Récupérer les utilisateurs ciblés
+        $users = $this->getTargetedUsers($notification);
+
+        // Envoyer aux utilisateurs
+        $this->sendPushNotification($notification, $users->toArray());
+    }
+
+    /**
+     * Récupère les utilisateurs ciblés selon les filtres de la notification.
+     *
+     * @param PushNotification $notification
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    protected function getTargetedUsers(PushNotification $notification)
+    {
+        $query = Utilisateur::query();
+
+        if ($notification->target_audience === 'filtered' && $notification->filters) {
+            $filters = is_array($notification->filters) ? $notification->filters : json_decode($notification->filters, true);
+
+            if (isset($filters['age_min'])) {
+                $query->whereRaw('YEAR(CURDATE()) - YEAR(dob) >= ?', [$filters['age_min']]);
+            }
+
+            if (isset($filters['age_max'])) {
+                $query->whereRaw('YEAR(CURDATE()) - YEAR(dob) <= ?', [$filters['age_max']]);
+            }
+
+            if (isset($filters['sexe'])) {
+                $query->where('sexe', $filters['sexe']);
+            }
+
+            if (isset($filters['ville_id'])) {
+                $query->where('ville_id', $filters['ville_id']);
+            }
+        }
+
+        return $query->whereNotNull('fcm_token')->get();
+    }
+
     /**
      * Envoie une notification push à une liste d'utilisateurs.
      *
@@ -54,12 +102,13 @@ class PushNotificationService
         $fcmToken = $user->fcm_token;
         $payload = [
             'title' => $notification->title,
-            'body' => $notification->body,
+            'body' => $notification->message,
             'sound' => 'default',
             'data' => [
                 'notification_id' => $notification->id,
                 'action' => $notification->action,
-                'deeplink' => $notification->deeplink,
+                'icon' => $notification->icon,
+                'image' => $notification->image,
             ],
         ];
 
@@ -173,20 +222,24 @@ class PushNotificationService
         if (str_contains($action, 'cycle') || str_contains($notification->title, 'Cycle')) {
             return 'cycle';
         }
-        if (str_contains($action, 'article') || str_contains($action, 'content')) {
+        if (str_contains($action, 'article') || str_contains($action, 'quiz') ||
+            str_contains($action, 'video') || str_contains($action, 'health_center') ||
+            str_contains($notification->title, 'quiz') || str_contains($notification->title, 'vidéo') ||
+            str_contains($notification->title, 'centre de santé')) {
             return 'content';
         }
         if (str_contains($action, 'forum') || str_contains($action, 'message')) {
             return 'forum';
         }
-        if (str_contains($action, 'conseil') || str_contains($action, 'health')) {
+        if (str_contains($action, 'conseil') || str_contains($action, 'health') ||
+            str_contains($notification->title, 'Conseil')) {
             return 'health_tips';
         }
         if (str_contains($notification->title, 'Admin') || $notification->type === 'admin') {
             return 'admin';
         }
 
-        return 'admin'; // Par défaut
+        return 'content'; // Par défaut - considérer comme contenu
     }
 
     /**

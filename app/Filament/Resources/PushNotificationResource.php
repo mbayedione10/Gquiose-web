@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\PushNotificationResource\Pages;
 use App\Models\PushNotification;
+use App\Models\NotificationTemplate;
 use App\Models\Ville;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -30,21 +31,65 @@ class PushNotificationResource extends Resource
             ->schema([
                 Forms\Components\Card::make()
                     ->schema([
+                        Forms\Components\Select::make('template_id')
+                            ->label('Utiliser un template')
+                            ->placeholder('Choisir un template (optionnel)')
+                            ->options(NotificationTemplate::all()->pluck('name', 'id'))
+                            ->searchable()
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                if ($state) {
+                                    $template = NotificationTemplate::find($state);
+                                    if ($template) {
+                                        $set('title', $template->title);
+                                        $set('message', $template->message);
+                                        $set('icon', $template->icon);
+                                        $set('action', $template->action);
+                                        $set('image', $template->image);
+                                    }
+                                }
+                            }),
+                    ])
+                    ->columns(1),
+
+                Forms\Components\Card::make()
+                    ->schema([
                         Forms\Components\TextInput::make('title')
                             ->label('Titre')
                             ->required()
-                            ->maxLength(255),
-                        
+                            ->maxLength(65)
+                            ->helperText('Maximum 65 caractères'),
+
                         Forms\Components\Textarea::make('message')
                             ->label('Message')
                             ->required()
-                            ->maxLength(500)
+                            ->maxLength(240)
+                            ->helperText('Maximum 240 caractères')
                             ->rows(3),
-                        
-                        Forms\Components\FileUpload::make('icon')
+
+                        Forms\Components\Select::make('icon')
                             ->label('Icône')
-                            ->image()
-                            ->directory('notifications/icons'),
+                            ->options([
+                                '🔔' => '🔔 Cloche',
+                                '📢' => '📢 Mégaphone',
+                                '💊' => '💊 Pilule',
+                                '🩺' => '🩺 Stéthoscope',
+                                '❤️' => '❤️ Cœur',
+                                '🩸' => '🩸 Cycle menstruel',
+                                '🤰' => '🤰 Grossesse',
+                                '👶' => '👶 Bébé',
+                                '💡' => '💡 Conseil',
+                                '📚' => '📚 Article',
+                                '🎥' => '🎥 Vidéo',
+                                '❓' => '❓ Quiz',
+                                '🏥' => '🏥 Centre de santé',
+                                '⚠️' => '⚠️ Alerte',
+                                '💬' => '💬 Message',
+                                '✅' => '✅ Validation',
+                                'ℹ️' => 'ℹ️ Information',
+                            ])
+                            ->searchable()
+                            ->placeholder('Choisir un emoji'),
                         
                         Forms\Components\FileUpload::make('image')
                             ->label('Image (optionnelle)')
@@ -214,6 +259,26 @@ class PushNotificationResource extends Resource
                     ->action(function (PushNotification $record) {
                         $service = app(\App\Services\PushNotificationService::class);
                         $service->sendNotification($record);
+                    }),
+                Tables\Actions\Action::make('duplicate')
+                    ->label('Dupliquer')
+                    ->icon('heroicon-o-document-duplicate')
+                    ->color('secondary')
+                    ->action(function (PushNotification $record) {
+                        $newNotification = $record->replicate();
+                        $newNotification->status = 'pending';
+                        $newNotification->sent_at = null;
+                        $newNotification->sent_count = 0;
+                        $newNotification->delivered_count = 0;
+                        $newNotification->opened_count = 0;
+                        $newNotification->clicked_count = 0;
+                        $newNotification->scheduled_at = null;
+                        $newNotification->save();
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Notification dupliquée avec succès')
+                            ->success()
+                            ->send();
                     }),
             ])
             ->bulkActions([
