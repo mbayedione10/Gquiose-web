@@ -79,17 +79,15 @@ class VilleResource extends Resource
                     ->boolean()
                     ->sortable(),
                     
-                Tables\Columns\TextColumn::make('structures_count')
+                Tables\Columns\BadgeColumn::make('structures_count')
                     ->label('Structures')
                     ->counts('structures')
-                    ->badge()
                     ->color('success')
                     ->toggleable(),
                     
-                Tables\Columns\TextColumn::make('alertes_count')
+                Tables\Columns\BadgeColumn::make('alertes_count')
                     ->label('Alertes')
                     ->counts('alertes')
-                    ->badge()
                     ->color('warning')
                     ->toggleable(),
                     
