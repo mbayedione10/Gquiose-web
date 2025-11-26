@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Article;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -14,12 +15,14 @@ class NewArticlePublished
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $article;
+
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct(Article $article)
     {
-        //
+        $this->article = $article;
     }
 
     /**

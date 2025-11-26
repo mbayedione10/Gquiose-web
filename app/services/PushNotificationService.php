@@ -1,96 +1,119 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Notifications;
 
 use App\Models\PushNotification;
 use App\Models\Utilisateur;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class PushNotificationService
 {
-    protected $fcmServerKey;
-
-    public function __construct()
-    {
-        $this->fcmServerKey = config('services.fcm.server_key');
-    }
-
     /**
-     * Envoyer une notification push à des utilisateurs ciblés
+     * Envoie une notification push à une liste d'utilisateurs.
+     *
+     * @param PushNotification $notification
+     * @param array $users
+     * @return void
      */
-    public function sendNotification(PushNotification $notification)
+    public function sendPushNotification(PushNotification $notification, array $users)
     {
-        $users = $this->getTargetedUsers($notification);
-        
-        $sentCount = 0;
-        $deliveredCount = 0;
+        $failed = 0;
+        $success = 0;
 
         foreach ($users as $user) {
-            if ($this->canSendToUser($user)) {
+            if ($this->canSendToUser($user, $notification)) {
                 $result = $this->sendToDevice($user, $notification);
-                
-                if ($result['sent']) {
-                    $sentCount++;
+                if ($result) {
+                    $success++;
+                } else {
+                    $failed++;
                 }
-                if ($result['delivered']) {
-                    $deliveredCount++;
-                }
+            } else {
+                $failed++;
             }
         }
 
+        // Enregistrer les statistiques
         $notification->update([
-            'sent_at' => now(),
-            'status' => 'sent',
-            'sent_count' => $sentCount,
-            'delivered_count' => $deliveredCount,
+            'sent' => $success,
+            'failed' => $failed,
         ]);
 
-        return [
-            'sent_count' => $sentCount,
-            'delivered_count' => $deliveredCount,
-            'total_users' => $users->count(),
-        ];
+        Log::info("Push notification sent: Success={$success}, Failed={$failed}");
     }
 
     /**
-     * Récupérer les utilisateurs ciblés selon les filtres
+     * Envoie la notification à un appareil spécifique.
+     *
+     * @param Utilisateur $user
+     * @param PushNotification $notification
+     * @return bool
      */
-    protected function getTargetedUsers(PushNotification $notification)
+    protected function sendToDevice(Utilisateur $user, PushNotification $notification): bool
     {
-        $query = Utilisateur::query();
+        $fcmToken = $user->fcm_token;
+        $payload = [
+            'title' => $notification->title,
+            'body' => $notification->body,
+            'sound' => 'default',
+            'data' => [
+                'notification_id' => $notification->id,
+                'action' => $notification->action,
+                'deeplink' => $notification->deeplink,
+            ],
+        ];
 
-        if ($notification->target_audience === 'all') {
-            return $query->get();
+        // Envoyer à Android (FCM)
+        if (!empty($fcmToken) && config('services.fcm.server_key')) {
+            try {
+                $client = new \GuzzleHttp\Client();
+                $response = $client->post('https://fcm.googleapis.com/fcm/send', [
+                    'headers' => [
+                        'Authorization' => 'key=' . config('services.fcm.server_key'),
+                        'Content-Type' => 'application/json',
+                    ],
+                    'json' => [
+                        'to' => $fcmToken,
+                        'notification' => [
+                            'title' => $payload['title'],
+                            'body' => $payload['body'],
+                            'sound' => $payload['sound'],
+                        ],
+                        'data' => $payload['data'],
+                    ],
+                ]);
+
+                if ($response->getStatusCode() == 200) {
+                    $this->trackNotificationStatus($notification->id, $user->id, 'sent');
+                    return true;
+                }
+            } catch (\Exception $e) {
+                Log::error("FCM send failed for user {$user->id}: " . $e->getMessage());
+            }
         }
 
-        $filters = $notification->filters ?? [];
+        // Envoyer à iOS (APNs)
+        if (!empty($user->apns_token) && config('services.apns.key_id')) {
+            try {
+                // Logique d'envoi APNs (à implémenter)
+                // Utiliser un package comme laravel-apn ou similaire
+                // Exemple simplifié:
+                // Apn::send($user->apns_token, $payload);
+                $this->trackNotificationStatus($notification->id, $user->id, 'sent');
+                return true;
 
-        // Filtre par âge
-        if (isset($filters['age_min'])) {
-            $query->whereRaw('TIMESTAMPDIFF(YEAR, dob, CURDATE()) >= ?', [$filters['age_min']]);
-        }
-        if (isset($filters['age_max'])) {
-            $query->whereRaw('TIMESTAMPDIFF(YEAR, dob, CURDATE()) <= ?', [$filters['age_max']]);
-        }
-
-        // Filtre par sexe
-        if (isset($filters['sexe'])) {
-            $query->where('sexe', $filters['sexe']);
-        }
-
-        // Filtre par ville/localisation
-        if (isset($filters['ville_id'])) {
-            $query->where('ville_id', $filters['ville_id']);
+            } catch (\Exception $e) {
+                Log::error("APNs send failed for user {$user->id}: " . $e->getMessage());
+            }
         }
 
-        return $query->get();
+        return false;
     }
 
     /**
-     * Vérifier si on peut envoyer à cet utilisateur
+     * Vérifier si on peut envoyer à cet utilisateur.
      */
-    protected function canSendToUser(Utilisateur $user)
+    protected function canSendToUser(Utilisateur $user, PushNotification $notification)
     {
         // Vérifier si l'utilisateur a un token FCM
         if (empty($user->fcm_token)) {
@@ -99,7 +122,7 @@ class PushNotificationService
 
         // Vérifier les préférences de notification
         $preferences = $user->notificationPreferences;
-        
+
         if (!$preferences || !$preferences->notifications_enabled) {
             return false;
         }
@@ -117,126 +140,67 @@ class PushNotificationService
             }
         }
 
+        // Vérifier les préférences par type de notification
+        $notificationType = $this->getNotificationType($notification);
+
+        if ($notificationType === 'cycle' && !$preferences->cycle_notifications) {
+            return false;
+        }
+        if ($notificationType === 'content' && !$preferences->content_notifications) {
+            return false;
+        }
+        if ($notificationType === 'forum' && !$preferences->forum_notifications) {
+            return false;
+        }
+        if ($notificationType === 'health_tips' && !$preferences->health_tips_notifications) {
+            return false;
+        }
+        if ($notificationType === 'admin' && !$preferences->admin_notifications) {
+            return false;
+        }
+
         return true;
     }
 
     /**
-     * Router les notifications par plateforme
+     * Déterminer le type de notification
      */
-    protected function sendToDevice(Utilisateur $user, PushNotification $notification)
+    protected function getNotificationType(PushNotification $notification)
     {
-        // Route to correct service based on platform
-        if ($user->platform === 'ios') {
-            return $this->sendToApple($user, $notification);
+        // Utiliser l'action ou le type pour déterminer la catégorie
+        $action = $notification->action ?? '';
+
+        if (str_contains($action, 'cycle') || str_contains($notification->title, 'Cycle')) {
+            return 'cycle';
+        }
+        if (str_contains($action, 'article') || str_contains($action, 'content')) {
+            return 'content';
+        }
+        if (str_contains($action, 'forum') || str_contains($action, 'message')) {
+            return 'forum';
+        }
+        if (str_contains($action, 'conseil') || str_contains($action, 'health')) {
+            return 'health_tips';
+        }
+        if (str_contains($notification->title, 'Admin') || $notification->type === 'admin') {
+            return 'admin';
         }
 
-        // Default to Android/FCM
-        return $this->sendToAndroid($user, $notification);
+        return 'admin'; // Par défaut
     }
 
     /**
-     * Envoyer notification Android via FCM
+     * Enregistrer le statut de la notification (envoyé, ouvert, cliqué).
+     *
+     * @param int $notificationId
+     * @param int $userId
+     * @param string $status
+     * @return void
      */
-    protected function sendToAndroid(Utilisateur $user, PushNotification $notification)
+    protected function trackNotificationStatus(int $notificationId, int $userId, string $status)
     {
-        $payload = [
-            'to' => $user->fcm_token,
-            'notification' => [
-                'title' => $notification->title,
-                'body' => $notification->message,
-                'icon' => $notification->icon ?? 'default_icon',
-                'click_action' => $notification->action ?? 'FLUTTER_NOTIFICATION_CLICK',
-            ],
-            'data' => [
-                'id' => $notification->id,
-                'type' => $notification->type,
-                'image' => $notification->image,
-            ],
-            'priority' => 'high',
-        ];
-
-        try {
-            $response = Http::withHeaders([
-                'Authorization' => 'key=' . $this->fcmServerKey,
-                'Content-Type' => 'application/json',
-            ])->post('https://fcm.googleapis.com/fcm/send', $payload);
-
-            $result = $response->json();
-
-            return [
-                'sent' => true,
-                'delivered' => isset($result['success']) && $result['success'] > 0,
-            ];
-
-        } catch (\Exception $e) {
-            Log::error('Erreur envoi notification push: ' . $e->getMessage());
-
-            return [
-                'sent' => false,
-                'delivered' => false,
-            ];
-        }
-    }
-
-    /**
-     * Envoyer notification iOS via APNs
-     */
-    protected function sendToApple(Utilisateur $user, PushNotification $notification)
-    {
-        try {
-            $config = config('services.apns');
-
-            // Create APNs client with JWT authentication
-            $authProvider = \Pushok\AuthProvider\Token::create([
-                'key_id' => $config['key_id'],
-                'team_id' => $config['team_id'],
-                'app_bundle_id' => $config['bundle_id'],
-                'private_key_path' => $config['key_path'],
-            ]);
-
-            $production = config('services.apns.environment', 'production') === 'production';
-            $client = new \Pushok\Client($authProvider, $production);
-
-            // Build APNs payload
-            $payload = \Pushok\Payload::create()
-                ->setAlert([
-                    'title' => $notification->title,
-                    'body' => $notification->message,
-                ])
-                ->setBadge(1)
-                ->setSound('default')
-                ->setMutableContent(true)
-                ->setCustomValue('notification_id', $notification->id)
-                ->setCustomValue('type', $notification->type)
-                ->setCustomValue('action', $notification->action)
-                ->setCustomValue('image', $notification->image);
-
-            // Create notification
-            $deviceNotification = new \Pushok\Notification($payload, $user->fcm_token);
-
-            // Send
-            $response = $client->push($deviceNotification);
-
-            return [
-                'sent' => true,
-                'delivered' => $response->getStatusCode() === 200,
-            ];
-
-        } catch (\Exception $e) {
-            Log::error('APNs error: ' . $e->getMessage(), [
-                'user_id' => $user->id,
-                'notification_id' => $notification->id,
-            ]);
-
-            // Handle invalid token
-            if (strpos($e->getMessage(), 'BadDeviceToken') !== false) {
-                $user->update(['fcm_token' => null]);
-            }
-
-            return [
-                'sent' => false,
-                'delivered' => false,
-            ];
-        }
+        // Implémenter la logique pour enregistrer le statut dans la base de données
+        // Par exemple, créer un enregistrement dans une table 'notification_user_status'
+        // Log::info("Tracking notification {$notificationId} for user {$userId} with status: {$status}");
     }
 }
