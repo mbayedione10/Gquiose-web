@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Models\Structure;
 use App\Models\TypeStructure;
 use App\Models\Ville;
+use App\Exports\StructuresExport;
 use Filament\{Tables, Forms};
 use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Grid;
@@ -17,6 +18,8 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\StructureResource\Pages;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class StructureResource extends Resource
 {
@@ -259,6 +262,23 @@ class StructureResource extends Resource
                     ->indicator('Ville')
                     ->multiple()
                     ->label('Ville'),
+            ])
+            ->headerActions([
+                Tables\Actions\Action::make('export_excel')
+                    ->label('Exporter Excel')
+                    ->icon('heroicon-o-document-download')
+                    ->color('success')
+                    ->action(fn () => Excel::download(new StructuresExport(), 'structures_' . date('Y-m-d') . '.xlsx')),
+
+                Tables\Actions\Action::make('export_pdf')
+                    ->label('Exporter PDF')
+                    ->icon('heroicon-o-document-text')
+                    ->color('danger')
+                    ->action(function () {
+                        $structures = Structure::with(['typeStructure', 'ville'])->get();
+                        $pdf = Pdf::loadView('pdf.structures', compact('structures'));
+                        return response()->streamDownload(fn () => print($pdf->output()), 'structures_' . date('Y-m-d') . '.pdf');
+                    }),
             ]);
     }
 

@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AlerteResource\Widgets\AlertOverview;
 use App\Models\Alerte;
+use App\Exports\AlertesExport;
 use Illuminate\Console\View\Components\Alert;
 use Filament\{Notifications\Notification, Tables, Forms};
 use Filament\Resources\{Form, Table, Resource};
@@ -16,6 +17,8 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\AlerteResource\Pages;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class AlerteResource extends Resource
 {
@@ -234,6 +237,23 @@ class AlerteResource extends Resource
             ])
             ->filters([
 
+            ])
+            ->headerActions([
+                Tables\Actions\Action::make('export_excel')
+                    ->label('Exporter Excel')
+                    ->icon('heroicon-o-document-download')
+                    ->color('success')
+                    ->action(fn () => Excel::download(new AlertesExport(), 'alertes_' . date('Y-m-d') . '.xlsx')),
+
+                Tables\Actions\Action::make('export_pdf')
+                    ->label('Exporter PDF')
+                    ->icon('heroicon-o-document-text')
+                    ->color('danger')
+                    ->action(function () {
+                        $alertes = Alerte::with(['utilisateur', 'typeAlerte', 'ville'])->get();
+                        $pdf = Pdf::loadView('pdf.alertes', compact('alertes'));
+                        return response()->streamDownload(fn () => print($pdf->output()), 'alertes_' . date('Y-m-d') . '.pdf');
+                    }),
             ]);
     }
 
