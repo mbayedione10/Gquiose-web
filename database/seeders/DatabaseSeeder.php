@@ -24,12 +24,34 @@ class DatabaseSeeder extends Seeder
             TypeAlerteSeeder::class,
             ThematiqueSeeder::class,
             RubriqueSeeder::class,
+            ThemeSeeder::class,
         ]);
 
         // Utilisateurs
         $this->call([
             SuperAdminSeeder::class,
             TestUsersSeeder::class,
+        ]);
+
+        // Contenu principal
+        $this->call([
+            StructureSeeder::class,
+            ArticleSeeder::class,
+            AlerteSeeder::class,
+            SuiviSeeder::class,
+        ]);
+
+        // Ressources éducatives
+        $this->call([
+            ConseilSeeder::class,
+            FaqSeeder::class,
+            VideoSeeder::class,
+        ]);
+
+        // Système
+        $this->call([
+            QuestionEvaluationSeeder::class,
+            NotificationTemplateSeeder::class,
         ]);
     }
 }

@@ -17,6 +17,7 @@ class Structure extends Model
         'latitude',
         'longitude',
         'phone',
+        'type_structure_id',
         'ville_id',
         'status',
         'adresse',

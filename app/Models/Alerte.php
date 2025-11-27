@@ -19,13 +19,28 @@ class Alerte extends Model
         'type_alerte_id',
         'etat',
         'ville_id',
+        'utilisateur_id',
     ];
-
 
     protected $searchableFields = ['*'];
 
     public function utilisateur()
     {
         return $this->belongsTo(Utilisateur::class);
+    }
+
+    public function typeAlerte()
+    {
+        return $this->belongsTo(TypeAlerte::class);
+    }
+
+    public function ville()
+    {
+        return $this->belongsTo(Ville::class);
+    }
+
+    public function suivis()
+    {
+        return $this->hasMany(Suivi::class);
     }
 }
