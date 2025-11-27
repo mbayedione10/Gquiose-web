@@ -11,27 +11,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Seeders essentiels
+        // Données de base
         $this->call([
-            SuperAdminSeeder::class,
+            RoleSeeder::class,
+            PermissionSeeder::class,
             VillesGuineeSeeder::class,
-            TestUsersSeeder::class,
         ]);
 
-        /*$this->call(AlerteSeeder::class);
-        $this->call(ArticleSeeder::class);
-        $this->call(PermissionSeeder::class);
-        $this->call(QuestionSeeder::class);
-        $this->call(ResponseSeeder::class);
-        $this->call(RoleSeeder::class);
-        $this->call(RubriqueSeeder::class);
-        $this->call(StructureSeeder::class);
-        $this->call(SuiviSeeder::class);
-        $this->call(ThematiqueSeeder::class);
-        $this->call(TypeAlerteSeeder::class);
-        $this->call(TypeStructureSeeder::class);
-        $this->call(UserSeeder::class);
-        $this->call(UtilisateurSeeder::class);
-        $this->call(VilleSeeder::class);*/
+        // Données de référence
+        $this->call([
+            TypeStructureSeeder::class,
+            TypeAlerteSeeder::class,
+            ThematiqueSeeder::class,
+            RubriqueSeeder::class,
+        ]);
+
+        // Utilisateurs
+        $this->call([
+            SuperAdminSeeder::class,
+            TestUsersSeeder::class,
+        ]);
     }
 }

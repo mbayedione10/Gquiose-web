@@ -7,13 +7,23 @@ use Illuminate\Database\Seeder;
 
 class RoleSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        Role::factory()
-            ->count(5)
-            ->create();
+        $roles = [
+            ['name' => 'Admin', 'status' => true],
+            ['name' => 'Gestionnaire', 'status' => true],
+            ['name' => 'Modérateur', 'status' => true],
+            ['name' => 'Structure Sanitaire', 'status' => true],
+            ['name' => 'Utilisateur', 'status' => true],
+        ];
+
+        foreach ($roles as $role) {
+            Role::firstOrCreate(
+                ['name' => $role['name']],
+                ['status' => $role['status']]
+            );
+        }
+
+        $this->command->info('✅ ' . count($roles) . ' rôles créés');
     }
 }
