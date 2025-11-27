@@ -45,14 +45,16 @@ return [
         ],
     ],
     'fcm' => [
-        'server_key' => env('FCM_SERVER_KEY'),
+        'server_key' => env('FCM_SERVER_KEY'), // Deprecated - keep for backward compatibility
+        'credentials_path' => env('FCM_CREDENTIALS_PATH', storage_path('app/firebase/credentials.json')),
     ],
 
     'apns' => [
         'key_id' => env('APNS_KEY_ID'),
         'team_id' => env('APNS_TEAM_ID'),
         'bundle_id' => env('APNS_BUNDLE_ID'),
-        'key_path' => storage_path('app/apns/AuthKey.p8'),
+        'key_path' => env('APNS_KEY_PATH', storage_path('app/apns/AuthKey.p8')),
+        'environment' => env('APNS_ENVIRONMENT', 'production'), // 'production' or 'sandbox'
     ],
 
     // Social Authentication

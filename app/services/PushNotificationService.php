@@ -4,6 +4,10 @@ namespace App\Services;
 
 use App\Models\PushNotification;
 use App\Models\Utilisateur;
+use App\Models\NotificationLog;
+use App\Services\Push\FCMService;
+use App\Services\Push\APNsService;
+use App\Jobs\SendBatchNotifications;
 use Illuminate\Support\Facades\Log;
 
 class PushNotificationService
@@ -21,6 +25,49 @@ class PushNotificationService
 
         // Envoyer aux utilisateurs
         $this->sendPushNotification($notification, $users->toArray());
+    }
+
+    /**
+     * Envoie une notification en utilisant des jobs en queue pour optimiser les envois massifs.
+     * Plus performant pour les grandes audiences.
+     *
+     * @param PushNotification $notification
+     * @param int $batchSize Nombre d'utilisateurs par batch (défaut: 100)
+     * @return void
+     */
+    public function sendNotificationInBatches(PushNotification $notification, int $batchSize = 100)
+    {
+        // Récupérer les utilisateurs ciblés
+        $users = $this->getTargetedUsers($notification);
+        $userIds = $users->pluck('id')->toArray();
+
+        $totalUsers = count($userIds);
+        Log::info("Preparing to send notification {$notification->id} to {$totalUsers} users in batches of {$batchSize}");
+
+        // Si peu d'utilisateurs, envoyer de manière synchrone
+        if ($totalUsers <= 50) {
+            Log::info("Small audience ({$totalUsers} users), sending synchronously");
+            $this->sendPushNotification($notification, $users->toArray());
+            return;
+        }
+
+        // Diviser en batches et dispatcher les jobs
+        $batches = array_chunk($userIds, $batchSize);
+        $jobCount = 0;
+
+        foreach ($batches as $batchUserIds) {
+            SendBatchNotifications::dispatch($notification, $batchUserIds)
+                ->onQueue('notifications'); // Queue spécifique pour les notifications
+
+            $jobCount++;
+        }
+
+        Log::info("Dispatched {$jobCount} batch jobs for notification {$notification->id}");
+
+        // Mettre à jour le statut
+        $notification->update([
+            'status' => 'sending',
+        ]);
     }
 
     /**
@@ -99,42 +146,16 @@ class PushNotificationService
      */
     protected function sendToDevice(Utilisateur $user, PushNotification $notification): bool
     {
-        $fcmToken = $user->fcm_token;
-        $payload = [
-            'title' => $notification->title,
-            'body' => $notification->message,
-            'sound' => 'default',
-            'data' => [
-                'notification_id' => $notification->id,
-                'action' => $notification->action,
-                'icon' => $notification->icon,
-                'image' => $notification->image,
-            ],
-        ];
+        $sent = false;
 
-        // Envoyer à Android (FCM)
-        if (!empty($fcmToken) && config('services.fcm.server_key')) {
+        // Envoyer à Android (FCM) - Utilise le nouveau Firebase Admin SDK
+        if (!empty($user->fcm_token)) {
             try {
-                $client = new \GuzzleHttp\Client();
-                $response = $client->post('https://fcm.googleapis.com/fcm/send', [
-                    'headers' => [
-                        'Authorization' => 'key=' . config('services.fcm.server_key'),
-                        'Content-Type' => 'application/json',
-                    ],
-                    'json' => [
-                        'to' => $fcmToken,
-                        'notification' => [
-                            'title' => $payload['title'],
-                            'body' => $payload['body'],
-                            'sound' => $payload['sound'],
-                        ],
-                        'data' => $payload['data'],
-                    ],
-                ]);
+                $fcmService = app(FCMService::class);
+                $sent = $fcmService->sendToDevice($user, $notification);
 
-                if ($response->getStatusCode() == 200) {
+                if ($sent) {
                     $this->trackNotificationStatus($notification->id, $user->id, 'sent');
-                    return true;
                 }
             } catch (\Exception $e) {
                 Log::error("FCM send failed for user {$user->id}: " . $e->getMessage());
@@ -142,21 +163,20 @@ class PushNotificationService
         }
 
         // Envoyer à iOS (APNs)
-        if (!empty($user->apns_token) && config('services.apns.key_id')) {
+        if (!$sent && !empty($user->apns_token)) {
             try {
-                // Logique d'envoi APNs (à implémenter)
-                // Utiliser un package comme laravel-apn ou similaire
-                // Exemple simplifié:
-                // Apn::send($user->apns_token, $payload);
-                $this->trackNotificationStatus($notification->id, $user->id, 'sent');
-                return true;
+                $apnsService = app(APNsService::class);
+                $sent = $apnsService->sendToDevice($user, $notification);
 
+                if ($sent) {
+                    $this->trackNotificationStatus($notification->id, $user->id, 'sent');
+                }
             } catch (\Exception $e) {
                 Log::error("APNs send failed for user {$user->id}: " . $e->getMessage());
             }
         }
 
-        return false;
+        return $sent;
     }
 
     /**
@@ -248,12 +268,82 @@ class PushNotificationService
      * @param int $notificationId
      * @param int $userId
      * @param string $status
+     * @return NotificationLog|null
+     */
+    protected function trackNotificationStatus(int $notificationId, int $userId, string $status): ?NotificationLog
+    {
+        try {
+            $notification = PushNotification::find($notificationId);
+
+            if (!$notification) {
+                Log::warning("Notification {$notificationId} not found for tracking");
+                return null;
+            }
+
+            $user = Utilisateur::find($userId);
+            if (!$user) {
+                Log::warning("User {$userId} not found for tracking");
+                return null;
+            }
+
+            // Déterminer la plateforme
+            $platform = null;
+            if (!empty($user->fcm_token)) {
+                $platform = 'android';
+            } elseif (!empty($user->apns_token)) {
+                $platform = 'ios';
+            }
+
+            // Créer ou mettre à jour le log
+            $log = NotificationLog::create([
+                'utilisateur_id' => $userId,
+                'notification_schedule_id' => $notification->id,
+                'title' => $notification->title,
+                'message' => $notification->message,
+                'icon' => $notification->icon,
+                'action' => $notification->action,
+                'image' => $notification->image,
+                'type' => $notification->type ?? 'manual',
+                'category' => $this->getNotificationType($notification),
+                'status' => $status,
+                'platform' => $platform,
+                'sent_at' => $status === 'sent' ? now() : null,
+            ]);
+
+            Log::info("Tracked notification {$notificationId} for user {$userId} with status: {$status}");
+
+            return $log;
+
+        } catch (\Exception $e) {
+            Log::error("Error tracking notification status: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Mettre à jour les statistiques de la notification
+     *
+     * @param PushNotification $notification
      * @return void
      */
-    protected function trackNotificationStatus(int $notificationId, int $userId, string $status)
+    public function updateNotificationStats(PushNotification $notification)
     {
-        // Implémenter la logique pour enregistrer le statut dans la base de données
-        // Par exemple, créer un enregistrement dans une table 'notification_user_status'
-        // Log::info("Tracking notification {$notificationId} for user {$userId} with status: {$status}");
+        $stats = NotificationLog::where('notification_schedule_id', $notification->id)
+            ->selectRaw('
+                COUNT(*) as total,
+                SUM(CASE WHEN status = "sent" THEN 1 ELSE 0 END) as sent,
+                SUM(CASE WHEN status = "delivered" THEN 1 ELSE 0 END) as delivered,
+                SUM(CASE WHEN opened_at IS NOT NULL THEN 1 ELSE 0 END) as opened,
+                SUM(CASE WHEN clicked_at IS NOT NULL THEN 1 ELSE 0 END) as clicked,
+                SUM(CASE WHEN status = "failed" THEN 1 ELSE 0 END) as failed
+            ')
+            ->first();
+
+        $notification->update([
+            'sent_count' => $stats->sent ?? 0,
+            'delivered_count' => $stats->delivered ?? 0,
+            'opened_count' => $stats->opened ?? 0,
+            'clicked_count' => $stats->clicked ?? 0,
+        ]);
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\APIForumController;
 use App\Http\Controllers\APIQuizController;
 use App\Http\Controllers\APIStructureController;
 use App\Http\Controllers\APIVideoController;
+use App\Http\Controllers\NotificationTrackingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,6 +42,13 @@ Route::prefix('v1')
             Route::post('update-profile', [APIAuthController::class, 'updateProfile']);
             Route::post('change-password', [APIAuthController::class, 'changePassword']);
             Route::post('delete-account', [APIAuthController::class, 'deleteAccount']);
+
+            // Notification tracking
+            Route::prefix('notifications')->group(function () {
+                Route::post('opened', [NotificationTrackingController::class, 'markAsOpened']);
+                Route::post('clicked', [NotificationTrackingController::class, 'markAsClicked']);
+                Route::get('history', [NotificationTrackingController::class, 'getHistory']);
+            });
         });
 
         /*************************  CONFIG    ***************************/

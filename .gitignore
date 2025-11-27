@@ -18,3 +18,5 @@ yarn-error.log
 /.idea
 /.vscode
 storage/app/apns/*.p8
+storage/app/firebase/*.json
+storage/app/apns/*.p8

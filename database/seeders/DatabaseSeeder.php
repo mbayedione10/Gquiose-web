@@ -11,13 +11,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Adding an admin user
-        $user = \App\Models\User::factory()
-            ->count(1)
-            ->create([
-                'email' => 'admin@admin.com',
-                'password' => \Hash::make('admin'),
-            ]);
+        // Seeders essentiels
+        $this->call([
+            SuperAdminSeeder::class,
+            VillesGuineeSeeder::class,
+            TestUsersSeeder::class,
+        ]);
 
         /*$this->call(AlerteSeeder::class);
         $this->call(ArticleSeeder::class);
