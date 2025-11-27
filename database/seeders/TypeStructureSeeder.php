@@ -10,16 +10,17 @@ class TypeStructureSeeder extends Seeder
     public function run(): void
     {
         $types = [
-            ['name' => 'Hôpital National', 'status' => true],
-            ['name' => 'Hôpital Régional', 'status' => true],
-            ['name' => 'Hôpital Préfectoral', 'status' => true],
-            ['name' => 'Centre de Santé', 'status' => true],
-            ['name' => 'Poste de Santé', 'status' => true],
-            ['name' => 'Clinique Privée', 'status' => true],
-            ['name' => 'Pharmacie', 'status' => true],
-            ['name' => 'Laboratoire', 'status' => true],
-            ['name' => 'Maternité', 'status' => true],
-            ['name' => 'Dispensaire', 'status' => true],
+            // Structures spécifiques SSR/VBG pour jeunes
+            ['name' => 'Centre de Santé pour Jeunes', 'status' => true],
+            ['name' => 'Centre de Planning Familial', 'status' => true],
+            ['name' => 'Centre d\'Écoute VBG', 'status' => true],
+            ['name' => 'Point de Service Jeunes', 'status' => true],
+            ['name' => 'Maison des Jeunes', 'status' => true],
+            ['name' => 'Centre de Prise en Charge VBG', 'status' => true],
+            ['name' => 'Clinique Amie des Jeunes', 'status' => true],
+            ['name' => 'Centre de Conseil et Dépistage', 'status' => true],
+            ['name' => 'Association de Lutte contre VBG', 'status' => true],
+            ['name' => 'Service Social', 'status' => true],
         ];
 
         foreach ($types as $type) {

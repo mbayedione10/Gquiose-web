@@ -10,18 +10,25 @@ class ThemeSeeder extends Seeder
     public function run(): void
     {
         $themes = [
-            ['name' => 'Questions générales de santé', 'status' => true],
-            ['name' => 'Santé de la mère et de l\'enfant', 'status' => true],
-            ['name' => 'Maladies infectieuses', 'status' => true],
-            ['name' => 'Nutrition et alimentation', 'status' => true],
-            ['name' => 'Vaccination', 'status' => true],
-            ['name' => 'Planning familial', 'status' => true],
-            ['name' => 'Hygiène et assainissement', 'status' => true],
-            ['name' => 'Premiers secours', 'status' => true],
-            ['name' => 'VIH/SIDA et IST', 'status' => true],
-            ['name' => 'Paludisme', 'status' => true],
-            ['name' => 'Diabète et hypertension', 'status' => true],
-            ['name' => 'Santé mentale', 'status' => true],
+            // Thèmes SSR
+            ['name' => 'Puberté et Questions Intimes', 'status' => true],
+            ['name' => 'Première Fois et Sexualité', 'status' => true],
+            ['name' => 'Contraception et Préservatifs', 'status' => true],
+            ['name' => 'Règles et Cycle Menstruel', 'status' => true],
+            ['name' => 'Grossesse et IVG', 'status' => true],
+            ['name' => 'IST, VIH et Dépistage', 'status' => true],
+            
+            // Thèmes VBG et Relations
+            ['name' => 'Relations Amoureuses Saines', 'status' => true],
+            ['name' => 'Consentement et Respect', 'status' => true],
+            ['name' => 'J\'ai Subi des Violences', 'status' => true],
+            ['name' => 'Harcèlement à l\'École', 'status' => true],
+            ['name' => 'Violence en Ligne', 'status' => true],
+            
+            // Thèmes Droits et Soutien
+            ['name' => 'Mes Droits en Tant que Jeune', 'status' => true],
+            ['name' => 'Où Trouver de l\'Aide ?', 'status' => true],
+            ['name' => 'Parler à mes Parents', 'status' => true],
         ];
 
         foreach ($themes as $theme) {
@@ -31,6 +38,6 @@ class ThemeSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ ' . count($themes) . ' thèmes de forum créés');
+        $this->command->info('✅ ' . count($themes) . ' thèmes de forum pour jeunes créés');
     }
 }

@@ -10,16 +10,16 @@ class RubriqueSeeder extends Seeder
     public function run(): void
     {
         $rubriques = [
-            ['name' => 'Actualités Santé', 'status' => true],
-            ['name' => 'Conseils Pratiques', 'status' => true],
-            ['name' => 'Prévention', 'status' => true],
-            ['name' => 'Santé de la Femme', 'status' => true],
-            ['name' => 'Santé de l\'Enfant', 'status' => true],
-            ['name' => 'Alimentation', 'status' => true],
-            ['name' => 'Activité Physique', 'status' => true],
-            ['name' => 'Bien-être', 'status' => true],
-            ['name' => 'Questions Fréquentes', 'status' => true],
-            ['name' => 'Guides et Tutoriels', 'status' => true],
+            ['name' => 'Je Découvre Mon Corps', 'status' => true],
+            ['name' => 'Sexualité et Relations', 'status' => true],
+            ['name' => 'Ma Santé Reproductive', 'status' => true],
+            ['name' => 'Contraception : Mes Options', 'status' => true],
+            ['name' => 'Prévention IST/VIH', 'status' => true],
+            ['name' => 'Dire Non aux Violences', 'status' => true],
+            ['name' => 'Mes Droits, Mon Pouvoir', 'status' => true],
+            ['name' => 'Témoignages de Jeunes', 'status' => true],
+            ['name' => 'Questions Sans Tabou', 'status' => true],
+            ['name' => 'Où Trouver de l\'Aide ?', 'status' => true],
         ];
 
         foreach ($rubriques as $rubrique) {
@@ -29,6 +29,6 @@ class RubriqueSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ ' . count($rubriques) . ' rubriques créées');
+        $this->command->info('✅ ' . count($rubriques) . ' rubriques pour jeunes créées');
     }
 }

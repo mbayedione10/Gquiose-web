@@ -10,14 +10,16 @@ class TypeAlerteSeeder extends Seeder
     public function run(): void
     {
         $types = [
-            ['name' => 'Épidémie', 'status' => true],
-            ['name' => 'Urgence Sanitaire', 'status' => true],
-            ['name' => 'Pénurie de Médicaments', 'status' => true],
-            ['name' => 'Fermeture de Structure', 'status' => true],
-            ['name' => 'Campagne de Vaccination', 'status' => true],
-            ['name' => 'Information Sanitaire', 'status' => true],
-            ['name' => 'Prévention', 'status' => true],
-            ['name' => 'Sensibilisation', 'status' => true],
+            // Types d'alertes VBG
+            ['name' => 'Violence Conjugale', 'status' => true],
+            ['name' => 'Harcèlement Sexuel', 'status' => true],
+            ['name' => 'Agression Sexuelle', 'status' => true],
+            ['name' => 'Mariage Forcé', 'status' => true],
+            ['name' => 'MGF (Excision)', 'status' => true],
+            ['name' => 'Cyberharcèlement', 'status' => true],
+            ['name' => 'Violence Scolaire', 'status' => true],
+            ['name' => 'Exploitation Sexuelle', 'status' => true],
+            ['name' => 'Autres Violences', 'status' => true],
         ];
 
         foreach ($types as $type) {
@@ -27,6 +29,6 @@ class TypeAlerteSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ ' . count($types) . ' types d\'alertes créés');
+        $this->command->info('✅ ' . count($types) . ' types d\'alertes VBG créés');
     }
 }
