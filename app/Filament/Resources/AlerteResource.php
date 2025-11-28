@@ -62,7 +62,6 @@ class AlerteResource extends Resource
         return $form->schema([
             Tabs::make('Informations VBG')
                 ->columnSpanFull()
-                ->contained(false)
                 ->tabs([
 
                 // TAB 1: Informations générales
