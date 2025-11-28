@@ -60,7 +60,10 @@ class AlerteResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Tabs::make('Informations VBG')->tabs([
+            Tabs::make('Informations VBG')
+                ->columnSpanFull()
+                ->contained(false)
+                ->tabs([
 
                 // TAB 1: Informations générales
                 Tabs\Tab::make('Informations générales')->schema([
