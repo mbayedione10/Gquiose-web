@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Filament\Resources;
@@ -71,11 +70,11 @@ class UserNotificationPreferenceResource extends Resource
                         
                         Forms\Components\TimePicker::make('quiet_start')
                             ->label('Début période silencieuse')
-                            ->seconds(false),
+                            ->withoutSeconds(),
                         
                         Forms\Components\TimePicker::make('quiet_end')
                             ->label('Fin période silencieuse')
-                            ->seconds(false),
+                            ->withoutSeconds(),
                     ])
                     ->columns(3),
             ]);
