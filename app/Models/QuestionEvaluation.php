@@ -40,22 +40,44 @@ class QuestionEvaluation extends Model
     }
 
     /**
+     * Add relationship to ReponseEvaluation in QuestionEvaluation model
+     */
+    public function reponsesEvaluations()
+    {
+        return $this->hasMany(ReponseEvaluation::class);
+    }
+
+    /**
      * Vérifier si la question doit être affichée selon la logique conditionnelle
      */
-    public function shouldDisplay(array $previousAnswers)
+    public function shouldDisplay(array $previousResponses = []): bool
     {
         if (!$this->condition_question_id) {
             return true;
         }
 
-        $conditionAnswer = $previousAnswers[$this->condition_question_id] ?? null;
-        
-        if ($conditionAnswer === null) {
-            return false;
+        $conditionQuestion = self::find($this->condition_question_id);
+        if (!$conditionQuestion) {
+            return true;
         }
 
-        $conditionMet = $this->evaluateCondition($conditionAnswer);
-        
+        $previousResponse = collect($previousResponses)
+            ->firstWhere('question_evaluation_id', $this->condition_question_id);
+
+        if (!$previousResponse) {
+            return !$this->show_if_condition_met;
+        }
+
+        $responseValue = $previousResponse['reponse'] ?? $previousResponse['valeur_numerique'] ?? null;
+
+        $conditionMet = match($this->condition_operator) {
+            'equals' => $responseValue == $this->condition_value,
+            'not_equals' => $responseValue != $this->condition_value,
+            'greater_than' => $responseValue > $this->condition_value,
+            'less_than' => $responseValue < $this->condition_value,
+            default => true,
+        };
+
         return $this->show_if_condition_met ? $conditionMet : !$conditionMet;
     }
 
