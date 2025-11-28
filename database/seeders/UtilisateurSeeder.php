@@ -14,6 +14,8 @@ class UtilisateurSeeder extends Seeder
     {
         Utilisateur::factory()
             ->count(5)
-            ->create();
+            ->create([
+                'sexe' => 'F'
+            ]);
     }
 }

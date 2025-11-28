@@ -1,10 +1,11 @@
+
 <?php
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Utilisateur;
 use App\Models\Ville;
+use Illuminate\Database\Seeder;
 
 class TestUsersSeeder extends Seeder
 {
@@ -26,18 +27,6 @@ class TestUsersSeeder extends Seeder
                 'phone_verified_at' => now(),
             ],
             [
-                'nom' => 'Bah',
-                'prenom' => 'Mamadou',
-                'phone' => '+224622345678',
-                'email' => 'mamadou.bah@test.gn',
-                'sexe' => 'M',
-                'status' => true,
-                'dob' => '1992-07-22',
-                'ville_id' => $conakry?->id,
-                'password' => bcrypt('password'),
-                'phone_verified_at' => now(),
-            ],
-            [
                 'nom' => 'Camara',
                 'prenom' => 'Aissatou',
                 'phone' => '+224623456789',
@@ -45,18 +34,6 @@ class TestUsersSeeder extends Seeder
                 'sexe' => 'F',
                 'status' => true,
                 'dob' => '1998-11-08',
-                'ville_id' => $conakry?->id,
-                'password' => bcrypt('password'),
-                'phone_verified_at' => now(),
-            ],
-            [
-                'nom' => 'Sylla',
-                'prenom' => 'Ibrahima',
-                'phone' => '+224624567890',
-                'email' => 'ibrahima.sylla@test.gn',
-                'sexe' => 'M',
-                'status' => true,
-                'dob' => '1990-01-30',
                 'ville_id' => $conakry?->id,
                 'password' => bcrypt('password'),
                 'phone_verified_at' => now(),
@@ -73,15 +50,39 @@ class TestUsersSeeder extends Seeder
                 'password' => bcrypt('password'),
                 'phone_verified_at' => now(),
             ],
+            [
+                'nom' => 'Bah',
+                'prenom' => 'Kadiatou',
+                'phone' => '+224622345678',
+                'email' => 'kadiatou.bah@test.gn',
+                'sexe' => 'F',
+                'status' => true,
+                'dob' => '1999-07-22',
+                'ville_id' => $conakry?->id,
+                'password' => bcrypt('password'),
+                'phone_verified_at' => now(),
+            ],
+            [
+                'nom' => 'Sylla',
+                'prenom' => 'Fatoumata',
+                'phone' => '+224624567890',
+                'email' => 'fatoumata.sylla@test.gn',
+                'sexe' => 'F',
+                'status' => true,
+                'dob' => '2000-01-30',
+                'ville_id' => $conakry?->id,
+                'password' => bcrypt('password'),
+                'phone_verified_at' => now(),
+            ],
         ];
 
-        foreach ($users as $user) {
+        foreach ($users as $userData) {
             Utilisateur::firstOrCreate(
-                ['email' => $user['email']],
-                $user
+                ['email' => $userData['email']],
+                $userData
             );
         }
 
-        $this->command->info('✅ 5 utilisateurs de test créés (mot de passe: password)');
+        $this->command->info('✅ 5 utilisatrices de test créées avec succès.');
     }
 }

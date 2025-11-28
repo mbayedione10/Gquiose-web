@@ -18,12 +18,12 @@ class AlerteSeeder extends Seeder
     {
         // Récupérer les données nécessaires
         $utilisateurs = Utilisateur::withoutGlobalScopes()->get();
-        
+
         if ($utilisateurs->isEmpty()) {
             $this->command->warn('Assurez-vous que les seeders Utilisateur et Ville ont été exécutés en premier.');
             return;
         }
-        
+
         $conakry = Ville::where('name', 'Conakry')->first();
         $kindia = Ville::where('name', 'Kindia')->first();
         $kankan = Ville::where('name', 'Kankan')->first();
@@ -64,7 +64,7 @@ class AlerteSeeder extends Seeder
             'type_alerte_id' => $revengePorn?->id,
             'sous_type_violence_numerique_id' => $sousTypes->where('nom', 'Partage non-consensuel d\'images intimes (revenge porn)')->first()?->id,
             'ville_id' => $conakry?->id,
-            'utilisateur_id' => $utilisateurs->random()->id,
+            'utilisateur_id' => $utilisateurs->where('sexe', 'F')->random()->id,
             'etat' => 'Non approuvée',
             'latitude' => 9.6412,
             'longitude' => -13.5784,
@@ -94,7 +94,7 @@ class AlerteSeeder extends Seeder
             'description' => 'Harcèlement sexuel sur mon lieu de travail. Mon supérieur hiérarchique me fait des avances déplacées et menace ma carrière si je refuse.',
             'type_alerte_id' => $harcelementSexuel?->id,
             'ville_id' => $kindia?->id,
-            'utilisateur_id' => $utilisateurs->random()->id,
+            'utilisateur_id' => $utilisateurs->where('sexe', 'F')->random()->id,
             'etat' => 'Non approuvée',
             'latitude' => 10.0570,
             'longitude' => -12.8470,
@@ -116,7 +116,7 @@ class AlerteSeeder extends Seeder
             'type_alerte_id' => $violenceNumerique?->id,
             'sous_type_violence_numerique_id' => $sousTypes->where('name', 'Cyberharcèlement')->first()?->id,
             'ville_id' => $conakry?->id,
-            'utilisateur_id' => $utilisateurs->random()->id,
+            'utilisateur_id' => $utilisateurs->where('sexe', 'F')->random()->id,
             'etat' => 'Confirmée',
             'latitude' => 9.5370,
             'longitude' => -13.6785,
@@ -141,7 +141,7 @@ class AlerteSeeder extends Seeder
             'description' => 'Mon conjoint m\'a frappée hier soir lors d\'une dispute. Ce n\'est pas la première fois mais la violence s\'aggrave.',
             'type_alerte_id' => $violencePhysique?->id,
             'ville_id' => $kankan?->id,
-            'utilisateur_id' => $utilisateurs->random()->id,
+            'utilisateur_id' => $utilisateurs->where('sexe', 'F')->random()->id,
             'etat' => 'Non approuvée',
             'latitude' => 10.3852,
             'longitude' => -9.3064,
@@ -162,7 +162,7 @@ class AlerteSeeder extends Seeder
             'description' => 'Ma famille veut me forcer à épouser un homme que je ne connais pas. J\'ai 17 ans et je veux continuer mes études.',
             'type_alerte_id' => $mariageForce?->id,
             'ville_id' => $conakry?->id,
-            'utilisateur_id' => $utilisateurs->random()->id,
+            'utilisateur_id' => $utilisateurs->where('sexe', 'F')->random()->id,
             'etat' => 'Non approuvée',
             'latitude' => 9.5092,
             'longitude' => -13.7122,
@@ -183,7 +183,7 @@ class AlerteSeeder extends Seeder
             'description' => 'Mon mari me violente régulièrement. Il contrôle mes déplacements et mes contacts.',
             'type_alerte_id' => $violenceConjugale?->id,
             'ville_id' => $conakry?->id,
-            'utilisateur_id' => $utilisateurs->random()->id,
+            'utilisateur_id' => $utilisateurs->where('sexe', 'F')->random()->id,
             'etat' => 'Non approuvée',
             'latitude' => 9.5370,
             'longitude' => -13.6785,
@@ -204,7 +204,7 @@ class AlerteSeeder extends Seeder
             'description' => 'Ma famille veut m\'emmener au village pour l\'excision. J\'ai peur et je ne veux pas.',
             'type_alerte_id' => $mgf?->id,
             'ville_id' => $kankan?->id,
-            'utilisateur_id' => $utilisateurs->random()->id,
+            'utilisateur_id' => $utilisateurs->where('sexe', 'F')->random()->id,
             'etat' => 'Non approuvée',
             'latitude' => 10.3852,
             'longitude' => -9.3064,
@@ -225,7 +225,7 @@ class AlerteSeeder extends Seeder
             'description' => 'J\'ai été agressée sexuellement par une connaissance lors d\'une soirée.',
             'type_alerte_id' => $agressionSexuelle?->id,
             'ville_id' => $conakry?->id,
-            'utilisateur_id' => $utilisateurs->random()->id,
+            'utilisateur_id' => $utilisateurs->where('sexe', 'F')->random()->id,
             'etat' => 'Non approuvée',
             'latitude' => 9.6412,
             'longitude' => -13.5784,
@@ -247,7 +247,7 @@ class AlerteSeeder extends Seeder
             'type_alerte_id' => $cyberstalking?->id,
             'sous_type_violence_numerique_id' => $sousTypes->where('nom', 'Surveillance/espionnage via téléphone')->first()?->id,
             'ville_id' => $kindia?->id,
-            'utilisateur_id' => $utilisateurs->random()->id,
+            'utilisateur_id' => $utilisateurs->where('sexe', 'F')->random()->id,
             'etat' => 'Non approuvée',
             'latitude' => 10.0570,
             'longitude' => -12.8470,
@@ -260,7 +260,7 @@ class AlerteSeeder extends Seeder
             'impact' => ['Paranoïa', 'Peur constante', 'Anxiété sévère'],
             'anonymat_souhaite' => false,
             'consentement_transmission' => true,
-            'conseils_securite' => "SÉCURITÉ NUMÉRIQUE :\n1. Changez tous vos mots de passe.\n2. Vérifiez les applications installées.\n3. Activez l\'authentification à deux facteurs.\n4. Désactivez le partage de localisation.\n5. Vérifiez les connexions suspectes.\n6. Faites analyser votre téléphone.",
+            'conseils_securite' => "SÉCURITÉ NUMÉRIQUE :\n1. Changez tous vos mots de passe.\n2. Vérifiez les applications installées.\n3. Activez l'authentification à deux facteurs.\n4. Désactivez le partage de localisation.\n5. Vérifiez les connexions suspectes.\n6. Faites analyser votre téléphone.",
             'conseils_lus' => false,
         ]);
 
@@ -272,7 +272,7 @@ class AlerteSeeder extends Seeder
             'type_alerte_id' => $chantage?->id,
             'sous_type_violence_numerique_id' => $sousTypes->where('nom', 'Chantage avec photos/vidéos intimes (sextorsion)')->first()?->id,
             'ville_id' => $conakry?->id,
-            'utilisateur_id' => $utilisateurs->random()->id,
+            'utilisateur_id' => $utilisateurs->where('sexe', 'F')->random()->id,
             'etat' => 'Confirmée',
             'latitude' => 9.5092,
             'longitude' => -13.7122,

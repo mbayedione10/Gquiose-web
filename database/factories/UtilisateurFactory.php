@@ -22,13 +22,18 @@ class UtilisateurFactory extends Factory
      */
     public function definition(): array
     {
+        $nomsGuineens = ['Diallo', 'Bah', 'Sylla', 'Condé', 'Camara', 'Keita', 'Soumaré', 'Touré', 'Barry', 'Baldé'];
+        $prenomsGuineensFeminins = ['Fatou', 'Mariama', 'Aissatou', 'Kadiatou', 'Fatoumata', 'Aminata', 'Hawa', 'Ramata', 'Bintu', 'Aïcha'];
+
         return [
-            'nom' => $this->faker->text(255),
-            'prenom' => $this->faker->text(255),
+            'nom' => $this->faker->randomElement($nomsGuineens),
+            'prenom' => $this->faker->randomElement($prenomsGuineensFeminins),
             'email' => $this->faker->unique->email(),
-            'phone' => $this->faker->unique->phoneNumber(),
-            'sexe' => $this->faker->text(255),
-            'status' => $this->faker->boolean(),
+            'phone' => '+224' . $this->faker->unique->numerify('6########'),
+            'sexe' => 'F',
+            'status' => true,
+            'dob' => $this->faker->dateTimeBetween('-40 years', '-15 years')->format('Y-m-d'),
+            'password' => bcrypt('password'),
         ];
     }
 }
