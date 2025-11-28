@@ -17,9 +17,9 @@ class NatureContenuResource extends Resource
     protected static ?string $model = NatureContenu::class;
 
     protected static ?string $navigationLabel = "Nature du contenu";
-    protected static ?string $navigationGroup = "Paramètres VBG";
+    protected static ?string $navigationGroup = "VBG";
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 14;
 
     public static function form(Form $form): Form
     {

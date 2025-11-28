@@ -17,9 +17,9 @@ class PlateformeResource extends Resource
     protected static ?string $model = Plateforme::class;
 
     protected static ?string $navigationLabel = "Plateformes";
-    protected static ?string $navigationGroup = "Paramètres VBG";
+    protected static ?string $navigationGroup = "VBG";
     protected static ?string $navigationIcon = 'heroicon-o-globe';
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 13;
 
     public static function form(Form $form): Form
     {
