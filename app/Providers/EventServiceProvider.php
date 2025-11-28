@@ -6,6 +6,10 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use App\Listeners\SendArticleNotification;
+use App\Listeners\SendHealthCenterNotification;
+use App\Listeners\SendQuizNotification;
+use App\Listeners\SendVideoNotification;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -17,9 +21,6 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
-        ],
-        \App\Events\AlertCreated::class => [
-            \App\Listeners\SendAlertNotification::class,
         ],
         \App\Events\NewArticlePublished::class => [
             \App\Listeners\SendArticleNotification::class,

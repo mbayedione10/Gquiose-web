@@ -4,7 +4,7 @@ namespace App\Filament\Resources\VideoResource\Pages;
 
 use App\Filament\Resources\VideoResource;
 use App\Events\NewVideoPublished;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateVideo extends CreateRecord
@@ -13,7 +13,7 @@ class CreateVideo extends CreateRecord
 
     protected function afterCreate(): void
     {
-        // Dispatcher l'event pour envoyer une notification
-        NewVideoPublished::dispatch($this->record);
+        // Déclencher la notification push automatique
+        event(new NewVideoPublished($this->record));
     }
 }

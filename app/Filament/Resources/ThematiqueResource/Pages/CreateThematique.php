@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources\ThematiqueResource\Pages;
 
-use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\ThematiqueResource;
 use App\Events\NewQuizPublished;
+use Filament\Actions;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateThematique extends CreateRecord
 {
@@ -12,7 +13,9 @@ class CreateThematique extends CreateRecord
 
     protected function afterCreate(): void
     {
-        // Dispatcher l'event pour envoyer une notification
-        NewQuizPublished::dispatch($this->record);
+        // Déclencher la notification push automatique pour le nouveau quiz
+        if ($this->record->status) {
+            event(new NewQuizPublished($this->record));
+        }
     }
 }

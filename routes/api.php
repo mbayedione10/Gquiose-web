@@ -49,6 +49,15 @@ Route::prefix('v1')
                 Route::post('clicked', [NotificationTrackingController::class, 'markAsClicked']);
                 Route::get('history', [NotificationTrackingController::class, 'getHistory']);
             });
+
+            // Push Notifications Routes
+            Route::prefix('notifications')->group(function () {
+                Route::post('/register-token', [App\Http\Controllers\APIPushNotificationController::class, 'registerToken']);
+                Route::post('/preferences', [App\Http\Controllers\APIPushNotificationController::class, 'updatePreferences']);
+                Route::get('/preferences/{userId}', [App\Http\Controllers\APIPushNotificationController::class, 'getPreferences']);
+                Route::post('/{notificationId}/opened', [App\Http\Controllers\APIPushNotificationController::class, 'trackOpened']);
+                Route::post('/{notificationId}/clicked', [App\Http\Controllers\APIPushNotificationController::class, 'trackClicked']);
+            });
         });
 
         /*************************  CONFIG    ***************************/
@@ -113,15 +122,6 @@ Route::prefix('v1')
             Route::post('/submit', [App\Http\Controllers\APIEvaluationController::class, 'submit']);
             Route::get('/statistics', [App\Http\Controllers\APIEvaluationController::class, 'statistics']);
             Route::get('/user/{userId}', [App\Http\Controllers\APIEvaluationController::class, 'userEvaluations']);
-        });
-
-        // Routes pour les notifications push
-        Route::prefix('notifications')->group(function () {
-            Route::post('/register-token', [App\Http\Controllers\APIPushNotificationController::class, 'registerToken']);
-            Route::post('/preferences', [App\Http\Controllers\APIPushNotificationController::class, 'updatePreferences']);
-            Route::get('/preferences/{userId}', [App\Http\Controllers\APIPushNotificationController::class, 'getPreferences']);
-            Route::post('/{notificationId}/opened', [App\Http\Controllers\APIPushNotificationController::class, 'trackOpened']);
-            Route::post('/{notificationId}/clicked', [App\Http\Controllers\APIPushNotificationController::class, 'trackClicked']);
         });
 
         // Forum routes
