@@ -29,10 +29,19 @@ class AlerteSeeder extends Seeder
         $kankan = Ville::where('name', 'Kankan')->first();
 
         // Types d'alertes
-        $violenceNumerique = TypeAlerte::where('name', 'Violence numérique')->first();
-        $harcelementSexuel = TypeAlerte::where('name', 'Harcèlement sexuel')->first();
-        $violencePhysique = TypeAlerte::where('name', 'Violence physique')->first();
-        $mariageForce = TypeAlerte::where('name', 'Mariage forcé')->first();
+        $violenceConjugale = TypeAlerte::where('name', 'Violence Conjugale')->first();
+        $harcelementSexuel = TypeAlerte::where('name', 'Harcèlement Sexuel')->first();
+        $agressionSexuelle = TypeAlerte::where('name', 'Agression Sexuelle')->first();
+        $mariageForce = TypeAlerte::where('name', 'Mariage Forcé')->first();
+        $mgf = TypeAlerte::where('name', 'MGF (Excision)')->first();
+        $violenceScolaire = TypeAlerte::where('name', 'Violence Scolaire')->first();
+        $exploitationSexuelle = TypeAlerte::where('name', 'Exploitation Sexuelle')->first();
+        $cyberharcelement = TypeAlerte::where('name', 'Cyberharcèlement')->first();
+        $harcelementMessage = TypeAlerte::where('name', 'Harcèlement par Messagerie (SMS/Appels)')->first();
+        $revengePorn = TypeAlerte::where('name', 'Diffusion Images Intimes (Revenge Porn)')->first();
+        $chantage = TypeAlerte::where('name', 'Chantage / Extorsion en Ligne')->first();
+        $cyberstalking = TypeAlerte::where('name', 'Cyberstalking / Surveillance Numérique')->first();
+        $usurpation = TypeAlerte::where('name', 'Usurpation d\'Identité en Ligne')->first();
 
         // Sous-types de violence numérique
         $sousTypes = SousTypeViolenceNumerique::all();
@@ -45,13 +54,13 @@ class AlerteSeeder extends Seeder
         // Génération du numéro de suivi
         $numeroSuivi = 'VBG-' . date('Y') . '-' . str_pad(1, 6, '0', STR_PAD_LEFT);
 
-        // Alerte 1 : Violence numérique - Revenge porn
+        // Alerte 1 : Revenge porn
         Alerte::create([
             'ref' => 'ALRT-' . date('Y') . '-001',
             'numero_suivi' => $numeroSuivi,
             'description' => 'Mon ex-partenaire a publié mes photos intimes sur les réseaux sociaux sans mon consentement. Les images sont partagées sur plusieurs groupes Facebook et WhatsApp.',
-            'type_alerte_id' => $violenceNumerique?->id,
-            'sous_type_violence_numerique_id' => $sousTypes->where('name', 'Revenge porn')->first()?->id,
+            'type_alerte_id' => $revengePorn?->id,
+            'sous_type_violence_numerique_id' => $sousTypes->where('nom', 'Partage non-consensuel d\'images intimes (revenge porn)')->first()?->id,
             'ville_id' => $conakry?->id,
             'utilisateur_id' => $utilisateurs->random()->id,
             'etat' => 'Non approuvée',
@@ -165,6 +174,120 @@ class AlerteSeeder extends Seeder
             'conseils_lus' => false,
         ]);
 
-        $this->command->info('5 alertes créées avec succès avec l\'architecture VBG complète.');
+        // Alerte 6 : Violence conjugale
+        Alerte::create([
+            'ref' => 'ALRT-' . date('Y') . '-006',
+            'numero_suivi' => 'VBG-' . date('Y') . '-' . str_pad(6, 6, '0', STR_PAD_LEFT),
+            'description' => 'Mon mari me violente régulièrement. Il contrôle mes déplacements et mes contacts.',
+            'type_alerte_id' => $violenceConjugale?->id,
+            'ville_id' => $conakry?->id,
+            'utilisateur_id' => $utilisateurs->random()->id,
+            'etat' => 'Non approuvée',
+            'latitude' => 9.5370,
+            'longitude' => -13.6785,
+            'date_incident' => now()->subDays(2),
+            'heure_incident' => '20:00:00',
+            'relation_agresseur' => 'conjoint',
+            'impact' => ['Peur constante', 'Isolement', 'Dépression'],
+            'anonymat_souhaite' => true,
+            'consentement_transmission' => true,
+            'conseils_securite' => "PROTECTION URGENTE :\n1. Contactez le numéro vert VBG.\n2. Préparez un plan de sécurité.\n3. Conservez vos documents en lieu sûr.\n4. Identifiez des personnes de confiance.",
+            'conseils_lus' => false,
+        ]);
+
+        // Alerte 7 : MGF (Excision)
+        Alerte::create([
+            'ref' => 'ALRT-' . date('Y') . '-007',
+            'numero_suivi' => 'VBG-' . date('Y') . '-' . str_pad(7, 6, '0', STR_PAD_LEFT),
+            'description' => 'Ma famille veut m\'emmener au village pour l\'excision. J\'ai peur et je ne veux pas.',
+            'type_alerte_id' => $mgf?->id,
+            'ville_id' => $kankan?->id,
+            'utilisateur_id' => $utilisateurs->random()->id,
+            'etat' => 'Non approuvée',
+            'latitude' => 10.3852,
+            'longitude' => -9.3064,
+            'date_incident' => now()->subDays(1),
+            'heure_incident' => '15:00:00',
+            'relation_agresseur' => 'famille',
+            'impact' => ['Peur intense', 'Anxiété', 'Sentiment de trahison'],
+            'anonymat_souhaite' => true,
+            'consentement_transmission' => true,
+            'conseils_securite' => "PROTECTION IMMÉDIATE :\n1. Contactez une association de défense des droits.\n2. L\'excision est illégale en Guinée.\n3. Parlez à un adulte de confiance.\n4. Ne partez pas en voyage suspect.",
+            'conseils_lus' => false,
+        ]);
+
+        // Alerte 8 : Agression sexuelle
+        Alerte::create([
+            'ref' => 'ALRT-' . date('Y') . '-008',
+            'numero_suivi' => 'VBG-' . date('Y') . '-' . str_pad(8, 6, '0', STR_PAD_LEFT),
+            'description' => 'J\'ai été agressée sexuellement par une connaissance lors d\'une soirée.',
+            'type_alerte_id' => $agressionSexuelle?->id,
+            'ville_id' => $conakry?->id,
+            'utilisateur_id' => $utilisateurs->random()->id,
+            'etat' => 'Non approuvée',
+            'latitude' => 9.6412,
+            'longitude' => -13.5784,
+            'date_incident' => now()->subHours(12),
+            'heure_incident' => '23:30:00',
+            'relation_agresseur' => 'connaissance',
+            'impact' => ['Traumatisme sévère', 'Choc', 'Honte', 'Peur'],
+            'anonymat_souhaite' => true,
+            'consentement_transmission' => true,
+            'conseils_securite' => "ACTIONS URGENTES :\n1. Rendez-vous immédiatement dans un centre de santé.\n2. Ne vous lavez pas avant l\'examen médical.\n3. Conservez vos vêtements comme preuves.\n4. Contactez la police.\n5. Demandez un soutien psychologique.",
+            'conseils_lus' => false,
+        ]);
+
+        // Alerte 9 : Cyberstalking
+        Alerte::create([
+            'ref' => 'ALRT-' . date('Y') . '-009',
+            'numero_suivi' => 'VBG-' . date('Y') . '-' . str_pad(9, 6, '0', STR_PAD_LEFT),
+            'description' => 'Quelqu\'un surveille tous mes mouvements en ligne, connaît ma localisation et me menace.',
+            'type_alerte_id' => $cyberstalking?->id,
+            'sous_type_violence_numerique_id' => $sousTypes->where('nom', 'Surveillance/espionnage via téléphone')->first()?->id,
+            'ville_id' => $kindia?->id,
+            'utilisateur_id' => $utilisateurs->random()->id,
+            'etat' => 'Non approuvée',
+            'latitude' => 10.0570,
+            'longitude' => -12.8470,
+            'plateformes' => ['Facebook', 'WhatsApp', 'Instagram', 'Localisation GPS'],
+            'nature_contenu' => ['Messages menaçants', 'Surveillance de localisation'],
+            'frequence_incidents' => 'quotidien',
+            'date_incident' => now()->subDays(7),
+            'heure_incident' => '00:00:00',
+            'relation_agresseur' => 'ex_partenaire',
+            'impact' => ['Paranoïa', 'Peur constante', 'Anxiété sévère'],
+            'anonymat_souhaite' => false,
+            'consentement_transmission' => true,
+            'conseils_securite' => "SÉCURITÉ NUMÉRIQUE :\n1. Changez tous vos mots de passe.\n2. Vérifiez les applications installées.\n3. Activez l\'authentification à deux facteurs.\n4. Désactivez le partage de localisation.\n5. Vérifiez les connexions suspectes.\n6. Faites analyser votre téléphone.",
+            'conseils_lus' => false,
+        ]);
+
+        // Alerte 10 : Chantage en ligne
+        Alerte::create([
+            'ref' => 'ALRT-' . date('Y') . '-010',
+            'numero_suivi' => 'VBG-' . date('Y') . '-' . str_pad(10, 6, '0', STR_PAD_LEFT),
+            'description' => 'On me fait chanter avec des vidéos intimes et menace de les envoyer à ma famille si je ne paie pas.',
+            'type_alerte_id' => $chantage?->id,
+            'sous_type_violence_numerique_id' => $sousTypes->where('nom', 'Chantage avec photos/vidéos intimes (sextorsion)')->first()?->id,
+            'ville_id' => $conakry?->id,
+            'utilisateur_id' => $utilisateurs->random()->id,
+            'etat' => 'Confirmée',
+            'latitude' => 9.5092,
+            'longitude' => -13.7122,
+            'plateformes' => ['WhatsApp', 'Email'],
+            'nature_contenu' => ['Vidéos intimes', 'Messages de menace'],
+            'comptes_impliques' => 'Numéro WhatsApp: +224XXXXXXXX',
+            'frequence_incidents' => 'hebdomadaire',
+            'date_incident' => now()->subDays(10),
+            'heure_incident' => '19:00:00',
+            'relation_agresseur' => 'inconnu',
+            'impact' => ['Stress intense', 'Honte', 'Peur du jugement social'],
+            'anonymat_souhaite' => true,
+            'consentement_transmission' => true,
+            'conseils_securite' => "NE PAYEZ PAS LE CHANTAGE :\n1. Ne répondez pas aux demandes.\n2. Conservez toutes les preuves.\n3. Bloquez le contact immédiatement.\n4. Déposez plainte à la police.\n5. Prévenez vos proches de la situation.\n6. Demandez un soutien psychologique.",
+            'conseils_lus' => true,
+        ]);
+
+        $this->command->info('10 alertes créées avec succès couvrant tous les types de VBG.');
     }
 }

@@ -80,21 +80,42 @@ class AlerteResource extends Resource
 
                             Select::make('type_alerte_id')
                                 ->label('Type de violence')
-                                ->relationship('typeAlerte', 'name')
+                                ->relationship('typeAlerte', 'name', fn ($query) => $query->where('status', true))
                                 ->searchable()
+                                ->preload()
                                 ->required()
                                 ->reactive()
+                                ->createOptionForm([
+                                    TextInput::make('name')
+                                        ->label('Nom du type de violence')
+                                        ->required()
+                                        ->unique('type_alertes', 'name')
+                                        ->maxLength(255),
+                                    Toggle::make('status')
+                                        ->label('Actif')
+                                        ->default(true),
+                                ])
                                 ->columnSpan(2),
 
                             Select::make('sous_type_violence_numerique_id')
                                 ->label('Sous-type de violence numérique')
-                                ->relationship('sousTypeViolenceNumerique', 'nom')
+                                ->relationship('sousTypeViolenceNumerique', 'nom', fn ($query) => $query->where('status', true))
                                 ->searchable()
-                                ->getSearchResultsUsing(fn (string $search) => \App\Models\SousTypeViolenceNumerique::where('nom', 'like', "%{$search}%")->where('status', true)->limit(50)->pluck('nom', 'id'))
-                                ->getOptionLabelUsing(fn ($value): ?string => \App\Models\SousTypeViolenceNumerique::find($value)?->nom)
+                                ->preload()
                                 ->visible(fn (callable $get) => $get('type_alerte_id'))
-                                ->columnSpan(2)
-                                ->placeholder('Commencez à taper pour rechercher...'),
+                                ->createOptionForm([
+                                    TextInput::make('nom')
+                                        ->label('Nom du sous-type')
+                                        ->required()
+                                        ->maxLength(255),
+                                    Textarea::make('description')
+                                        ->label('Description')
+                                        ->rows(3),
+                                    Toggle::make('status')
+                                        ->label('Actif')
+                                        ->default(true),
+                                ])
+                                ->columnSpan(2),
 
                             Textarea::make('description')
                                 ->label('Description')
@@ -139,15 +160,57 @@ class AlerteResource extends Resource
                 Tabs\Tab::make('Violences numériques')->schema([
                     Section::make('Informations sur les violences technologiques')->schema([
                         Grid::make(2)->schema([
-                            TagsInput::make('plateformes')
+                            Select::make('plateformes')
                                 ->label('Plateformes concernées')
-                                ->placeholder('Facebook, WhatsApp, Instagram...')
-                                ->helperText('Où la violence a eu lieu'),
+                                ->relationship('', '')
+                                ->multiple()
+                                ->searchable()
+                                ->preload()
+                                ->options(fn () => \App\Models\Plateforme::where('status', true)->pluck('nom', 'nom'))
+                                ->helperText('Où la violence a eu lieu')
+                                ->createOptionForm([
+                                    TextInput::make('nom')
+                                        ->label('Nom de la plateforme')
+                                        ->required()
+                                        ->unique('plateformes', 'nom')
+                                        ->maxLength(255),
+                                    Textarea::make('description')
+                                        ->label('Description')
+                                        ->rows(3),
+                                    Toggle::make('status')
+                                        ->label('Active')
+                                        ->default(true),
+                                ])
+                                ->createOptionUsing(function ($data) {
+                                    $plateforme = \App\Models\Plateforme::create($data);
+                                    return $plateforme->nom;
+                                }),
 
-                            TagsInput::make('nature_contenu')
+                            Select::make('nature_contenu')
                                 ->label('Nature du contenu')
-                                ->placeholder('Messages, Images, Vidéos...')
-                                ->helperText('Type de contenu problématique'),
+                                ->relationship('', '')
+                                ->multiple()
+                                ->searchable()
+                                ->preload()
+                                ->options(fn () => \App\Models\NatureContenu::where('status', true)->pluck('nom', 'nom'))
+                                ->helperText('Type de contenu problématique')
+                                ->createOptionForm([
+                                    TextInput::make('nom')
+                                        ->label('Nom du type de contenu')
+                                        ->required()
+                                        ->unique('nature_contenus', 'nom')
+                                        ->maxLength(255),
+                                    Textarea::make('description')
+                                        ->label('Description')
+                                        ->rows(3),
+                                    Toggle::make('status')
+                                        ->label('Actif')
+                                        ->default(true),
+                                ])
+                                ->createOptionUsing(function ($data) {
+                                    $nature = \App\Models\NatureContenu::create($data);
+                                    return $nature->nom;
+                                }),
 
                             Textarea::make('urls_problematiques')
                                 ->label('URLs problématiques')
