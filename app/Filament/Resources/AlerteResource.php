@@ -19,6 +19,7 @@ use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
@@ -87,12 +88,13 @@ class AlerteResource extends Resource
 
                             Select::make('sous_type_violence_numerique_id')
                                 ->label('Sous-type de violence numérique')
-                                ->relationship('sousTypeViolenceNumerique', 'nom', fn ($query) => $query->where('status', true))
-                                ->preload()
+                                ->relationship('sousTypeViolenceNumerique', 'nom')
                                 ->searchable()
+                                ->getSearchResultsUsing(fn (string $search) => \App\Models\SousTypeViolenceNumerique::where('nom', 'like', "%{$search}%")->where('status', true)->limit(50)->pluck('nom', 'id'))
+                                ->getOptionLabelUsing(fn ($value): ?string => \App\Models\SousTypeViolenceNumerique::find($value)?->nom)
                                 ->visible(fn (callable $get) => $get('type_alerte_id'))
                                 ->columnSpan(2)
-                                ->helperText('Choisissez le sous-type spécifique de violence numérique'),
+                                ->placeholder('Commencez à taper pour rechercher...'),
 
                             Textarea::make('description')
                                 ->label('Description')
@@ -137,27 +139,15 @@ class AlerteResource extends Resource
                 Tabs\Tab::make('Violences numériques')->schema([
                     Section::make('Informations sur les violences technologiques')->schema([
                         Grid::make(2)->schema([
-                            Select::make('plateformes')
+                            TagsInput::make('plateformes')
                                 ->label('Plateformes concernées')
-                                ->multiple()
-                                ->options(function () {
-                                    return \App\Models\Plateforme::where('status', true)
-                                        ->pluck('nom', 'nom');
-                                })
-                                ->preload()
-                                ->searchable()
-                                ->helperText('Sélectionnez une ou plusieurs plateformes'),
+                                ->placeholder('Facebook, WhatsApp, Instagram...')
+                                ->helperText('Où la violence a eu lieu'),
 
-                            Select::make('nature_contenu')
+                            TagsInput::make('nature_contenu')
                                 ->label('Nature du contenu')
-                                ->multiple()
-                                ->options(function () {
-                                    return \App\Models\NatureContenu::where('status', true)
-                                        ->pluck('nom', 'nom');
-                                })
-                                ->preload()
-                                ->searchable()
-                                ->helperText('Sélectionnez un ou plusieurs types de contenu'),
+                                ->placeholder('Messages, Images, Vidéos...')
+                                ->helperText('Type de contenu problématique'),
 
                             Textarea::make('urls_problematiques')
                                 ->label('URLs problématiques')
