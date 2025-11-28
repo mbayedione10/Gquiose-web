@@ -17,7 +17,13 @@ class AlerteSeeder extends Seeder
     public function run(): void
     {
         // Récupérer les données nécessaires
-        $utilisateur = Utilisateur::withoutGlobalScopes()->first();
+        $utilisateurs = Utilisateur::withoutGlobalScopes()->get();
+        
+        if ($utilisateurs->isEmpty()) {
+            $this->command->warn('Assurez-vous que les seeders Utilisateur et Ville ont été exécutés en premier.');
+            return;
+        }
+        
         $conakry = Ville::where('name', 'Conakry')->first();
         $kindia = Ville::where('name', 'Kindia')->first();
         $kankan = Ville::where('name', 'Kankan')->first();
@@ -31,8 +37,8 @@ class AlerteSeeder extends Seeder
         // Sous-types de violence numérique
         $sousTypes = SousTypeViolenceNumerique::all();
 
-        if (!$utilisateur || !$conakry) {
-            $this->command->warn('Assurez-vous que les seeders Utilisateur et Ville ont été exécutés en premier.');
+        if (!$conakry) {
+            $this->command->warn('Assurez-vous que les seeders Ville ont été exécutés en premier.');
             return;
         }
 
@@ -47,7 +53,7 @@ class AlerteSeeder extends Seeder
             'type_alerte_id' => $violenceNumerique?->id,
             'sous_type_violence_numerique_id' => $sousTypes->where('name', 'Revenge porn')->first()?->id,
             'ville_id' => $conakry?->id,
-            'utilisateur_id' => $utilisateur->id,
+            'utilisateur_id' => $utilisateurs->random()->id,
             'etat' => 'Non approuvée',
             'latitude' => 9.6412,
             'longitude' => -13.5784,
@@ -77,7 +83,7 @@ class AlerteSeeder extends Seeder
             'description' => 'Harcèlement sexuel sur mon lieu de travail. Mon supérieur hiérarchique me fait des avances déplacées et menace ma carrière si je refuse.',
             'type_alerte_id' => $harcelementSexuel?->id,
             'ville_id' => $kindia?->id,
-            'utilisateur_id' => $utilisateur->id,
+            'utilisateur_id' => $utilisateurs->random()->id,
             'etat' => 'Non approuvée',
             'latitude' => 10.0570,
             'longitude' => -12.8470,
@@ -99,7 +105,7 @@ class AlerteSeeder extends Seeder
             'type_alerte_id' => $violenceNumerique?->id,
             'sous_type_violence_numerique_id' => $sousTypes->where('name', 'Cyberharcèlement')->first()?->id,
             'ville_id' => $conakry?->id,
-            'utilisateur_id' => $utilisateur->id,
+            'utilisateur_id' => $utilisateurs->random()->id,
             'etat' => 'Confirmée',
             'latitude' => 9.5370,
             'longitude' => -13.6785,
@@ -124,7 +130,7 @@ class AlerteSeeder extends Seeder
             'description' => 'Mon conjoint m\'a frappée hier soir lors d\'une dispute. Ce n\'est pas la première fois mais la violence s\'aggrave.',
             'type_alerte_id' => $violencePhysique?->id,
             'ville_id' => $kankan?->id,
-            'utilisateur_id' => $utilisateur->id,
+            'utilisateur_id' => $utilisateurs->random()->id,
             'etat' => 'Non approuvée',
             'latitude' => 10.3852,
             'longitude' => -9.3064,
@@ -145,7 +151,7 @@ class AlerteSeeder extends Seeder
             'description' => 'Ma famille veut me forcer à épouser un homme que je ne connais pas. J\'ai 17 ans et je veux continuer mes études.',
             'type_alerte_id' => $mariageForce?->id,
             'ville_id' => $conakry?->id,
-            'utilisateur_id' => $utilisateur->id,
+            'utilisateur_id' => $utilisateurs->random()->id,
             'etat' => 'Non approuvée',
             'latitude' => 9.5092,
             'longitude' => -13.7122,

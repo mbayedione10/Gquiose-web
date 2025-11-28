@@ -17,8 +17,6 @@ class TypeAlerteResource extends Resource
 {
     protected static ?string $model = TypeAlerte::class;
 
-    protected static bool $shouldRegisterNavigation = false;
-
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $navigationLabel = "Type d'alertes";

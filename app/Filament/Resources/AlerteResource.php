@@ -44,17 +44,17 @@ class AlerteResource extends Resource
 
     public static function canCreate(): bool
     {
-        return false;
+        return true;
     }
 
     public static function canEdit(Model $record): bool
     {
-        return false;
+        return true;
     }
 
     public static function canDelete(Model $record): bool
     {
-        return false;
+        return true;
     }
 
     public static function form(Form $form): Form
@@ -68,47 +68,66 @@ class AlerteResource extends Resource
                         Grid::make(2)->schema([
                             TextInput::make('ref')
                                 ->label('Référence')
-                                ->disabled()
-                                ->dehydrated(false),
+                                ->default(fn() => 'ALRT-' . date('Y') . '-' . str_pad(random_int(1, 9999), 4, '0', STR_PAD_LEFT))
+                                ->required()
+                                ->unique(ignoreRecord: true),
 
-                            Placeholder::make('numero_suivi')
+                            TextInput::make('numero_suivi')
                                 ->label('Numéro de suivi')
-                                ->content(fn (?Alerte $record): string => $record?->numero_suivi ?? 'Généré automatiquement'),
+                                ->default(fn() => 'VBG-' . date('Y') . '-' . str_pad(random_int(1, 999999), 6, '0', STR_PAD_LEFT))
+                                ->required()
+                                ->unique(ignoreRecord: true),
 
                             Select::make('type_alerte_id')
                                 ->label('Type de violence')
                                 ->relationship('typeAlerte', 'name')
                                 ->searchable()
-                                ->disabled()
+                                ->required()
+                                ->reactive()
+                                ->columnSpan(2),
+
+                            Select::make('sous_type_violence_numerique_id')
+                                ->label('Sous-type de violence numérique')
+                                ->relationship('sousTypeViolenceNumerique', 'nom')
+                                ->searchable()
+                                ->visible(fn (callable $get) => $get('type_alerte_id'))
                                 ->columnSpan(2),
 
                             Textarea::make('description')
                                 ->label('Description')
                                 ->rows(5)
-                                ->disabled()
+                                ->required()
                                 ->columnSpan(2),
 
                             Select::make('utilisateur_id')
                                 ->label('Signalée par')
                                 ->relationship('utilisateur', 'name')
-                                ->disabled(),
+                                ->searchable()
+                                ->required(),
 
                             Select::make('ville_id')
                                 ->label('Ville')
                                 ->relationship('ville', 'name')
-                                ->disabled(),
+                                ->searchable()
+                                ->required(),
 
                             TextInput::make('latitude')
                                 ->label('Latitude')
-                                ->disabled(),
+                                ->numeric(),
 
                             TextInput::make('longitude')
                                 ->label('Longitude')
-                                ->disabled(),
+                                ->numeric(),
 
-                            TextInput::make('etat')
+                            Select::make('etat')
                                 ->label('État du signalement')
-                                ->disabled(),
+                                ->options([
+                                    'Non approuvée' => 'Non approuvée',
+                                    'Confirmée' => 'Confirmée',
+                                    'Rejetée' => 'Rejetée',
+                                ])
+                                ->default('Non approuvée')
+                                ->required(),
                         ]),
                     ]),
                 ])->icon('heroicon-o-information-circle'),
@@ -120,26 +139,22 @@ class AlerteResource extends Resource
                             TagsInput::make('plateformes')
                                 ->label('Plateformes concernées')
                                 ->placeholder('Facebook, WhatsApp, Instagram...')
-                                ->disabled()
                                 ->helperText('Où la violence a eu lieu'),
 
                             TagsInput::make('nature_contenu')
                                 ->label('Nature du contenu')
                                 ->placeholder('Messages, Images, Vidéos...')
-                                ->disabled()
                                 ->helperText('Type de contenu problématique'),
 
                             Textarea::make('urls_problematiques')
                                 ->label('URLs problématiques')
                                 ->rows(3)
-                                ->disabled()
                                 ->columnSpan(2)
                                 ->helperText('Liens vers les contenus problématiques'),
 
                             Textarea::make('comptes_impliques')
                                 ->label('Comptes/Pseudonymes impliqués')
                                 ->rows(3)
-                                ->disabled()
                                 ->columnSpan(2)
                                 ->helperText('Noms des profils des agresseurs'),
 
@@ -152,7 +167,6 @@ class AlerteResource extends Resource
                                     'mensuel' => 'Mensuel',
                                     'continu' => 'Continu',
                                 ])
-                                ->disabled()
                                 ->columnSpan(2),
                         ]),
                     ]),
@@ -164,13 +178,11 @@ class AlerteResource extends Resource
                         Grid::make(2)->schema([
                             DatePicker::make('date_incident')
                                 ->label('Date de l\'incident')
-                                ->displayFormat('d/m/Y')
-                                ->disabled(),
+                                ->displayFormat('d/m/Y'),
 
                             TimePicker::make('heure_incident')
                                 ->label('Heure de l\'incident')
-                                ->displayFormat('H:i')
-                                ->disabled(),
+                                ->displayFormat('H:i'),
 
                             Select::make('relation_agresseur')
                                 ->label('Relation avec l\'agresseur')
@@ -184,13 +196,11 @@ class AlerteResource extends Resource
                                     'inconnu' => 'Inconnu',
                                     'autre' => 'Autre',
                                 ])
-                                ->disabled()
                                 ->columnSpan(2),
 
                             TagsInput::make('impact')
                                 ->label('Impact sur la victime')
                                 ->placeholder('Stress, Peur, Dépression...')
-                                ->disabled()
                                 ->columnSpan(2)
                                 ->helperText('Impact psychologique et physique'),
                         ]),
@@ -224,14 +234,12 @@ class AlerteResource extends Resource
 
                     Section::make('Conseils de sécurité')->schema([
                         Textarea::make('conseils_securite')
-                            ->label('Conseils automatiques générés')
+                            ->label('Conseils de sécurité')
                             ->rows(8)
-                            ->disabled()
                             ->helperText('Conseils personnalisés selon le type de violence'),
 
                         Toggle::make('conseils_lus')
                             ->label('Conseils lus par la victime')
-                            ->disabled()
                             ->inline(false),
                     ]),
                 ])->icon('heroicon-o-shield-check'),
@@ -242,14 +250,14 @@ class AlerteResource extends Resource
                         Grid::make(1)->schema([
                             Toggle::make('anonymat_souhaite')
                                 ->label('Anonymat souhaité')
-                                ->disabled()
                                 ->inline(false)
+                                ->default(false)
                                 ->helperText('La victime souhaite rester anonyme'),
 
                             Toggle::make('consentement_transmission')
                                 ->label('Consentement pour transmission')
-                                ->disabled()
                                 ->inline(false)
+                                ->default(true)
                                 ->helperText('Autorisation de transmettre au système national VBG'),
                         ]),
                     ]),
