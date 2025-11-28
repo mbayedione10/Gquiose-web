@@ -148,6 +148,7 @@ class AlerteResource extends Resource
                                     'Telegram' => 'Telegram',
                                     'Snapchat' => 'Snapchat',
                                     'Twitter/X' => 'Twitter/X',
+                                    'LinkedIn' => 'LinkedIn',
                                     'Email' => 'Email',
                                     'Site web/blog' => 'Site web/blog',
                                     'Application de rencontre' => 'Application de rencontre (Tinder, Badoo...)',
