@@ -147,18 +147,16 @@ class APIAlertWorkflowController extends Controller
         $alerte->longitude = $request->longitude;
         $alerte->ville_id = $request->ville_id;
 
-        // Gestion des preuves uploadées
+        // Gestion sécurisée des preuves uploadées avec chiffrement et suppression EXIF
         if ($request->hasFile('preuves')) {
+            $evidenceService = app(\App\Services\VBG\EvidenceSecurityService::class);
             $preuves = [];
+            
             foreach ($request->file('preuves') as $file) {
-                $path = $file->store('preuves', 'public');
-                $preuves[] = [
-                    'path' => $path,
-                    'type' => $file->getClientMimeType(),
-                    'original_name' => $file->getClientOriginalName(),
-                    'uploaded_at' => now()->toDateTimeString()
-                ];
+                $secureEvidence = $evidenceService->secureUpload($file, $alerte->ref);
+                $preuves[] = $secureEvidence;
             }
+            
             $alerte->preuves = $preuves;
         }
 
@@ -167,7 +165,7 @@ class APIAlertWorkflowController extends Controller
         return ApiResponse::success([
             'alerte_id' => $alerte->id,
             'next_step' => 'step4',
-            'message' => 'Informations de l\'incident enregistrées'
+            'message' => 'Informations de l\'incident enregistrées de manière sécurisée'
         ]);
     }
 

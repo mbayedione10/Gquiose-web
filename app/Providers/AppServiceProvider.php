@@ -22,6 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Alerte::observe(AlerteObserver::class);
+        // Enregistrer l'observer pour la suppression sécurisée des preuves
+        \App\Models\Alerte::observe(\App\Observers\AlerteObserver::class);
     }
 }

@@ -45,3 +45,37 @@ class AlerteObserver
         return $prefix . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
     }
 }
+<?php
+
+namespace App\Observers;
+
+use App\Models\Alerte;
+use App\Services\VBG\EvidenceSecurityService;
+
+class AlerteObserver
+{
+    protected $evidenceService;
+
+    public function __construct(EvidenceSecurityService $evidenceService)
+    {
+        $this->evidenceService = $evidenceService;
+    }
+
+    /**
+     * Suppression sécurisée des preuves lors de la suppression d'une alerte
+     */
+    public function deleting(Alerte $alerte)
+    {
+        // Supprimer toutes les preuves chiffrées de manière sécurisée
+        if ($alerte->preuves && is_array($alerte->preuves)) {
+            $this->evidenceService->deleteAllEvidences($alerte->preuves);
+            
+            \Log::info('Preuves supprimées pour alerte', [
+                'alerte_id' => $alerte->id,
+                'ref' => $alerte->ref,
+                'nombre_preuves' => count($alerte->preuves),
+                'timestamp' => now()->toDateTimeString()
+            ]);
+        }
+    }
+}
