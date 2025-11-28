@@ -14,6 +14,7 @@ class Plateforme extends Model
     protected $fillable = [
         'nom',
         'description',
+        'signalement_url',
         'status',
     ];
 

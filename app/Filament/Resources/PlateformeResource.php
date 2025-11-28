@@ -37,6 +37,12 @@ class PlateformeResource extends Resource
                         ->rows(3)
                         ->maxLength(65535),
 
+                    TextInput::make('signalement_url')
+                        ->label('URL de signalement')
+                        ->url()
+                        ->maxLength(500)
+                        ->placeholder('https://...'),
+
                     Toggle::make('status')
                         ->label('Active')
                         ->default(true)
