@@ -48,7 +48,10 @@ class AlerteController extends Controller
 
         // Générer automatiquement les conseils de sécurité
         $safetyAdviceService = new \App\Services\VBG\SafetyAdviceService();
-        $validated['conseils_securite'] = $safetyAdviceService->generateSafetyAdvice($validated['type_alerte_id'] ?? null);
+        $validated['conseils_securite'] = $safetyAdviceService->generateSafetyAdvice(
+            $validated['type_alerte_id'] ?? null,
+            $validated['sous_type_violence_numerique_id'] ?? null
+        );
 
         $alerte = Alerte::create($validated);
 

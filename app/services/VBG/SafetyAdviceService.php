@@ -10,10 +10,19 @@ class SafetyAdviceService
      * Génère des conseils de sécurité automatiques basés sur le type de violence
      *
      * @param int|null $typeAlerteId
+     * @param int|null $sousTypeId
      * @return string
      */
-    public function generateSafetyAdvice(?int $typeAlerteId): string
+    public function generateSafetyAdvice(?int $typeAlerteId, ?int $sousTypeId = null): string
     {
+        // Si un sous-type de violence numérique est fourni, l'utiliser en priorité
+        if ($sousTypeId) {
+            $sousType = \App\Models\SousTypeViolenceNumerique::find($sousTypeId);
+            if ($sousType) {
+                return $this->getAdviceForSousType($sousType->nom);
+            }
+        }
+
         if (!$typeAlerteId) {
             return $this->getGeneralAdvice();
         }
@@ -446,5 +455,213 @@ class SafetyAdviceService
             "• OPROGEM : 116\n" .
             "• C'est très traumatisant, ne reste pas seul.e\n\n" .
             "⚠️ Les deepfakes sont une forme de VIOLENCE SEXUELLE. Ce n'est PAS de ta faute.";
+    }
+}
+
+
+
+    /**
+     * Génère des conseils spécifiques selon le sous-type de violence numérique
+     *
+     * @param string $sousTypeName
+     * @return string
+     */
+    private function getAdviceForSousType(string $sousTypeName): string
+    {
+        return match ($sousTypeName) {
+            'Harcèlement sur réseaux sociaux' => $this->getHarcelementReseauxSociauxAdvice(),
+            'Harcèlement par messagerie (SMS)' => $this->getHarcelementSMSAdvice(),
+            'Chantage avec photos/vidéos intimes (sextorsion)' => $this->getChantageEnLigneAdvice(),
+            'Menaces ou insultes répétées en ligne' => $this->getMenacesEnLigneAdvice(),
+            'Partage non-consensuel d\'images intimes (revenge porn)' => $this->getRevengePornAdvice(),
+            'Surveillance/espionnage via téléphone' => $this->getCyberstalkingAdvice(),
+            'Usurpation d\'identité en ligne' => $this->getUsurpationIdentiteAdvice(),
+            'Arnaque sentimentale' => $this->getArnaqueSentimentaleAdvice(),
+            'Exploitation sexuelle via internet' => $this->getExploitationSexuelleAdvice(),
+            'Création de faux profils pour harceler' => $this->getFauxProfilsAdvice(),
+            'Autre violence numérique' => $this->getCyberharcelementAdvice(),
+            default => $this->getCyberharcelementAdvice(),
+        };
+    }
+
+    private function getHarcelementReseauxSociauxAdvice(): string
+    {
+        return "⚠️ CONSEILS - HARCÈLEMENT SUR RÉSEAUX SOCIAUX :\n\n" .
+            "🛑 PROTÈGE-TOI IMMÉDIATEMENT :\n" .
+            "• BLOQUE la personne sur TOUS les réseaux sociaux\n" .
+            "• Mets tes comptes en PRIVÉ temporairement\n" .
+            "• Limite qui peut te contacter et commenter\n" .
+            "• Ne réponds PAS aux provocations\n\n" .
+            "📱 COLLECTE DES PREUVES :\n" .
+            "• CAPTURES D'ÉCRAN de TOUT (messages, posts, commentaires)\n" .
+            "• Inclus les dates, heures, noms d'utilisateur visibles\n" .
+            "• Sauvegarde dans plusieurs endroits (email, cloud, clé USB)\n" .
+            "• NE SUPPRIME RIEN avant d'avoir sauvegardé\n\n" .
+            "📢 SIGNALE SUR LA PLATEFORME :\n" .
+            "• Facebook : Menu (3 points) > Signaler > Harcèlement\n" .
+            "• Instagram : ... > Signaler > C'est du harcèlement ou intimidation\n" .
+            "• TikTok : Partager > Signaler > Harcèlement\n" .
+            "• Twitter/X : ... > Signaler le tweet > Comportement abusif\n\n" .
+            "⚙️ SÉCURITÉ DU COMPTE :\n" .
+            "• Change TOUS tes mots de passe\n" .
+            "• Active l'authentification à deux facteurs\n" .
+            "• Vérifie les appareils connectés à tes comptes\n" .
+            "• Révoque l'accès aux applications tierces suspectes\n\n" .
+            "🚨 PORTE PLAINTE :\n" .
+            "• Le harcèlement en ligne est un DÉLIT\n" .
+            "• Police : 117 (apporte les captures d'écran)\n" .
+            "• OPROGEM : 116 pour accompagnement\n\n" .
+            "📞 AIDE :\n" .
+            "• OPROGEM : 116 (24h/24)\n" .
+            "• Centre Sabou : +224 621 000 006\n\n" .
+            "⚠️ Le harcèlement n'est JAMAIS acceptable. Tu as le droit d'être en sécurité en ligne.";
+    }
+
+    private function getHarcelementSMSAdvice(): string
+    {
+        return "⚠️ CONSEILS - HARCÈLEMENT PAR MESSAGERIE (SMS) :\n\n" .
+            "🛑 PROTÈGE-TOI :\n" .
+            "• BLOQUE le numéro immédiatement\n" .
+            "• Active le filtre anti-spam de ton opérateur\n" .
+            "• Ne réponds JAMAIS aux messages\n\n" .
+            "📱 COLLECTE DES PREUVES :\n" .
+            "• CAPTURES D'ÉCRAN de TOUS les SMS (avec numéro et date visibles)\n" .
+            "• Note les heures et fréquence des messages\n" .
+            "• Sauvegarde dans plusieurs endroits\n" .
+            "• NE SUPPRIME RIEN\n\n" .
+            "📞 CONTACTE TON OPÉRATEUR :\n" .
+            "• Orange Guinée : 111\n" .
+            "• MTN Guinée : 1000\n" .
+            "• Cellcom : 122\n" .
+            "• Demande le blocage du numéro et historique des appels\n\n" .
+            "🚨 PORTE PLAINTE :\n" .
+            "• Le harcèlement par SMS est un DÉLIT\n" .
+            "• Police : 117 (apporte les captures d'écran)\n" .
+            "• L'opérateur peut fournir les logs d'appels à la police\n\n" .
+            "⚙️ OPTIONS TECHNIQUES :\n" .
+            "• Change de numéro si nécessaire (opérateur peut aider)\n" .
+            "• Utilise une app de blocage d'appels (Truecaller, etc.)\n" .
+            "• Ne partage ton nouveau numéro qu'avec des personnes de confiance\n\n" .
+            "📞 AIDE :\n" .
+            "• OPROGEM : 116\n" .
+            "• Police : 117\n\n" .
+            "⚠️ Personne n'a le droit de te harceler. Protège-toi.";
+    }
+
+    private function getArnaqueSentimentaleAdvice(): string
+    {
+        return "⚠️ CONSEILS - ARNAQUE SENTIMENTALE :\n\n" .
+            "🚨 SIGNES D'ARNAQUE :\n" .
+            "• Déclaration d'amour très rapide\n" .
+            "• Refuse de se rencontrer ou de faire un appel vidéo\n" .
+            "• Demande d'argent (urgence médicale, voyage, etc.)\n" .
+            "• Photos qui semblent professionnelles ou trop parfaites\n" .
+            "• Histoire personnelle qui semble trop dramatique\n\n" .
+            "🛑 ARRÊTE IMMÉDIATEMENT :\n" .
+            "• N'envoie JAMAIS d'argent\n" .
+            "• Ne partage AUCUNE information bancaire\n" .
+            "• Ne donne pas de photos intimes\n" .
+            "• BLOQUE la personne sur toutes les plateformes\n\n" .
+            "🔍 VÉRIFIE L'IDENTITÉ :\n" .
+            "• Recherche inversée d'image Google (les arnaqueurs utilisent des photos volées)\n" .
+            "• Vérifie les profils sociaux (souvent récents avec peu d'amis)\n" .
+            "• Demande un appel vidéo immédiat (les arnaqueurs refusent)\n\n" .
+            "📝 PREUVES :\n" .
+            "• Captures d'écran de TOUTES les conversations\n" .
+            "• Profil de la personne\n" .
+            "• Demandes d'argent ou informations bancaires\n" .
+            "• Relevés bancaires si tu as déjà envoyé de l'argent\n\n" .
+            "🚨 PORTE PLAINTE :\n" .
+            "• L'arnaque sentimentale est un CRIME\n" .
+            "• Police : 117 (apporte toutes les preuves)\n" .
+            "• Contacte ta banque si tu as envoyé de l'argent\n\n" .
+            "💡 PRÉVENTION FUTURE :\n" .
+            "• Méfie-toi des rencontres qui progressent trop vite\n" .
+            "• Ne partage jamais d'informations financières en ligne\n" .
+            "• Toujours vérifier l'identité avant de faire confiance\n\n" .
+            "📞 AIDE :\n" .
+            "• OPROGEM : 116\n" .
+            "• Police cybercriminalité : 117\n\n" .
+            "⚠️ L'amour véritable ne demande pas d'argent. Si c'est trop beau pour être vrai, c'est probablement une arnaque.";
+    }
+
+    private function getExploitationSexuelleAdvice(): string
+    {
+        return "⚠️ CONSEILS URGENTS - EXPLOITATION SEXUELLE VIA INTERNET :\n\n" .
+            "🚨 C'EST TRÈS GRAVE :\n" .
+            "• L'exploitation sexuelle est un CRIME grave\n" .
+            "• Tu es une VICTIME, pas une criminelle\n" .
+            "• L'aide existe et est GRATUITE\n\n" .
+            "🆘 AIDE IMMÉDIATE :\n" .
+            "• OPROGEM : 116 (24h/24, confidentiel)\n" .
+            "• Centre Sabou Guinée : +224 621 000 006\n" .
+            "• Police : 117 (tu seras protégée, pas jugée)\n\n" .
+            "📝 SI TU VEUX PORTER PLAINTE :\n" .
+            "• Collecte TOUTES les preuves (messages, profils, photos)\n" .
+            "• Note tous les détails (noms, lieux, dates)\n" .
+            "• L'Association des Juristes Guinéennes peut t'accompagner gratuitement\n" .
+            "• Tu peux porter plainte de manière anonyme au début\n\n" .
+            "🔒 PROTÈGE-TOI :\n" .
+            "• Change TOUS tes mots de passe\n" .
+            "• Bloque les personnes impliquées\n" .
+            "• Ne supprime AUCUNE preuve\n" .
+            "• Mets tes comptes en privé\n\n" .
+            "🏥 SOUTIEN MÉDICAL ET PSYCHOLOGIQUE :\n" .
+            "• Guichet Unique VBG CHU Donka : +224 621 000 007 (gratuit)\n" .
+            "• Soins médicaux gratuits si nécessaire\n" .
+            "• Accompagnement psychologique\n" .
+            "• Tout est CONFIDENTIEL\n\n" .
+            "⚖️ TES DROITS :\n" .
+            "• Les exploiteurs risquent de LOURDES peines de prison\n" .
+            "• Tu peux demander des dommages-intérêts\n" .
+            "• Tu seras protégée pendant la procédure\n" .
+            "• Ton identité peut rester confidentielle\n\n" .
+            "📞 URGENCES :\n" .
+            "• OPROGEM : 116 (24h/24)\n" .
+            "• Police : 117\n" .
+            "• Centre Sabou : +224 621 000 006\n\n" .
+            "⚠️ Tu n'es PAS seule. Ce n'est PAS de ta faute. L'aide existe.";
+    }
+
+    private function getFauxProfilsAdvice(): string
+    {
+        return "⚠️ CONSEILS - CRÉATION DE FAUX PROFILS POUR HARCELER :\n\n" .
+            "🚨 IDENTIFIE LES FAUX PROFILS :\n" .
+            "• Profil récent avec peu d'amis\n" .
+            "• Utilise tes photos ou ton nom\n" .
+            "• Contacts répétés de comptes différents\n" .
+            "• Messages similaires de profils différents\n\n" .
+            "📢 SIGNALE IMMÉDIATEMENT :\n" .
+            "• Sur chaque plateforme : Signaler > Faux compte\n" .
+            "• Facebook : Formulaire spécial pour usurpation d'identité\n" .
+            "• Instagram : Signaler > C'est un faux compte\n" .
+            "• Demande le retrait urgent du profil\n\n" .
+            "📱 PRÉVIENS TON RÉSEAU :\n" .
+            "• Poste publiquement que ces comptes sont FAUX\n" .
+            "• Demande à tes amis de signaler aussi\n" .
+            "• Ne pas accepter ou interagir avec ces profils\n" .
+            "• Partage la liste des faux comptes identifiés\n\n" .
+            "📝 COLLECTE DES PREUVES :\n" .
+            "• Captures d'écran de TOUS les faux profils (URL visible)\n" .
+            "• Captures des messages reçus\n" .
+            "• Liste de tous les comptes suspects\n" .
+            "• Sauvegarde dans plusieurs endroits\n\n" .
+            "🔒 PROTÈGE TES COMPTES RÉELS :\n" .
+            "• Mets tes comptes en PRIVÉ temporairement\n" .
+            "• Limite qui peut voir tes photos et infos\n" .
+            "• Active l'authentification à deux facteurs\n" .
+            "• Ajoute un watermark sur tes photos publiques\n\n" .
+            "🚨 PORTE PLAINTE :\n" .
+            "• La création de faux profils pour harceler est un DÉLIT\n" .
+            "• Police : 117 (apporte les captures d'écran)\n" .
+            "• OPROGEM : 116 pour accompagnement\n\n" .
+            "⚖️ ACTION LÉGALE :\n" .
+            "• Association des Juristes Guinéennes : +224 621 000 013\n" .
+            "• Les harceleurs risquent des poursuites\n" .
+            "• Tu peux demander des dommages-intérêts\n\n" .
+            "📞 AIDE :\n" .
+            "• OPROGEM : 116\n" .
+            "• Police : 117\n\n" .
+            "⚠️ Agis VITE pour faire retirer les faux profils avant qu'ils ne causent plus de dégâts.";
     }
 }
