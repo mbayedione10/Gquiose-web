@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\EvaluationStatsResource\Widgets;
 
 use App\Models\ReponseEvaluation;
+use App\Models\QuestionEvaluation;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Database\Eloquent\Model;
 
 class QuestionChartWidget extends ChartWidget
 {
