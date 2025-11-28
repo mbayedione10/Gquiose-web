@@ -60,5 +60,10 @@ class DatabaseSeeder extends Seeder
             PlateformeSeeder::class,
             NatureContenuSeeder::class,
         ]);
+
+        // Données du cycle menstruel
+        $this->call([
+            MenstrualCycleSeeder::class,
+        ]);
     }
 }
