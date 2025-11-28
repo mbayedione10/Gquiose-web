@@ -28,6 +28,7 @@ use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\AlerteResource\Pages;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Arr;
 
 class AlerteResource extends Resource
 {

@@ -31,7 +31,13 @@ class Utilisateur extends Model
         'ville_id'
     ];
 
-    protected $searchableFields = ['*'];
+   protected $searchableFields = [
+    'nom',
+    'prenom',
+    'email',
+    'phone',
+];
+
 
     protected $casts = [
         'status' => 'boolean',
@@ -49,10 +55,11 @@ class Utilisateur extends Model
         return $this->hasMany(Response::class);
     }
 
-    public function getNameAttribute()
-    {
-        return $this->prenom. " " .$this->nom;
-    }
+    public function getFullNameAttribute()
+{
+    return $this->prenom . " " . $this->nom;
+}
+
 
     public function alertes()
     {
