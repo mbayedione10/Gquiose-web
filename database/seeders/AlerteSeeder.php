@@ -42,6 +42,8 @@ class AlerteSeeder extends Seeder
         $chantage = TypeAlerte::where('name', 'Chantage / Extorsion en Ligne')->first();
         $cyberstalking = TypeAlerte::where('name', 'Cyberstalking / Surveillance Numérique')->first();
         $usurpation = TypeAlerte::where('name', 'Usurpation d\'Identité en Ligne')->first();
+        $violenceNumerique = $cyberharcelement; // Alias pour violence numérique
+        $violencePhysique = $violenceConjugale; // Alias pour violence physique
 
         // Sous-types de violence numérique
         $sousTypes = SousTypeViolenceNumerique::all();
