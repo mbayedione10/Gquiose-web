@@ -1,0 +1,159 @@
+⚠️ 2. CE QUI RESTE À FAIRE / MANQUANT
+A. Sous-types détaillés de violences numériques ❌
+Cahier des charges demande 11 sous-types spécifiques :
+
+Harcèlement sur réseaux sociaux ❌
+Harcèlement par messagerie (SMS) ❌
+Chantage avec photos/vidéos intimes (sextorsion) ❌
+Menaces ou insultes répétées en ligne ❌
+Partage non-consensuel d'images intimes (revenge porn) ❌
+Surveillance/espionnage via téléphone ❌
+Usurpation d'identité en ligne ❌
+Arnaque sentimentale ❌
+Exploitation sexuelle via internet ❌
+Création de faux profils pour harceler ❌
+Autre violence numérique ❌
+Actuellement : Seul "Violence Numérique" existe comme type général
+
+Solution nécessaire :
+
+Ajouter un champ sous_type_violence_numerique dans la table alertes
+Créer une enum ou table de référence pour ces 11 sous-types
+B. Plateformes - Liste exhaustive manquante ⚠️
+Cahier des charges demande :
+
+Facebook, WhatsApp, Instagram, TikTok ✓ (présents dans seeders)
+MANQUANTS :
+Telegram ❌
+Snapchat ❌
+Twitter/X ❌
+Email ❌
+Site web/blog ❌
+Application de rencontre (Tinder, Badoo) ❌
+Jeu en ligne ❌
+Solution : Mettre à jour les données de référence pour plateformes
+
+C. Upload de preuves - Spécifications sécurité ⚠️
+Cahier des charges exige :
+
+✅ Upload jusqu'à 5 fichiers (JPG, PNG - max 5 Mo)
+❌ Chiffrement AES-256 (pas confirmé dans le code)
+❌ Suppression automatique métadonnées de géolocalisation
+❌ Suppression auto si signalement retiré
+❌ Accès restreint (victime + système national VBG uniquement)
+Actuellement : Seul le champ preuves (json) existe, mais les règles de sécurité ne sont pas implémentées
+
+Solution nécessaire :
+
+Service de chiffrement de fichiers
+Middleware de nettoyage EXIF
+Politique de suppression automatique
+Contrôle d'accès granulaire aux preuves
+D. Conseils automatiques personnalisés ⚠️
+Cahier des charges demande des conseils spécifiques selon le type :
+
+Pour violences numériques :
+
+❌ Section "Préservation des preuves" (captures, dates)
+❌ Section "Sécurité immédiate" (bloquer, changer mots de passe, 2FA)
+❌ Boutons directs vers signalement plateformes
+❌ Conseils désactivation géolocalisation
+Actuellement : Champ conseils_securite existe mais contenu non généré automatiquement
+
+Solution nécessaire :
+
+Étendre SafetyAdviceService.php avec logique conditionnelle
+Ajouter templates de conseils par type de violence
+Intégrer deep links vers formulaires de signalement des plateformes
+E. Numéros d'urgence et ressources ⚠️
+Cahier des charges demande :
+
+✅ Numéro vert VBG : 116 (dans InformationSeeder probablement)
+✅ Police : 117, Pompiers : 118
+❌ MANQUANT : Numéro cybercriminalité spécifique
+❌ MANQUANT : Email signalement cybercriminalité
+❌ MANQUANT : Boutons "Appeler" cliquables dans l'API
+Solution nécessaire :
+
+Ajouter table numeros_urgence avec types (VBG, cybercriminalité, police, etc.)
+API endpoint pour récupérer numéros selon contexte
+F. Interface formulaire multi-écrans ❌
+Cahier des charges décrit 6 écrans spécifiques :
+
+Écran 1 - Type de violence principale ❌
+Écran 2 - Détails violence numérique (si sélectionnée) ❌
+Écran 3 - Informations sur l'incident ❌
+Écran 4 - Conseils automatiques adaptés ❌
+Écran 5 - Orientation et ressources ❌
+Écran 6 - Consentement et transmission ❌
+Actuellement : Backend supporte les données, mais pas de workflow d'écrans défini dans l'API
+
+Solution nécessaire :
+
+Créer endpoint API multi-étapes /api/alertes/create-step/{step}
+Validation par étape
+Session de formulaire temporaire
+G. Boutons signalement plateformes ❌
+Cahier des charges demande :
+
+Liens directs vers formulaires de signalement :
+Facebook/Instagram ❌
+WhatsApp ❌
+TikTok ❌
+Twitter/X ❌
+Solution nécessaire :
+
+Table plateformes_signalement avec URLs de signalement
+API endpoint pour récupérer ces URLs
+H. Carte interactive des structures ⚠️
+Cahier des charges demande :
+
+✅ Géolocalisation des structures (latitude/longitude présents)
+❌ API pour filtrer structures par proximité
+❌ Calcul de distance
+❌ Endpoint pour carte interactive
+Solution nécessaire :
+
+Endpoint GET /api/structures/nearby?lat={lat}&lng={lng}&radius={km}
+Calcul distance haversine
+I. Message de confirmation après envoi ⚠️
+Cahier des charges demande :
+
+❌ Message de confirmation personnalisé
+❌ Affichage du numéro de suivi généré
+❌ Rappel des ressources disponibles
+❌ Option d'ajouter numéros d'urgence aux favoris
+Actuellement : Numéro de suivi généré (numero_suivi) mais pas de workflow de confirmation
+
+Solution nécessaire :
+
+Endpoint POST /api/alertes doit retourner objet complet avec message
+Template de réponse avec ressources
+J. Chiffrement et sécurité renforcée ❌
+Cahier des charges exige :
+
+❌ Chiffrement bout-en-bout des preuves (AES-256)
+❌ Suppression métadonnées EXIF des images
+❌ Accès restreint aux preuves (RBAC)
+❌ Audit trail des accès aux preuves
+Solution nécessaire :
+
+Service de chiffrement de fichiers
+Library de traitement d'images (suppression EXIF)
+Middleware d'autorisation granulaire
+Table acces_preuves pour audit
+📋 RÉSUMÉ DES ACTIONS PRIORITAIRES
+🔴 Priorité HAUTE
+Ajouter sous-types de violences numériques (11 types)
+Implémenter chiffrement AES-256 des preuves
+Créer workflow API multi-écrans
+Générer conseils automatiques selon type de violence
+🟠 Priorité MOYENNE
+Compléter liste des plateformes
+Ajouter numéros cybercriminalité
+API structures à proximité (géolocalisation)
+Boutons signalement plateformes
+🟡 Priorité BASSE
+Templates de confirmation après envoi
+Suppression métadonnées EXIF
+Audit trail accès preuves
