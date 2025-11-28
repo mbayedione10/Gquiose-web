@@ -69,6 +69,14 @@ Route::prefix('v1')
         /*************************  SYNC ALERTE    ***************************/
         Route::post('alert-sync', [APIAlertController::class, 'sync']);
 
+        // Routes VBG amélioré - Téléchargement sécurisé des preuves et gestion conseils
+        Route::middleware('auth:sanctum')->prefix('alertes')->group(function () {
+            Route::get('{alerte}/evidence/{index}', [App\Http\Controllers\Api\AlerteController::class, 'downloadEvidence'])
+                ->name('alertes.download-evidence');
+            Route::post('{alerte}/mark-advice-read', [App\Http\Controllers\Api\AlerteController::class, 'markAdviceAsRead'])
+                ->name('alertes.mark-advice-read');
+        });
+
         /*************************  SYNC MESSAGE    ***************************/
         Route::post('message-sync', [APIForumController::class, 'syncMessage']);
 

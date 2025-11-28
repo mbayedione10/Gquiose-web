@@ -28,6 +28,18 @@ class AlerteStoreRequest extends FormRequest
             'type_alerte_id' => ['required', 'exists:type_alertes,id'],
             'etat' => ['required', 'max:255', 'string'],
             'ville_id' => ['required', 'exists:villes,id'],
+            'utilisateur_id' => ['required', 'exists:utilisateurs,id'],
+
+            // Preuves (evidence files) - maximum 5 fichiers
+            'preuves' => ['nullable', 'array', 'max:5'],
+            'preuves.*' => [
+                'file',
+                'max:10240', // 10 MB max par fichier
+                'mimes:jpeg,jpg,png,pdf,mp4,mov,avi,doc,docx'
+            ],
+
+            // Les conseils de sécurité seront générés automatiquement
+            'conseils_lus' => ['nullable', 'boolean'],
         ];
     }
 }

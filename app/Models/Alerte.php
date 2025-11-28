@@ -20,9 +20,17 @@ class Alerte extends Model
         'etat',
         'ville_id',
         'utilisateur_id',
+        'preuves',
+        'conseils_securite',
+        'conseils_lus',
     ];
 
     protected $searchableFields = ['*'];
+
+    protected $casts = [
+        'preuves' => 'array',
+        'conseils_lus' => 'boolean',
+    ];
 
     public function utilisateur()
     {

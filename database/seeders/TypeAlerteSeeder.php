@@ -10,15 +10,26 @@ class TypeAlerteSeeder extends Seeder
     public function run(): void
     {
         $types = [
-            // Types d'alertes VBG
+            // Types d'alertes VBG traditionnels
             ['name' => 'Violence Conjugale', 'status' => true],
             ['name' => 'Harcèlement Sexuel', 'status' => true],
             ['name' => 'Agression Sexuelle', 'status' => true],
             ['name' => 'Mariage Forcé', 'status' => true],
             ['name' => 'MGF (Excision)', 'status' => true],
-            ['name' => 'Cyberharcèlement', 'status' => true],
             ['name' => 'Violence Scolaire', 'status' => true],
             ['name' => 'Exploitation Sexuelle', 'status' => true],
+
+            // Violences Facilitées par les Technologies (VFT)
+            ['name' => 'Cyberharcèlement', 'status' => true],
+            ['name' => 'Diffusion Images Intimes (Revenge Porn)', 'status' => true],
+            ['name' => 'Chantage / Extorsion en Ligne', 'status' => true],
+            ['name' => 'Cyberstalking / Surveillance Numérique', 'status' => true],
+            ['name' => 'Usurpation d\'Identité en Ligne', 'status' => true],
+            ['name' => 'Hacking / Violation Vie Privée', 'status' => true],
+            ['name' => 'Menaces en Ligne', 'status' => true],
+            ['name' => 'Deepfake / Manipulation Média', 'status' => true],
+
+            // Autres
             ['name' => 'Autres Violences', 'status' => true],
         ];
 
