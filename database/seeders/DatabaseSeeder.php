@@ -52,6 +52,7 @@ class DatabaseSeeder extends Seeder
         // Système
         $this->call([
             QuestionEvaluationSeeder::class,
+            ReponseEvaluationSeeder::class,
             NotificationTemplateSeeder::class,
         ]);
 
