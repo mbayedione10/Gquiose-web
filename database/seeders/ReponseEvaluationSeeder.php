@@ -1,3 +1,4 @@
+
 <?php
 
 namespace Database\Seeders;
@@ -7,6 +8,7 @@ use App\Models\QuestionEvaluation;
 use App\Models\ReponseEvaluation;
 use App\Models\Utilisateur;
 use Illuminate\Database\Seeder;
+use Carbon\Carbon;
 
 class ReponseEvaluationSeeder extends Seeder
 {
@@ -26,12 +28,15 @@ class ReponseEvaluationSeeder extends Seeder
             return;
         }
 
-        // Créer 30 évaluations de test
+        // Types de formulaires disponibles
+        $formulaireTypes = ['generale', 'satisfaction_quiz', 'satisfaction_article', 'satisfaction_structure'];
+
+        // Créer 100 évaluations de test
         $evaluationsCreated = 0;
         
-        foreach (range(1, 30) as $index) {
+        foreach (range(1, 100) as $index) {
             $utilisateur = $utilisateurs->random();
-            $formulaireType = ['generale', 'satisfaction_quiz', 'satisfaction_article', 'satisfaction_structure'][array_rand(['generale', 'satisfaction_quiz', 'satisfaction_article', 'satisfaction_structure'])];
+            $formulaireType = $formulaireTypes[array_rand($formulaireTypes)];
             
             // Questions pour ce type de formulaire
             $questionsFormulaire = $questions->where('formulaire_type', $formulaireType);
@@ -40,21 +45,22 @@ class ReponseEvaluationSeeder extends Seeder
                 continue;
             }
 
-            // Créer l'évaluation
+            // Créer l'évaluation avec une date aléatoire dans les 60 derniers jours
             $evaluation = Evaluation::create([
                 'utilisateur_id' => $utilisateur->id,
                 'contexte' => $this->getContexte($formulaireType),
                 'contexte_id' => rand(1, 10),
                 'reponses' => [],
                 'score_global' => 0,
-                'commentaire' => $this->faker()->optional()->sentence(),
+                'commentaire' => $this->getFaker()->optional(0.3)->sentence(),
+                'created_at' => Carbon::now()->subDays(rand(0, 60)),
             ]);
 
             $reponses = [];
             $totalScore = 0;
             $scoreCount = 0;
 
-            // Créer des réponses pour chaque question
+            // Créer des réponses pour chaque question du formulaire
             foreach ($questionsFormulaire as $question) {
                 $reponseData = $this->generateReponse($question);
                 
@@ -63,6 +69,7 @@ class ReponseEvaluationSeeder extends Seeder
                     'question_evaluation_id' => $question->id,
                     'reponse' => $reponseData['reponse'],
                     'valeur_numerique' => $reponseData['valeur_numerique'],
+                    'created_at' => $evaluation->created_at,
                 ]);
 
                 $reponses[] = [
@@ -72,7 +79,16 @@ class ReponseEvaluationSeeder extends Seeder
                 ];
 
                 if ($reponseData['valeur_numerique'] !== null) {
-                    $totalScore += $reponseData['valeur_numerique'];
+                    // Normaliser le score sur 5
+                    if ($question->type === 'scale') {
+                        $options = is_array($question->options) ? $question->options : json_decode($question->options, true);
+                        $max = $options['max'] ?? 10;
+                        $normalizedScore = ($reponseData['valeur_numerique'] / $max) * 5;
+                    } else {
+                        $normalizedScore = $reponseData['valeur_numerique'];
+                    }
+                    
+                    $totalScore += $normalizedScore;
                     $scoreCount++;
                 }
             }
@@ -80,7 +96,7 @@ class ReponseEvaluationSeeder extends Seeder
             // Mettre à jour l'évaluation avec le score global
             $evaluation->update([
                 'reponses' => $reponses,
-                'score_global' => $scoreCount > 0 ? $totalScore / $scoreCount : null,
+                'score_global' => $scoreCount > 0 ? round($totalScore / $scoreCount, 2) : null,
             ]);
 
             $evaluationsCreated++;
@@ -101,7 +117,7 @@ class ReponseEvaluationSeeder extends Seeder
                 ];
 
             case 'scale':
-                $options = json_decode($question->options, true);
+                $options = is_array($question->options) ? $question->options : json_decode($question->options, true);
                 $max = $options['max'] ?? 10;
                 $valeur = rand(1, $max);
                 return [
@@ -110,23 +126,39 @@ class ReponseEvaluationSeeder extends Seeder
                 ];
 
             case 'yesno':
-                $reponse = ['oui', 'non'][array_rand(['oui', 'non'])];
+                $reponse = rand(0, 1) === 1 ? 'oui' : 'non';
                 return [
                     'reponse' => $reponse,
                     'valeur_numerique' => $reponse === 'oui' ? 1 : 0,
                 ];
 
             case 'multiple_choice':
-                $options = json_decode($question->options, true);
-                $reponse = $options[array_rand($options)];
+                $options = is_array($question->options) ? $question->options : json_decode($question->options, true);
+                if (!empty($options)) {
+                    $reponse = $options[array_rand($options)];
+                } else {
+                    $reponse = 'Option ' . rand(1, 3);
+                }
                 return [
                     'reponse' => $reponse,
                     'valeur_numerique' => null,
                 ];
 
             case 'text':
+                $phrases = [
+                    'Très satisfait de cette expérience',
+                    'Bon service, à améliorer',
+                    'Excellente plateforme',
+                    'Quelques bugs à corriger',
+                    'Interface intuitive et facile à utiliser',
+                    'Contenu de qualité',
+                    'Besoin de plus de fonctionnalités',
+                    'Service rapide et efficace',
+                    'Très utile pour ma situation',
+                    'Merci pour cette initiative',
+                ];
                 return [
-                    'reponse' => $this->faker()->sentence(),
+                    'reponse' => $phrases[array_rand($phrases)],
                     'valeur_numerique' => null,
                 ];
 
@@ -148,7 +180,7 @@ class ReponseEvaluationSeeder extends Seeder
         };
     }
 
-    private function faker()
+    private function getFaker()
     {
         return \Faker\Factory::create('fr_FR');
     }
