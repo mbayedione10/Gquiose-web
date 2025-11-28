@@ -39,42 +39,69 @@ class UserNotificationPreferenceResource extends Resource
                     ->schema([
                         Forms\Components\Toggle::make('notifications_enabled')
                             ->label('Notifications activées')
-                            ->default(true),
+                            ->default(true)
+                            ->reactive()
+                            ->disabled(fn ($get) => $get('do_not_disturb') === true),
                         
                         Forms\Components\Toggle::make('cycle_notifications')
                             ->label('Notifications de cycle')
-                            ->default(true),
+                            ->default(true)
+                            ->reactive()
+                            ->disabled(fn ($get) => $get('do_not_disturb') === true),
                         
                         Forms\Components\Toggle::make('content_notifications')
                             ->label('Notifications de contenu')
-                            ->default(true),
+                            ->default(true)
+                            ->reactive()
+                            ->disabled(fn ($get) => $get('do_not_disturb') === true),
                         
                         Forms\Components\Toggle::make('forum_notifications')
                             ->label('Notifications du forum')
-                            ->default(true),
+                            ->default(true)
+                            ->reactive()
+                            ->disabled(fn ($get) => $get('do_not_disturb') === true),
                         
                         Forms\Components\Toggle::make('health_tips_notifications')
                             ->label('Conseils de santé')
-                            ->default(true),
+                            ->default(true)
+                            ->reactive()
+                            ->disabled(fn ($get) => $get('do_not_disturb') === true),
                         
                         Forms\Components\Toggle::make('admin_notifications')
                             ->label('Notifications admin')
-                            ->default(true),
+                            ->default(true)
+                            ->reactive()
+                            ->disabled(fn ($get) => $get('do_not_disturb') === true),
                     ])
                     ->columns(2),
 
                 Forms\Components\Card::make()
                     ->schema([
                         Forms\Components\Toggle::make('do_not_disturb')
-                            ->label('Mode Ne pas déranger'),
+                            ->label('Mode Ne pas déranger')
+                            ->reactive()
+                            ->afterStateUpdated(function ($state, callable $set) {
+                                if ($state) {
+                                    // Désactiver toutes les notifications si mode "Ne pas déranger" est activé
+                                    $set('notifications_enabled', false);
+                                    $set('cycle_notifications', false);
+                                    $set('content_notifications', false);
+                                    $set('forum_notifications', false);
+                                    $set('health_tips_notifications', false);
+                                    $set('admin_notifications', false);
+                                }
+                            })
+                            ->helperText('Active ce mode pour désactiver toutes les notifications'),
                         
                         Forms\Components\TimePicker::make('quiet_start')
                             ->label('Début période silencieuse')
-                            ->withoutSeconds(),
+                            ->withoutSeconds()
+                            ->disabled(fn ($get) => $get('do_not_disturb') === true),
                         
                         Forms\Components\TimePicker::make('quiet_end')
                             ->label('Fin période silencieuse')
-                            ->withoutSeconds(),
+                            ->withoutSeconds()
+                            ->disabled(fn ($get) => $get('do_not_disturb') === true),
                     ])
                     ->columns(3),
             ]);
