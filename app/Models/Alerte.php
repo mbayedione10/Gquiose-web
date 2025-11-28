@@ -23,6 +23,21 @@ class Alerte extends Model
         'preuves',
         'conseils_securite',
         'conseils_lus',
+        // Champs spécifiques violences numériques
+        'plateformes',
+        'nature_contenu',
+        'urls_problematiques',
+        'comptes_impliques',
+        'frequence_incidents',
+        // Informations générales incident
+        'date_incident',
+        'heure_incident',
+        'relation_agresseur',
+        'impact',
+        // Consentement et anonymat
+        'anonymat_souhaite',
+        'consentement_transmission',
+        'numero_suivi',
     ];
 
     protected $searchableFields = ['*'];
@@ -30,6 +45,13 @@ class Alerte extends Model
     protected $casts = [
         'preuves' => 'array',
         'conseils_lus' => 'boolean',
+        'plateformes' => 'array',
+        'nature_contenu' => 'array',
+        'impact' => 'array',
+        'anonymat_souhaite' => 'boolean',
+        'consentement_transmission' => 'boolean',
+        'date_incident' => 'date',
+        'heure_incident' => 'datetime:H:i',
     ];
 
     public function utilisateur()
