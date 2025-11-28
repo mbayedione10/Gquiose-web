@@ -19,7 +19,6 @@ use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TimePicker;
-use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
@@ -88,10 +87,12 @@ class AlerteResource extends Resource
 
                             Select::make('sous_type_violence_numerique_id')
                                 ->label('Sous-type de violence numérique')
-                                ->relationship('sousTypeViolenceNumerique', 'nom')
+                                ->relationship('sousTypeViolenceNumerique', 'nom', fn ($query) => $query->where('status', true))
+                                ->preload()
                                 ->searchable()
                                 ->visible(fn (callable $get) => $get('type_alerte_id'))
-                                ->columnSpan(2),
+                                ->columnSpan(2)
+                                ->helperText('Choisissez le sous-type spécifique de violence numérique'),
 
                             Textarea::make('description')
                                 ->label('Description')
@@ -136,15 +137,45 @@ class AlerteResource extends Resource
                 Tabs\Tab::make('Violences numériques')->schema([
                     Section::make('Informations sur les violences technologiques')->schema([
                         Grid::make(2)->schema([
-                            TagsInput::make('plateformes')
+                            Select::make('plateformes')
                                 ->label('Plateformes concernées')
-                                ->placeholder('Facebook, WhatsApp, Instagram...')
-                                ->helperText('Où la violence a eu lieu'),
+                                ->multiple()
+                                ->options([
+                                    'Facebook' => 'Facebook',
+                                    'WhatsApp' => 'WhatsApp',
+                                    'Instagram' => 'Instagram',
+                                    'TikTok' => 'TikTok',
+                                    'Telegram' => 'Telegram',
+                                    'Snapchat' => 'Snapchat',
+                                    'Twitter/X' => 'Twitter/X',
+                                    'Email' => 'Email',
+                                    'Site web/blog' => 'Site web/blog',
+                                    'Application de rencontre' => 'Application de rencontre (Tinder, Badoo...)',
+                                    'Jeu en ligne' => 'Jeu en ligne',
+                                    'SMS' => 'SMS',
+                                    'Autre' => 'Autre',
+                                ])
+                                ->searchable()
+                                ->helperText('Sélectionnez une ou plusieurs plateformes'),
 
-                            TagsInput::make('nature_contenu')
+                            Select::make('nature_contenu')
                                 ->label('Nature du contenu')
-                                ->placeholder('Messages, Images, Vidéos...')
-                                ->helperText('Type de contenu problématique'),
+                                ->multiple()
+                                ->options([
+                                    'Messages texte' => 'Messages texte',
+                                    'Images/Photos' => 'Images/Photos',
+                                    'Vidéos' => 'Vidéos',
+                                    'Captures d\'écran' => 'Captures d\'écran',
+                                    'Enregistrements audio' => 'Enregistrements audio',
+                                    'Liens URL' => 'Liens URL',
+                                    'Commentaires publics' => 'Commentaires publics',
+                                    'Messages privés' => 'Messages privés',
+                                    'Publications/Posts' => 'Publications/Posts',
+                                    'Stories' => 'Stories',
+                                    'Autre' => 'Autre',
+                                ])
+                                ->searchable()
+                                ->helperText('Sélectionnez un ou plusieurs types de contenu'),
 
                             Textarea::make('urls_problematiques')
                                 ->label('URLs problématiques')
