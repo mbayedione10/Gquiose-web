@@ -69,6 +69,20 @@ Route::prefix('v1')
         /*************************  SYNC ALERTE    ***************************/
         Route::post('alert-sync', [APIAlertController::class, 'sync']);
 
+        /*************************  WORKFLOW MULTI-ÉCRANS ALERTE VBG    ***************************/
+        Route::prefix('alertes')->group(function () {
+            // Récupérer les options pour le formulaire
+            Route::get('workflow-options', [App\Http\Controllers\APIAlertWorkflowController::class, 'getWorkflowOptions']);
+            
+            // Workflow étapes
+            Route::post('step1', [App\Http\Controllers\APIAlertWorkflowController::class, 'step1']);
+            Route::post('step2', [App\Http\Controllers\APIAlertWorkflowController::class, 'step2']);
+            Route::post('step3', [App\Http\Controllers\APIAlertWorkflowController::class, 'step3']);
+            Route::get('step4/{alerte_id}', [App\Http\Controllers\APIAlertWorkflowController::class, 'step4']);
+            Route::get('step5/{alerte_id}', [App\Http\Controllers\APIAlertWorkflowController::class, 'step5']);
+            Route::post('step6', [App\Http\Controllers\APIAlertWorkflowController::class, 'step6']);
+        });
+
         // Routes VBG amélioré - Téléchargement sécurisé des preuves et gestion conseils
         Route::middleware('auth:sanctum')->prefix('alertes')->group(function () {
             Route::get('{alerte}/evidence/{index}', [App\Http\Controllers\Api\AlerteController::class, 'downloadEvidence'])
