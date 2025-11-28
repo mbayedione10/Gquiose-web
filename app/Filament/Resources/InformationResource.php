@@ -43,6 +43,20 @@ class InformationResource extends Resource
                             ->placeholder("L'URL de prise des structures sanitaires")
                             ->label("Structures sanitaires"),
 
+                        Forms\Components\TextInput::make("numero_cybercriminalite")
+                            ->nullable()
+                            ->tel()
+                            ->placeholder("Ex: 117 ou +224 XXX XXX XXX")
+                            ->label("Numéro Cybercriminalité")
+                            ->helperText("Numéro pour signaler les cas de cybercriminalité en Guinée"),
+
+                        Forms\Components\TextInput::make("email_cybercriminalite")
+                            ->nullable()
+                            ->email()
+                            ->placeholder("Ex: cybercrime@police.gov.gn")
+                            ->label("Email Cybercriminalité")
+                            ->helperText("Adresse email pour les signalements de cybercriminalité"),
+
                         Forms\Components\FileUpload::make('image')
                             ->label("Bannière")
                             ->required()
@@ -78,6 +92,13 @@ class InformationResource extends Resource
                 Tables\Columns\TextColumn::make('structure_url')
                     ->label("Structure sanitaire"),
 
+                Tables\Columns\TextColumn::make('numero_cybercriminalite')
+                    ->label("N° Cybercriminalité")
+                    ->default('-'),
+
+                Tables\Columns\TextColumn::make('email_cybercriminalite')
+                    ->label("Email Cybercriminalité")
+                    ->default('-'),
 
             ])
             ->filters([
