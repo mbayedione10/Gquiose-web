@@ -18,6 +18,9 @@ class Kernel extends ConsoleKernel
         // Envoyer un conseil santé chaque lundi à 9h00 (GMT Guinée)
         $schedule->command('notifications:send-weekly-health-tips')
             ->weeklyOn(1, '09:00');
+
+        // Envoyer les rappels de cycle menstruel toutes les heures
+        $schedule->command('notifications:send-cycle-reminders')->hourly();
     }
 
     /**
