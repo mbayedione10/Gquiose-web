@@ -39,6 +39,9 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\UserMentioned::class => [
             \App\Listeners\SendMentionNotification::class,
         ],
+        \App\Events\CycleReminderTriggered::class => [
+            \App\Listeners\SendCycleReminderNotification::class,
+        ],
     ];
 
     /**
