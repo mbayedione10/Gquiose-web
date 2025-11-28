@@ -14,13 +14,17 @@ class SendArticleNotification implements ShouldQueue
     use InteractsWithQueue;
 
     protected $notificationService;
+    protected $evaluationTriggerService;
 
     /**
      * Create the event listener.
      */
-    public function __construct(PushNotificationService $notificationService)
-    {
+    public function __construct(
+        PushNotificationService $notificationService,
+        \App\Services\EvaluationTriggerService $evaluationTriggerService
+    ) {
         $this->notificationService = $notificationService;
+        $this->evaluationTriggerService = $evaluationTriggerService;
     }
 
     /**
@@ -49,5 +53,20 @@ class SendArticleNotification implements ShouldQueue
         $notificationService->sendNotificationInBatches($notification, 100);
 
         Log::info("Article notification dispatched: {$notification->id}");
+
+        // Programmer une évaluation automatique 1 jour après la lecture de l'article
+        // pour les utilisateurs actifs
+        $activeUserIds = \App\Models\Utilisateur::where('status', true)
+            ->where('updated_at', '>', now()->subDays(7))
+            ->pluck('id')
+            ->toArray();
+
+        if (!empty($activeUserIds)) {
+            $this->evaluationTriggerService->triggerAutoEvaluation('article', $article->id, [
+                'delay_days' => 1,
+                'target_users' => $activeUserIds,
+                'evaluation_type' => 'satisfaction_article'
+            ]);
+        }
     }
 }

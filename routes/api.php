@@ -10,6 +10,10 @@ use App\Http\Controllers\APIVideoController;
 use App\Http\Controllers\NotificationTrackingController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\APIEvaluationController; // Added for evaluation routes
+use App\Http\Controllers\APICycleController; // Added for cycle routes
+use App\Http\Controllers\APIEvaluationStatsController; // Added for evaluation stats routes
+
 
 /*
 |--------------------------------------------------------------------------
@@ -117,12 +121,20 @@ Route::prefix('v1')
         Route::get('videos', [APIVideoController::class, 'videos']);
 
         // Routes pour les évaluations
-        Route::prefix('evaluations')->group(function () {
-            Route::get('/questions', [App\Http\Controllers\APIEvaluationController::class, 'getQuestions']);
-            Route::post('/submit', [App\Http\Controllers\APIEvaluationController::class, 'submit']);
-            Route::get('/statistics', [App\Http\Controllers\APIEvaluationController::class, 'statistics']);
-            Route::get('/user/{userId}', [App\Http\Controllers\APIEvaluationController::class, 'userEvaluations']);
-        });
+        Route::prefix('evaluations')
+            ->middleware('auth:sanctum')
+            ->group(function () {
+                Route::get('/questions', [APIEvaluationController::class, 'getQuestions']);
+                Route::post('/submit', [APIEvaluationController::class, 'submit']);
+                Route::get('/statistics', [APIEvaluationController::class, 'statistics']);
+                Route::get('/user/{userId}', [APIEvaluationController::class, 'userEvaluations']);
+
+                // Nouvelles routes pour statistiques et graphiques
+                Route::get('/stats/global', [APIEvaluationStatsController::class, 'globalStats']);
+                Route::get('/stats/question/{questionId}', [APIEvaluationStatsController::class, 'questionStats']);
+                Route::get('/stats/formulaire/{formulaireType}', [APIEvaluationStatsController::class, 'formulaireStats']);
+                Route::get('/stats/report', [APIEvaluationStatsController::class, 'detailedReport']);
+            });
 
         // Forum routes
         Route::post('/forum/message/sync', [APIForumController::class, 'syncMessage']);
