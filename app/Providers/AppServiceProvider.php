@@ -22,7 +22,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Enregistrer l'observer pour la suppression sécurisée des preuves
-        \App\Models\Alerte::observe(\App\Observers\AlerteObserver::class);
+        // Créer les préférences de notification par défaut pour les nouveaux utilisateurs
+        \App\Models\Utilisateur::created(function ($user) {
+            \App\Models\UserNotificationPreference::create([
+                'utilisateur_id' => $user->id,
+                'notifications_enabled' => true,
+                'cycle_notifications' => true,
+                'content_notifications' => true,
+                'forum_notifications' => true,
+                'health_tips_notifications' => true,
+                'admin_notifications' => true,
+                'do_not_disturb' => false,
+            ]);
+        });
     }
 }

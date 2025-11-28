@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources\StructureResource\Pages;
 
-use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\StructureResource;
 use App\Events\NewHealthCenterAdded;
+use Filament\Actions;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateStructure extends CreateRecord
 {
@@ -12,7 +13,9 @@ class CreateStructure extends CreateRecord
 
     protected function afterCreate(): void
     {
-        // Dispatcher l'event pour envoyer une notification
-        NewHealthCenterAdded::dispatch($this->record);
+        // Déclencher la notification push automatique
+        if ($this->record->status) {
+            event(new NewHealthCenterAdded($this->record));
+        }
     }
 }

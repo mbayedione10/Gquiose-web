@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\ArticleStoreRequest;
 use App\Http\Requests\ArticleUpdateRequest;
+use App\Events\NewArticlePublished;
 
 class ArticleController extends Controller
 {

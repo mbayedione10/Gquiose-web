@@ -13,16 +13,33 @@ class SendScheduledNotifications extends Command
 
     public function handle()
     {
+        $this->info('Checking for scheduled notifications...');
+
+        // Get notifications that are scheduled and due
         $notifications = PushNotification::where('type', 'scheduled')
             ->where('status', 'pending')
             ->where('scheduled_at', '<=', now())
             ->get();
 
-        foreach ($notifications as $notification) {
-            SendScheduledNotification::dispatch($notification->id);
-            $this->info("Notification #{$notification->id} mise en file d'attente");
+        if ($notifications->isEmpty()) {
+            $this->info('No scheduled notifications to send.');
+            return 0;
         }
 
-        $this->info("Total: {$notifications->count()} notifications programmées");
+        foreach ($notifications as $notification) {
+            $this->info("Sending notification: {$notification->title}");
+
+            // Dispatch the job to send the notification
+            SendScheduledNotification::dispatch($notification->id);
+
+            // Update status to sending
+            $notification->update([
+                'status' => 'sending',
+            ]);
+        }
+
+        $this->info("Dispatched {$notifications->count()} scheduled notifications.");
+
+        return 0;
     }
 }

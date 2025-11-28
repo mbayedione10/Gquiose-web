@@ -7,6 +7,7 @@ use App\Models\PushNotification;
 use App\Services\PushNotificationService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Log;
 
 class SendArticleNotification implements ShouldQueue
 {
@@ -29,19 +30,24 @@ class SendArticleNotification implements ShouldQueue
     {
         $article = $event->article;
 
-        // Créer une notification push automatique
+        Log::info("Event triggered: New article published - {$article->titre}");
+
+        // Créer la notification push
         $notification = PushNotification::create([
-            'title' => 'Nouvel article publié',
-            'message' => $article->titre,
-            'icon' => 'article_icon',
-            'action' => 'article/' . $article->id,
+            'title' => '📚 Nouvel article disponible !',
+            'message' => substr($article->titre, 0, 100) . '...',
+            'icon' => '📚',
+            'action' => 'article/' . $article->slug,
             'image' => $article->image,
             'type' => 'automatic',
             'target_audience' => 'all',
-            'status' => 'pending',
+            'status' => 'sending',
         ]);
 
-        // Envoyer immédiatement
-        $this->notificationService->sendNotification($notification);
+        // Envoyer la notification en batch pour optimisation
+        $notificationService = app(PushNotificationService::class);
+        $notificationService->sendNotificationInBatches($notification, 100);
+
+        Log::info("Article notification dispatched: {$notification->id}");
     }
 }

@@ -12,15 +12,19 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // Vérifier les notifications programmées toutes les minutes
-        $schedule->command('notifications:send-scheduled')->everyMinute();
+        // Envoyer les rappels de cycle quotidiennement à 9h00
+        $schedule->command('cycle:send-reminders')
+            ->dailyAt('09:00')
+            ->timezone('Africa/Conakry');
 
-        // Envoyer un conseil santé chaque lundi à 9h00 (GMT Guinée)
-        $schedule->command('notifications:send-weekly-health-tips')
-            ->weeklyOn(1, '09:00');
+        // Envoyer les notifications programmées toutes les 5 minutes
+        $schedule->command('notifications:send-scheduled')
+            ->everyFiveMinutes();
 
-        // Envoyer les rappels de cycle menstruel toutes les heures
-        $schedule->command('notifications:send-cycle-reminders')->hourly();
+        // Envoyer les conseils de santé hebdomadaires le lundi à 10h00
+        $schedule->command('health-tips:send-weekly')
+            ->weeklyOn(1, '10:00')
+            ->timezone('Africa/Conakry');
     }
 
     /**

@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\ArticleResource\Pages;
 
-use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\ArticleResource;
+use App\Events\NewArticlePublished;
+use Filament\Actions;
+use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 
 class CreateArticle extends CreateRecord
@@ -18,6 +20,14 @@ class CreateArticle extends CreateRecord
         $data['user_id'] = Auth::user()->id;
 
         return $data;
+    }
+
+    protected function afterCreate(): void
+    {
+        // Déclencher la notification push automatique
+        if ($this->record->status) {
+            event(new NewArticlePublished($this->record));
+        }
     }
 
     protected function getRedirectUrl(): string
