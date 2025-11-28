@@ -1,0 +1,99 @@
+
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Models\Plateforme;
+use Filament\{Tables, Forms};
+use Filament\Resources\{Form, Table, Resource};
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use App\Filament\Resources\PlateformeResource\Pages;
+
+class PlateformeResource extends Resource
+{
+    protected static ?string $model = Plateforme::class;
+
+    protected static ?string $navigationLabel = "Plateformes";
+    protected static ?string $navigationGroup = "Paramètres VBG";
+    protected static ?string $navigationIcon = 'heroicon-o-globe';
+    protected static ?int $navigationSort = 3;
+
+    public static function form(Form $form): Form
+    {
+        return $form->schema([
+            Card::make()->schema([
+                Grid::make(['default' => 1])->schema([
+                    TextInput::make('nom')
+                        ->label('Nom de la plateforme')
+                        ->required()
+                        ->unique(ignoreRecord: true)
+                        ->maxLength(255),
+
+                    Textarea::make('description')
+                        ->label('Description')
+                        ->rows(3)
+                        ->maxLength(65535),
+
+                    Toggle::make('status')
+                        ->label('Active')
+                        ->default(true)
+                        ->inline(false),
+                ]),
+            ]),
+        ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                Tables\Columns\TextColumn::make('nom')
+                    ->label('Nom')
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('description')
+                    ->label('Description')
+                    ->limit(50)
+                    ->toggleable(),
+
+                Tables\Columns\IconColumn::make('status')
+                    ->label('Active')
+                    ->boolean()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Créée le')
+                    ->date('d/m/Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                Tables\Filters\TernaryFilter::make('status')
+                    ->label('Statut')
+                    ->boolean()
+                    ->trueLabel('Actives')
+                    ->falseLabel('Inactives'),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make(),
+            ]);
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListPlateformes::route('/'),
+            'create' => Pages\CreatePlateforme::route('/create'),
+            'edit' => Pages\EditPlateforme::route('/{record}/edit'),
+        ];
+    }
+}

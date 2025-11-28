@@ -54,5 +54,11 @@ class DatabaseSeeder extends Seeder
             QuestionEvaluationSeeder::class,
             NotificationTemplateSeeder::class,
         ]);
+
+        // Nouvelles tables
+        $this->call([
+            PlateformeSeeder::class,
+            NatureContenuSeeder::class,
+        ]);
     }
 }

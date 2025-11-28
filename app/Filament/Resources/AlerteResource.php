@@ -140,41 +140,22 @@ class AlerteResource extends Resource
                             Select::make('plateformes')
                                 ->label('Plateformes concernées')
                                 ->multiple()
-                                ->options([
-                                    'Facebook' => 'Facebook',
-                                    'WhatsApp' => 'WhatsApp',
-                                    'Instagram' => 'Instagram',
-                                    'TikTok' => 'TikTok',
-                                    'Telegram' => 'Telegram',
-                                    'Snapchat' => 'Snapchat',
-                                    'Twitter/X' => 'Twitter/X',
-                                    'LinkedIn' => 'LinkedIn',
-                                    'Email' => 'Email',
-                                    'Site web/blog' => 'Site web/blog',
-                                    'Application de rencontre' => 'Application de rencontre (Tinder, Badoo...)',
-                                    'Jeu en ligne' => 'Jeu en ligne',
-                                    'SMS' => 'SMS',
-                                    'Autre' => 'Autre',
-                                ])
+                                ->options(function () {
+                                    return \App\Models\Plateforme::where('status', true)
+                                        ->pluck('nom', 'nom');
+                                })
+                                ->preload()
                                 ->searchable()
                                 ->helperText('Sélectionnez une ou plusieurs plateformes'),
 
                             Select::make('nature_contenu')
                                 ->label('Nature du contenu')
                                 ->multiple()
-                                ->options([
-                                    'Messages texte' => 'Messages texte',
-                                    'Images/Photos' => 'Images/Photos',
-                                    'Vidéos' => 'Vidéos',
-                                    'Captures d\'écran' => 'Captures d\'écran',
-                                    'Enregistrements audio' => 'Enregistrements audio',
-                                    'Liens URL' => 'Liens URL',
-                                    'Commentaires publics' => 'Commentaires publics',
-                                    'Messages privés' => 'Messages privés',
-                                    'Publications/Posts' => 'Publications/Posts',
-                                    'Stories' => 'Stories',
-                                    'Autre' => 'Autre',
-                                ])
+                                ->options(function () {
+                                    return \App\Models\NatureContenu::where('status', true)
+                                        ->pluck('nom', 'nom');
+                                })
+                                ->preload()
                                 ->searchable()
                                 ->helperText('Sélectionnez un ou plusieurs types de contenu'),
 
