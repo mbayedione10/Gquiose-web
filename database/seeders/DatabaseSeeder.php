@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             TypeStructureSeeder::class,
             TypeAlerteSeeder::class,
+            SousTypeViolenceNumeriqueSeeder::class,
             ThematiqueSeeder::class,
             RubriqueSeeder::class,
             ThemeSeeder::class,

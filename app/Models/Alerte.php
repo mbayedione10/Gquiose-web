@@ -17,6 +17,7 @@ class Alerte extends Model
         'latitude',
         'longitude',
         'type_alerte_id',
+        'sous_type_violence_numerique_id',
         'etat',
         'ville_id',
         'utilisateur_id',
@@ -72,5 +73,10 @@ class Alerte extends Model
     public function suivis()
     {
         return $this->hasMany(Suivi::class);
+    }
+
+    public function sousTypeViolenceNumerique()
+    {
+        return $this->belongsTo(SousTypeViolenceNumerique::class, 'sous_type_violence_numerique_id');
     }
 }
