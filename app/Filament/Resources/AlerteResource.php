@@ -14,6 +14,15 @@ use Filament\Forms\Components\Select;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\TagsInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Repeater;
 use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\AlerteResource\Pages;
@@ -50,68 +59,200 @@ class AlerteResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Card::make()->schema([
-                Grid::make(['default' => 0])->schema([
-                    TextInput::make('ref')
-                        ->rules(['max:255', 'string'])
-                        ->required()
-                        ->unique(
-                            'alertes',
-                            'ref',
-                            fn(?Model $record) => $record
-                        )
-                        ->placeholder('Ref')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
+            Tabs::make('Informations VBG')->tabs([
 
+                // TAB 1: Informations générales
+                Tabs\Tab::make('Informations générales')->schema([
+                    Section::make('')->schema([
+                        Grid::make(2)->schema([
+                            TextInput::make('ref')
+                                ->label('Référence')
+                                ->disabled()
+                                ->dehydrated(false),
 
-                    Select::make('type')
-                        ->rules(['exists:type_alertes,id'])
-                        ->required()
-                        ->relationship('typeAlerte', 'name')
-                        ->searchable()
-                        ->placeholder('Type Alerte')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
+                            Placeholder::make('numero_suivi')
+                                ->label('Numéro de suivi')
+                                ->content(fn (?Alerte $record): string => $record?->numero_suivi ?? 'Généré automatiquement'),
 
-                    TextInput::make('description')
-                        ->label("Description")
-                        ->required()
-                        ->placeholder("Description de l'alerte")
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
+                            Select::make('type_alerte_id')
+                                ->label('Type de violence')
+                                ->relationship('typeAlerte', 'name')
+                                ->searchable()
+                                ->disabled()
+                                ->columnSpan(2),
 
-                    TextInput::make('etat')
-                        ->rules(['max:255', 'string'])
-                        ->required()
-                        ->placeholder('Etat')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
+                            Textarea::make('description')
+                                ->label('Description')
+                                ->rows(5)
+                                ->disabled()
+                                ->columnSpan(2),
 
-                    Select::make('ville_id')
-                        ->rules(['exists:villes,id'])
-                        ->required()
-                        ->relationship('ville', 'name')
-                        ->searchable()
-                        ->placeholder('Ville')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
+                            Select::make('utilisateur_id')
+                                ->label('Signalée par')
+                                ->relationship('utilisateur', 'name')
+                                ->disabled(),
+
+                            Select::make('ville_id')
+                                ->label('Ville')
+                                ->relationship('ville', 'name')
+                                ->disabled(),
+
+                            TextInput::make('latitude')
+                                ->label('Latitude')
+                                ->disabled(),
+
+                            TextInput::make('longitude')
+                                ->label('Longitude')
+                                ->disabled(),
+
+                            TextInput::make('etat')
+                                ->label('État du signalement')
+                                ->disabled(),
                         ]),
-                ]),
+                    ]),
+                ])->icon('heroicon-o-information-circle'),
+
+                // TAB 2: Violences numériques
+                Tabs\Tab::make('Violences numériques')->schema([
+                    Section::make('Informations sur les violences technologiques')->schema([
+                        Grid::make(2)->schema([
+                            TagsInput::make('plateformes')
+                                ->label('Plateformes concernées')
+                                ->placeholder('Facebook, WhatsApp, Instagram...')
+                                ->disabled()
+                                ->helperText('Où la violence a eu lieu'),
+
+                            TagsInput::make('nature_contenu')
+                                ->label('Nature du contenu')
+                                ->placeholder('Messages, Images, Vidéos...')
+                                ->disabled()
+                                ->helperText('Type de contenu problématique'),
+
+                            Textarea::make('urls_problematiques')
+                                ->label('URLs problématiques')
+                                ->rows(3)
+                                ->disabled()
+                                ->columnSpan(2)
+                                ->helperText('Liens vers les contenus problématiques'),
+
+                            Textarea::make('comptes_impliques')
+                                ->label('Comptes/Pseudonymes impliqués')
+                                ->rows(3)
+                                ->disabled()
+                                ->columnSpan(2)
+                                ->helperText('Noms des profils des agresseurs'),
+
+                            Select::make('frequence_incidents')
+                                ->label('Fréquence des incidents')
+                                ->options([
+                                    'unique' => 'Incident unique',
+                                    'quotidien' => 'Quotidien',
+                                    'hebdomadaire' => 'Hebdomadaire',
+                                    'mensuel' => 'Mensuel',
+                                    'continu' => 'Continu',
+                                ])
+                                ->disabled()
+                                ->columnSpan(2),
+                        ]),
+                    ]),
+                ])->icon('heroicon-o-device-mobile'),
+
+                // TAB 3: Détails de l'incident
+                Tabs\Tab::make('Détails incident')->schema([
+                    Section::make('Informations sur l\'incident')->schema([
+                        Grid::make(2)->schema([
+                            DatePicker::make('date_incident')
+                                ->label('Date de l\'incident')
+                                ->displayFormat('d/m/Y')
+                                ->disabled(),
+
+                            TimePicker::make('heure_incident')
+                                ->label('Heure de l\'incident')
+                                ->displayFormat('H:i')
+                                ->disabled(),
+
+                            Select::make('relation_agresseur')
+                                ->label('Relation avec l\'agresseur')
+                                ->options([
+                                    'conjoint' => 'Conjoint(e)',
+                                    'ex_partenaire' => 'Ex-partenaire',
+                                    'famille' => 'Membre de la famille',
+                                    'collegue' => 'Collègue',
+                                    'ami' => 'Ami(e)',
+                                    'connaissance' => 'Connaissance',
+                                    'inconnu' => 'Inconnu',
+                                    'autre' => 'Autre',
+                                ])
+                                ->disabled()
+                                ->columnSpan(2),
+
+                            TagsInput::make('impact')
+                                ->label('Impact sur la victime')
+                                ->placeholder('Stress, Peur, Dépression...')
+                                ->disabled()
+                                ->columnSpan(2)
+                                ->helperText('Impact psychologique et physique'),
+                        ]),
+                    ]),
+                ])->icon('heroicon-o-clock'),
+
+                // TAB 4: Preuves et conseils
+                Tabs\Tab::make('Preuves & Conseils')->schema([
+                    Section::make('Preuves')->schema([
+                        Placeholder::make('preuves_info')
+                            ->label('Fichiers de preuves')
+                            ->content(function (?Alerte $record): string {
+                                if (!$record || !$record->preuves) {
+                                    return 'Aucune preuve fournie';
+                                }
+                                $count = count($record->preuves);
+                                return "{$count} fichier(s) de preuve fourni(s)";
+                            }),
+
+                        Repeater::make('preuves')
+                            ->label('Liste des preuves')
+                            ->schema([
+                                TextInput::make('path')
+                                    ->label('Chemin du fichier')
+                                    ->disabled(),
+                            ])
+                            ->disabled()
+                            ->defaultItems(0)
+                            ->hidden(fn (?Alerte $record): bool => !$record || !$record->preuves),
+                    ]),
+
+                    Section::make('Conseils de sécurité')->schema([
+                        Textarea::make('conseils_securite')
+                            ->label('Conseils automatiques générés')
+                            ->rows(8)
+                            ->disabled()
+                            ->helperText('Conseils personnalisés selon le type de violence'),
+
+                        Toggle::make('conseils_lus')
+                            ->label('Conseils lus par la victime')
+                            ->disabled()
+                            ->inline(false),
+                    ]),
+                ])->icon('heroicon-o-shield-check'),
+
+                // TAB 5: Consentement & Anonymat
+                Tabs\Tab::make('Consentement')->schema([
+                    Section::make('Préférences de la victime')->schema([
+                        Grid::make(1)->schema([
+                            Toggle::make('anonymat_souhaite')
+                                ->label('Anonymat souhaité')
+                                ->disabled()
+                                ->inline(false)
+                                ->helperText('La victime souhaite rester anonyme'),
+
+                            Toggle::make('consentement_transmission')
+                                ->label('Consentement pour transmission')
+                                ->disabled()
+                                ->inline(false)
+                                ->helperText('Autorisation de transmettre au système national VBG'),
+                        ]),
+                    ]),
+                ])->icon('heroicon-o-shield-exclamation'),
             ]),
         ]);
     }
@@ -121,26 +262,48 @@ class AlerteResource extends Resource
         return $table
             ->poll('60s')
             ->columns([
-                Tables\Columns\TextColumn::make('ref')
-
+                Tables\Columns\TextColumn::make('numero_suivi')
+                    ->label('N° Suivi')
                     ->searchable()
-                    ->limit(50),
+                    ->sortable()
+                    ->copyable()
+                    ->copyMessage('Numéro de suivi copié')
+                    ->copyMessageDuration(1500)
+                    ->icon('heroicon-o-hashtag')
+                    ->weight('bold')
+                    ->color('primary'),
 
+                Tables\Columns\TextColumn::make('ref')
+                    ->label('Référence')
+                    ->searchable()
+                    ->limit(50)
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make("utilisateur.name")
                     ->label("Signalée par")
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make("type")
-                    ->label("Type")
+                    ->sortable()
                     ->searchable()
-                    ->sortable(),
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make("typeAlerte.name")
+                    ->label("Type de violence")
+                    ->searchable()
+                    ->sortable()
+                    ->wrap()
+                    ->limit(30),
 
                 Tables\Columns\TextColumn::make('description')
                     ->label("Description")
-                    ->searchable(),
+                    ->searchable()
+                    ->limit(50)
+                    ->wrap()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
-
+                Tables\Columns\IconColumn::make('anonymat_souhaite')
+                    ->label('Anonymat')
+                    ->boolean()
+                    ->toggleable()
+                    ->tooltip(fn (Alerte $record): string => $record->anonymat_souhaite ? 'Anonymat souhaité' : 'Pas d\'anonymat'),
 
                 Tables\Columns\BadgeColumn::make('etat')
                     ->label("État")
@@ -150,19 +313,26 @@ class AlerteResource extends Resource
                         'danger' => static fn ($state): bool => $state === 'Rejetée',
                     ])
                     ->searchable()
-                    ->limit(50),
+                    ->sortable(),
 
-
+                Tables\Columns\TextColumn::make('ville.name')
+                    ->label("Ville")
+                    ->toggleable()
+                    ->searchable(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label("Signalée ")
+                    ->label("Date de signalement")
                     ->searchable()
-                    ->date("d F Y H:i")
-                    ->limit(50),
-
+                    ->date("d/m/Y H:i")
+                    ->sortable()
+                    ->toggleable(),
 
             ])
             ->actions([
+                Tables\Actions\ViewAction::make()
+                    ->label('Voir les détails')
+                    ->color('info'),
+
                 Tables\Actions\Action::make('confirmation')
                     ->label("Confirmez")
                     ->requiresConfirmation()
@@ -236,7 +406,52 @@ class AlerteResource extends Resource
 
             ])
             ->filters([
+                SelectFilter::make('type_alerte_id')
+                    ->label('Type de violence')
+                    ->relationship('typeAlerte', 'name')
+                    ->multiple()
+                    ->searchable(),
 
+                SelectFilter::make('etat')
+                    ->label('État')
+                    ->options([
+                        'Non approuvée' => 'Non approuvée',
+                        'Confirmée' => 'Confirmée',
+                        'Rejetée' => 'Rejetée',
+                    ])
+                    ->multiple(),
+
+                SelectFilter::make('ville_id')
+                    ->label('Ville')
+                    ->relationship('ville', 'name')
+                    ->multiple()
+                    ->searchable(),
+
+                SelectFilter::make('anonymat_souhaite')
+                    ->label('Anonymat')
+                    ->options([
+                        '1' => 'Avec anonymat',
+                        '0' => 'Sans anonymat',
+                    ]),
+
+                Tables\Filters\Filter::make('created_at')
+                    ->form([
+                        DatePicker::make('created_from')
+                            ->label('Signalée du'),
+                        DatePicker::make('created_until')
+                            ->label('Jusqu\'au'),
+                    ])
+                    ->query(function ($query, array $data) {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn ($query, $date) => $query->whereDate('created_at', '>=', $date)
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn ($query, $date) => $query->whereDate('created_at', '<=', $date)
+                            );
+                    }),
             ])
             ->headerActions([
                 Tables\Actions\Action::make('export_excel')
