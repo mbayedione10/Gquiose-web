@@ -203,7 +203,7 @@ class StructureResource extends Resource
                                     $lng = $record?->longitude ?? -13.7122;
                                     
                                     return new \Illuminate\Support\HtmlString("
-                                        <div id='map-container' style='width: 100%; height: 400px; border-radius: 8px; overflow: hidden;'>
+                                        <div id='map-container' style='width: 100%; height: 400px; border-radius: 8px; overflow: hidden; margin-top: 16px;'>
                                             <div id='map' style='width: 100%; height: 100%;'></div>
                                         </div>
                                         
@@ -211,7 +211,12 @@ class StructureResource extends Resource
                                         <script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'></script>
                                         
                                         <script>
-                                            document.addEventListener('DOMContentLoaded', function() {
+                                            setTimeout(function() {
+                                                if (typeof L === 'undefined') return;
+                                                
+                                                const mapElement = document.getElementById('map');
+                                                if (!mapElement || mapElement._leaflet_id) return;
+                                                
                                                 const map = L.map('map').setView([{$lat}, {$lng}], 13);
                                                 let marker = null;
                                                 
@@ -232,30 +237,46 @@ class StructureResource extends Resource
                                                     const lat = e.latlng.lat.toFixed(6);
                                                     const lng = e.latlng.lng.toFixed(6);
                                                     
-                                                    document.querySelector('input[wire\\\\:model=\"data.latitude\"]').value = lat;
-                                                    document.querySelector('input[wire\\\\:model=\"data.longitude\"]').value = lng;
+                                                    // Trouver les inputs par leur attribut name
+                                                    const latInput = document.querySelector('input[id*=\"latitude\"]');
+                                                    const lngInput = document.querySelector('input[id*=\"longitude\"]');
                                                     
-                                                    document.querySelector('input[wire\\\\:model=\"data.latitude\"]').dispatchEvent(new Event('input'));
-                                                    document.querySelector('input[wire\\\\:model=\"data.longitude\"]').dispatchEvent(new Event('input'));
-                                                    
-                                                    updateMarker(lat, lng);
+                                                    if (latInput && lngInput) {
+                                                        latInput.value = lat;
+                                                        lngInput.value = lng;
+                                                        
+                                                        // Déclencher les événements pour Livewire
+                                                        latInput.dispatchEvent(new Event('input', { bubbles: true }));
+                                                        lngInput.dispatchEvent(new Event('input', { bubbles: true }));
+                                                        
+                                                        updateMarker(lat, lng);
+                                                    }
                                                 });
                                                 
                                                 // Mise à jour de la carte quand les inputs changent
-                                                const latInput = document.querySelector('input[wire\\\\:model=\"data.latitude\"]');
-                                                const lngInput = document.querySelector('input[wire\\\\:model=\"data.longitude\"]');
+                                                setTimeout(function() {
+                                                    const latInput = document.querySelector('input[id*=\"latitude\"]');
+                                                    const lngInput = document.querySelector('input[id*=\"longitude\"]');
+                                                    
+                                                    if (latInput && lngInput) {
+                                                        [latInput, lngInput].forEach(input => {
+                                                            input.addEventListener('input', function() {
+                                                                const lat = parseFloat(latInput.value);
+                                                                const lng = parseFloat(lngInput.value);
+                                                                if (lat && lng) {
+                                                                    map.setView([lat, lng], 13);
+                                                                    updateMarker(lat, lng);
+                                                                }
+                                                            });
+                                                        });
+                                                    }
+                                                }, 500);
                                                 
-                                                [latInput, lngInput].forEach(input => {
-                                                    input?.addEventListener('input', function() {
-                                                        const lat = parseFloat(latInput.value);
-                                                        const lng = parseFloat(lngInput.value);
-                                                        if (lat && lng) {
-                                                            map.setView([lat, lng], 13);
-                                                            updateMarker(lat, lng);
-                                                        }
-                                                    });
-                                                });
-                                            });
+                                                // Fix pour affichage correct de la carte
+                                                setTimeout(function() {
+                                                    map.invalidateSize();
+                                                }, 100);
+                                            }, 500);
                                         </script>
                                     ");
                                 }),
