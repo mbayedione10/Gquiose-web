@@ -22,6 +22,8 @@ class PushNotificationResource extends Resource
     protected static ?string $navigationLabel = 'Notifications Push';
     
     protected static ?string $pluralLabel = 'Notifications Push';
+    
+    protected static ?string $navigationGroup = 'Notifications';
 
     protected static ?int $navigationSort = 8;
 
