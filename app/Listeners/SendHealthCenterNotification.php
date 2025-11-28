@@ -14,13 +14,17 @@ class SendHealthCenterNotification implements ShouldQueue
     use InteractsWithQueue;
 
     protected $notificationService;
+    protected $evaluationTriggerService;
 
     /**
      * Create the event listener.
      */
-    public function __construct(PushNotificationService $notificationService)
-    {
+    public function __construct(
+        PushNotificationService $notificationService,
+        \App\Services\EvaluationTriggerService $evaluationTriggerService
+    ) {
         $this->notificationService = $notificationService;
+        $this->evaluationTriggerService = $evaluationTriggerService;
     }
 
     /**
@@ -51,5 +55,19 @@ class SendHealthCenterNotification implements ShouldQueue
         $notificationService->sendNotificationInBatches($notification, 100);
 
         Log::info("Health center notification dispatched: {$notification->id}");
+
+        // Programmer une évaluation 3 jours après pour les utilisateurs de cette ville
+        $villeUserIds = \App\Models\Utilisateur::where('ville_id', $structure->ville_id)
+            ->where('status', true)
+            ->pluck('id')
+            ->toArray();
+
+        if (!empty($villeUserIds)) {
+            $this->evaluationTriggerService->triggerAutoEvaluation('structure', $structure->id, [
+                'delay_days' => 3,
+                'target_users' => $villeUserIds,
+                'evaluation_type' => 'satisfaction_structure'
+            ]);
+        }
     }
 }

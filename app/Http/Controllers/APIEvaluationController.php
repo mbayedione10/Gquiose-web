@@ -17,24 +17,52 @@ class APIEvaluationController extends Controller
     public function getQuestions(Request $request)
     {
         $contexte = $request->input('contexte', 'generale');
+        $formulaireType = $this->mapContexteToFormulaireType($contexte);
+        $previousAnswers = $request->input('previous_answers', []);
         
         $questions = QuestionEvaluation::where('status', true)
+            ->where('formulaire_type', $formulaireType)
             ->orderBy('ordre')
             ->get()
+            ->filter(function ($question) use ($previousAnswers) {
+                return $question->shouldDisplay($previousAnswers);
+            })
+            ->values()
             ->map(function ($question) {
                 return [
                     'id' => $question->id,
                     'question' => $question->question,
                     'type' => $question->type,
+                    'formulaire_type' => $question->formulaire_type,
                     'options' => $question->options,
                     'obligatoire' => $question->obligatoire,
+                    'has_condition' => !is_null($question->condition_question_id),
+                    'condition' => $question->condition_question_id ? [
+                        'question_id' => $question->condition_question_id,
+                        'operator' => $question->condition_operator,
+                        'value' => $question->condition_value,
+                    ] : null,
                 ];
             });
 
         return response()->json([
             'success' => true,
             'data' => $questions,
+            'formulaire_type' => $formulaireType,
         ]);
+    }
+
+    private function mapContexteToFormulaireType($contexte)
+    {
+        $mapping = [
+            'quiz' => 'satisfaction_quiz',
+            'article' => 'satisfaction_article',
+            'structure' => 'satisfaction_structure',
+            'generale' => 'generale',
+            'alerte' => 'generale',
+        ];
+
+        return $mapping[$contexte] ?? 'generale';
     }
 
     /**
@@ -110,6 +138,9 @@ class APIEvaluationController extends Controller
             }
 
             DB::commit();
+
+            // Déclencher l'événement de complétion
+            event(new \App\Events\EvaluationCompleted($evaluation));
 
             return response()->json([
                 'success' => true,

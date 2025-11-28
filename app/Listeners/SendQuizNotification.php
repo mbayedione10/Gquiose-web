@@ -3,8 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\NewQuizPublished;
-use App\Models\PushNotification;
-use App\Services\PushNotificationService;
+use App\Services\EvaluationTriggerService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
@@ -13,40 +12,35 @@ class SendQuizNotification implements ShouldQueue
 {
     use InteractsWithQueue;
 
-    protected $notificationService;
+    protected $evaluationTriggerService;
 
-    /**
-     * Create the event listener.
-     */
-    public function __construct(PushNotificationService $notificationService)
+    public function __construct(EvaluationTriggerService $evaluationTriggerService)
     {
-        $this->notificationService = $notificationService;
+        $this->evaluationTriggerService = $evaluationTriggerService;
     }
 
-    /**
-     * Handle the event.
-     */
-    public function handle(NewQuizPublished $event): void
+    public function handle(NewQuizPublished $event)
     {
-        $quiz = $event->quiz;
+        $thematique = $event->thematique;
 
-        Log::info("Event triggered: New quiz published - {$quiz->name}");
+        Log::info("Event triggered: New quiz published - {$thematique->titre}");
 
-        // Créer la notification push
-        $notification = PushNotification::create([
-            'title' => '❓ Nouveau quiz disponible !',
-            'message' => 'Testez vos connaissances : ' . substr($quiz->name, 0, 80),
-            'icon' => '❓',
-            'action' => 'quiz/' . $quiz->id,
-            'type' => 'automatic',
-            'target_audience' => 'all',
-            'status' => 'sending',
-        ]);
+        // Déclencher automatiquement une évaluation 7 jours après le quiz
+        // pour tous les utilisateurs qui ont répondu au quiz
+        $userIds = \App\Models\Response::where('question_id', function($query) use ($thematique) {
+            $query->select('id')
+                ->from('questions')
+                ->where('thematique_id', $thematique->id);
+        })->distinct()->pluck('utilisateur_id')->toArray();
 
-        // Envoyer la notification en batch
-        $notificationService = app(PushNotificationService::class);
-        $notificationService->sendNotificationInBatches($notification, 100);
+        if (!empty($userIds)) {
+            $this->evaluationTriggerService->triggerAutoEvaluation('quiz', $thematique->id, [
+                'delay_days' => 7,
+                'target_users' => $userIds,
+                'evaluation_type' => 'satisfaction_quiz'
+            ]);
 
-        Log::info("Quiz notification dispatched: {$notification->id}");
+            Log::info("Quiz evaluation scheduled for " . count($userIds) . " users");
+        }
     }
 }

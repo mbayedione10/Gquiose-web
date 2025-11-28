@@ -13,11 +13,24 @@ return new class extends Migration {
             $table->bigIncrements('id');
             $table->string('question');
             $table->enum('type', ['text', 'rating', 'yesno', 'multiple_choice', 'scale']);
+            $table->enum('formulaire_type', ['satisfaction_quiz', 'satisfaction_article', 'satisfaction_structure', 'generale'])->default('generale');
             $table->json('options')->nullable(); // Pour les choix multiples
             $table->integer('ordre')->default(0);
             $table->boolean('obligatoire')->default(false);
             $table->boolean('status')->default(true);
+            
+            // Logique conditionnelle
+            $table->unsignedBigInteger('condition_question_id')->nullable();
+            $table->string('condition_operator')->nullable(); // equals, not_equals, greater_than, etc.
+            $table->text('condition_value')->nullable();
+            $table->boolean('show_if_condition_met')->default(true);
+            
             $table->timestamps();
+            
+            $table->foreign('condition_question_id')
+                ->references('id')
+                ->on('question_evaluations')
+                ->onDelete('set null');
         });
 
         // Table des évaluations soumises
