@@ -22,6 +22,8 @@ class NotificationTemplateResource extends Resource
     protected static ?string $navigationLabel = 'Templates de Notifications';
 
     protected static ?string $pluralLabel = 'Templates de Notifications';
+    
+    protected static ?string $navigationGroup = 'Notifications';
 
     protected static ?int $navigationSort = 9;
 
