@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Http\Controllers;
@@ -12,6 +11,8 @@ use App\Models\NatureContenu;
 use App\Models\Structure;
 use App\Models\Utilisateur;
 use App\Services\VBG\SafetyAdviceService;
+use App\Services\VBG\EvidenceSecurityService;
+use App\Services\VBG\SecureLocationService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -137,26 +138,72 @@ class APIAlertWorkflowController extends Controller
             return ApiResponse::error("Alerte introuvable ou déjà soumise", Response::HTTP_NOT_FOUND);
         }
 
+        // Mise à jour avec les informations détaillées
+        $validated = $request->validate([
+            'date_incident' => 'nullable|date',
+            'heure_incident' => 'nullable|date_format:H:i',
+            'relation_agresseur' => 'nullable|string|in:conjoint,ex_partenaire,famille,collegue,ami,connaissance,inconnu,autre',
+            'impact' => 'nullable|array',
+            'impact.*' => 'string',
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+            'ville_id' => 'nullable|exists:villes,id',
+        ]);
+
+        // Anonymiser la géolocalisation si fournie
+        if (!empty($validated['latitude']) && !empty($validated['longitude'])) {
+            $locationService = new SecureLocationService();
+
+            // Valider les coordonnées
+            $validation = $locationService->validateCoordinates(
+                $validated['latitude'],
+                $validated['longitude']
+            );
+
+            if (!$validation['valid']) {
+                return response::error('Coordonnées GPS invalides: ' . implode(', ', $validation['errors']), 422);
+            }
+
+            // Préparer la localisation sécurisée (avec anonymisation)
+            $secureLocation = $locationService->prepareSecureLocation(
+                $validated['latitude'],
+                $validated['longitude'],
+                $validated['ville_id'] ?? null,
+                anonymize: true // Toujours anonymiser pour protéger la victime
+            );
+
+            // Remplacer les coordonnées par les coordonnées anonymisées
+            $validated['latitude'] = $secureLocation['latitude'];
+            $validated['longitude'] = $secureLocation['longitude'];
+            $validated['precision_localisation'] = $secureLocation['precision'];
+            $validated['rayon_approximation_km'] = $secureLocation['radius_km'];
+            $validated['quartier'] = $secureLocation['quartier'];
+            $validated['commune'] = $secureLocation['commune'];
+
+            // Utiliser la ville détectée si non fournie
+            if (!$validated['ville_id'] && $secureLocation['ville_id']) {
+                $validated['ville_id'] = $secureLocation['ville_id'];
+            }
+        }
+
+        $alerte->update($validated);
+
+
         $alerte->description = $request->description;
-        $alerte->date_incident = $request->date_incident;
-        $alerte->heure_incident = $request->heure_incident;
-        $alerte->relation_agresseur = $request->relation_agresseur;
         $alerte->frequence_incidents = $request->frequence_incidents;
         $alerte->impact = $request->impact;
-        $alerte->latitude = $request->latitude;
-        $alerte->longitude = $request->longitude;
-        $alerte->ville_id = $request->ville_id;
+
 
         // Gestion sécurisée des preuves uploadées avec chiffrement et suppression EXIF
         if ($request->hasFile('preuves')) {
             $evidenceService = app(\App\Services\VBG\EvidenceSecurityService::class);
             $preuves = [];
-            
+
             foreach ($request->file('preuves') as $file) {
                 $secureEvidence = $evidenceService->secureUpload($file, $alerte->ref);
                 $preuves[] = $secureEvidence;
             }
-            
+
             $alerte->preuves = $preuves;
         }
 
@@ -183,7 +230,7 @@ class APIAlertWorkflowController extends Controller
 
         // Générer les conseils de sécurité automatiques
         $conseils = $this->safetyAdviceService->getAdviceForAlert($alerte);
-        
+
         $alerte->conseils_securite = $conseils;
         $alerte->save();
 
@@ -291,13 +338,13 @@ class APIAlertWorkflowController extends Controller
                 $content .= "Numéro de suivi: " . $alerte->numero_suivi . "\n";
                 $content .= "Réf: " . $alerte->ref . "\n";
                 $content .= "Type: " . $alerte->typeAlerte->name . "\n\n";
-                
+
                 if ($alerte->sousTypeViolenceNumerique) {
                     $content .= "Sous-type: " . $alerte->sousTypeViolenceNumerique->nom . "\n\n";
                 }
 
                 $content .= "Description: " . $alerte->description . "\n\n";
-                
+
                 if (!$alerte->anonymat_souhaite) {
                     $content .= "Utilisateur: " . $user->name . "\n";
                     $content .= "Téléphone: " . $user->phone . "\n";
@@ -344,13 +391,13 @@ class APIAlertWorkflowController extends Controller
             'plateformes' => Plateforme::all(['id', 'nom']),
             'natures_contenu' => NatureContenu::all(['id', 'nom']),
             'relations_agresseur' => [
-                'conjoint', 'ex_partenaire', 'famille', 'collegue', 
+                'conjoint', 'ex_partenaire', 'famille', 'collegue',
                 'ami', 'connaissance', 'inconnu', 'autre'
             ],
             'frequences' => ['unique', 'quotidien', 'hebdomadaire', 'mensuel', 'continu'],
             'impacts' => [
-                'stress_anxiete', 'peur_securite', 'depression', 
-                'problemes_sommeil', 'isolement_social', 
+                'stress_anxiete', 'peur_securite', 'depression',
+                'problemes_sommeil', 'isolement_social',
                 'difficultes_professionnelles', 'autre'
             ]
         ]);

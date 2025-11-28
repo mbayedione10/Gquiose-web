@@ -138,12 +138,37 @@ class AlerteResource extends Resource
                                 ->required(),
 
                             TextInput::make('latitude')
-                                ->label('Latitude')
-                                ->numeric(),
+                                ->label('Latitude (anonymisée)')
+                                ->numeric()
+                                ->helperText('Coordonnée approximative pour protéger la victime'),
 
                             TextInput::make('longitude')
-                                ->label('Longitude')
-                                ->numeric(),
+                                ->label('Longitude (anonymisée)')
+                                ->numeric()
+                                ->helperText('Coordonnée approximative pour protéger la victime'),
+
+                            TextInput::make('quartier')
+                                ->label('Quartier')
+                                ->disabled(),
+
+                            TextInput::make('commune')
+                                ->label('Commune')
+                                ->disabled(),
+
+                            Select::make('precision_localisation')
+                                ->label('Précision de la localisation')
+                                ->options([
+                                    'exacte' => 'Exacte',
+                                    'approximative' => 'Approximative (anonymisée)',
+                                ])
+                                ->default('approximative')
+                                ->disabled(),
+
+                            TextInput::make('rayon_approximation_km')
+                                ->label('Rayon d\'approximation (km)')
+                                ->numeric()
+                                ->disabled()
+                                ->helperText('Distance d\'anonymisation appliquée'),
 
                             Select::make('etat')
                                 ->label('État du signalement')
