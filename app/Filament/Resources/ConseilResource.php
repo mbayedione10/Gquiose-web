@@ -18,7 +18,10 @@ class ConseilResource extends Resource
 {
     protected static ?string $model = Conseil::class;
 
+    protected static ?string $navigationLabel = "Conseils";
+    protected static ?string $navigationGroup = "Contenu Educatif";
     protected static ?string $navigationIcon = 'heroicon-o-light-bulb';
+    protected static ?int $navigationSort = 5;
 
     public static function form(Form $form): Form
     {
@@ -26,16 +29,23 @@ class ConseilResource extends Resource
             ->schema([
                 Forms\Components\Card::make()
                     ->schema([
-                        Forms\Components\TextInput::make("message")
-                            ->label("Conseil")
-                            ->placeholder("Conseil de cycle menstruel")
-                            ->unique(
-                                'rubriques',
-                                'name',
-                                fn(?Conseil $record) => $record
-                            )
-                            ->rules(['max:255', 'string'])
+                        Forms\Components\Select::make('categorie')
+                            ->label('Catégorie')
+                            ->options([
+                                'SSR' => 'Santé Sexuelle et Reproductive',
+                                'VBG' => 'Violences Basées sur le Genre',
+                                'Autonomisation' => 'Autonomisation',
+                                'Général' => 'Général',
+                            ])
                             ->required()
+                            ->default('Général'),
+
+                        Forms\Components\Textarea::make("message")
+                            ->label("Conseil")
+                            ->placeholder("Entrez votre conseil ici...")
+                            ->rows(4)
+                            ->required()
+                            ->maxLength(500)
                     ])
             ]);
     }
