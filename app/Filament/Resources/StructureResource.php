@@ -174,22 +174,92 @@ class StructureResource extends Resource
                             'lg' => 12,
                         ]),
 
-                    TextInput::make('latitude')
-                        ->label("Latitude")
-                        ->required()
-                        ->numeric()
-                        ->placeholder('Latitude')
-                        ->columnSpan([
-                            'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
-                        ]),
+                    Forms\Components\Section::make('Localisation GPS')
+                        ->description('Cliquez sur la carte, recherchez une adresse, ou saisissez les coordonnées manuellement')
+                        ->schema([
+                            Forms\Components\Grid::make(2)
+                                ->schema([
+                                    TextInput::make('latitude')
+                                        ->label("Latitude")
+                                        ->required()
+                                        ->numeric()
+                                        ->step(0.000001)
+                                        ->placeholder('Ex: 9.5450')
+                                        ->helperText('Entre -90 et 90'),
 
-                    TextInput::make('longitude')
-                        ->label("Longitude")
-                        ->required()
-                        ->numeric()
-                        ->placeholder('Longitude')
+                                    TextInput::make('longitude')
+                                        ->label("Longitude")
+                                        ->required()
+                                        ->numeric()
+                                        ->step(0.000001)
+                                        ->placeholder('Ex: -13.6520')
+                                        ->helperText('Entre -180 et 180'),
+                                ]),
+
+                            Forms\Components\Placeholder::make('map_placeholder')
+                                ->label('')
+                                ->content(function ($record) {
+                                    $lat = $record?->latitude ?? 9.5092;
+                                    $lng = $record?->longitude ?? -13.7122;
+                                    
+                                    return new \Illuminate\Support\HtmlString("
+                                        <div id='map-container' style='width: 100%; height: 400px; border-radius: 8px; overflow: hidden;'>
+                                            <div id='map' style='width: 100%; height: 100%;'></div>
+                                        </div>
+                                        
+                                        <link rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css' />
+                                        <script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'></script>
+                                        
+                                        <script>
+                                            document.addEventListener('DOMContentLoaded', function() {
+                                                const map = L.map('map').setView([{$lat}, {$lng}], 13);
+                                                let marker = null;
+                                                
+                                                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                                    attribution: '© OpenStreetMap'
+                                                }).addTo(map);
+                                                
+                                                function updateMarker(lat, lng) {
+                                                    if (marker) map.removeLayer(marker);
+                                                    marker = L.marker([lat, lng]).addTo(map);
+                                                }
+                                                
+                                                if ({$lat} && {$lng}) {
+                                                    updateMarker({$lat}, {$lng});
+                                                }
+                                                
+                                                map.on('click', function(e) {
+                                                    const lat = e.latlng.lat.toFixed(6);
+                                                    const lng = e.latlng.lng.toFixed(6);
+                                                    
+                                                    document.querySelector('input[wire\\\\:model=\"data.latitude\"]').value = lat;
+                                                    document.querySelector('input[wire\\\\:model=\"data.longitude\"]').value = lng;
+                                                    
+                                                    document.querySelector('input[wire\\\\:model=\"data.latitude\"]').dispatchEvent(new Event('input'));
+                                                    document.querySelector('input[wire\\\\:model=\"data.longitude\"]').dispatchEvent(new Event('input'));
+                                                    
+                                                    updateMarker(lat, lng);
+                                                });
+                                                
+                                                // Mise à jour de la carte quand les inputs changent
+                                                const latInput = document.querySelector('input[wire\\\\:model=\"data.latitude\"]');
+                                                const lngInput = document.querySelector('input[wire\\\\:model=\"data.longitude\"]');
+                                                
+                                                [latInput, lngInput].forEach(input => {
+                                                    input?.addEventListener('input', function() {
+                                                        const lat = parseFloat(latInput.value);
+                                                        const lng = parseFloat(lngInput.value);
+                                                        if (lat && lng) {
+                                                            map.setView([lat, lng], 13);
+                                                            updateMarker(lat, lng);
+                                                        }
+                                                    });
+                                                });
+                                            });
+                                        </script>
+                                    ");
+                                }),
+                        ])
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,

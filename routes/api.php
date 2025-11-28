@@ -65,6 +65,7 @@ Route::prefix('v1')
 
         /*************************  SYNC STRUCTURE    ***************************/
         Route::get('structures', [APIStructureController::class, 'list']);
+        Route::get('structures/nearby', [APIStructureController::class, 'nearby']);
 
         /*************************  SYNC ALERTE    ***************************/
         Route::post('alert-sync', [APIAlertController::class, 'sync']);
