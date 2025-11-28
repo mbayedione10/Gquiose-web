@@ -162,7 +162,6 @@ class AlerteResource extends Resource
                         Grid::make(2)->schema([
                             Select::make('plateformes')
                                 ->label('Plateformes concernées')
-                                ->relationship('', '')
                                 ->multiple()
                                 ->searchable()
                                 ->preload()
@@ -188,7 +187,6 @@ class AlerteResource extends Resource
 
                             Select::make('nature_contenu')
                                 ->label('Nature du contenu')
-                                ->relationship('', '')
                                 ->multiple()
                                 ->searchable()
                                 ->preload()
