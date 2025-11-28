@@ -83,6 +83,7 @@ class PushNotificationService
         if ($notification->target_audience === 'filtered' && $notification->filters) {
             $filters = is_array($notification->filters) ? $notification->filters : json_decode($notification->filters, true);
 
+            // Filtres démographiques
             if (isset($filters['age_min'])) {
                 $query->whereRaw('YEAR(CURDATE()) - YEAR(dob) >= ?', [$filters['age_min']]);
             }
@@ -95,12 +96,39 @@ class PushNotificationService
                 $query->where('sexe', $filters['sexe']);
             }
 
+            // Filtres géographiques
             if (isset($filters['ville_id'])) {
                 $query->where('ville_id', $filters['ville_id']);
             }
+
+            if (isset($filters['villes']) && is_array($filters['villes']) && count($filters['villes']) > 0) {
+                $query->whereIn('ville_id', $filters['villes']);
+            }
+
+            // Filtres d'activité
+            if (isset($filters['active_users'])) {
+                $days = match($filters['active_users']) {
+                    'last_7_days' => 7,
+                    'last_30_days' => 30,
+                    'last_90_days' => 90,
+                    default => null,
+                };
+
+                if ($days) {
+                    $query->where('updated_at', '>=', now()->subDays($days));
+                }
+            }
+
+            if (isset($filters['has_cycle_data']) && $filters['has_cycle_data']) {
+                $query->whereHas('menstrualCycles');
+            }
+
+            if (isset($filters['has_alerts']) && $filters['has_alerts']) {
+                $query->whereHas('alertes');
+            }
         }
 
-        return $query->whereNotNull('fcm_token')->get();
+        return $query->whereNotNull('fcm_token')->where('status', true)->get();
     }
 
     /**

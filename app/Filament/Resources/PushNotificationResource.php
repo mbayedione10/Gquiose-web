@@ -134,32 +134,109 @@ class PushNotificationResource extends Resource
                 
                 Forms\Components\Card::make()
                     ->schema([
-                        Forms\Components\Grid::make(3)
+                        Forms\Components\Section::make('Filtres démographiques')
                             ->schema([
-                                Forms\Components\TextInput::make('filters.age_min')
-                                    ->label('Âge minimum')
-                                    ->numeric()
-                                    ->minValue(10)
-                                    ->maxValue(100),
-                                
-                                Forms\Components\TextInput::make('filters.age_max')
-                                    ->label('Âge maximum')
-                                    ->numeric()
-                                    ->minValue(10)
-                                    ->maxValue(100),
-                                
-                                Forms\Components\Select::make('filters.sexe')
-                                    ->label('Sexe')
-                                    ->options([
-                                        'F' => 'Féminin',
-                                        'M' => 'Masculin',
+                                Forms\Components\Grid::make(3)
+                                    ->schema([
+                                        Forms\Components\TextInput::make('filters.age_min')
+                                            ->label('Âge minimum')
+                                            ->numeric()
+                                            ->minValue(10)
+                                            ->maxValue(100)
+                                            ->helperText('Âge minimum des utilisateurs ciblés'),
+                                        
+                                        Forms\Components\TextInput::make('filters.age_max')
+                                            ->label('Âge maximum')
+                                            ->numeric()
+                                            ->minValue(10)
+                                            ->maxValue(100)
+                                            ->helperText('Âge maximum des utilisateurs ciblés'),
+                                        
+                                        Forms\Components\Select::make('filters.sexe')
+                                            ->label('Sexe')
+                                            ->options([
+                                                'F' => 'Féminin',
+                                                'M' => 'Masculin',
+                                            ])
+                                            ->placeholder('Tous les sexes'),
                                     ]),
                             ]),
                         
-                        Forms\Components\Select::make('filters.ville_id')
-                            ->label('Ville')
-                            ->options(Ville::pluck('name', 'id'))
-                            ->searchable(),
+                        Forms\Components\Section::make('Filtres géographiques')
+                            ->schema([
+                                Forms\Components\Select::make('filters.ville_id')
+                                    ->label('Ville spécifique')
+                                    ->options(Ville::pluck('name', 'id'))
+                                    ->searchable()
+                                    ->placeholder('Toutes les villes')
+                                    ->helperText('Cibler les utilisateurs d\'une ville spécifique'),
+                                
+                                Forms\Components\Select::make('filters.villes')
+                                    ->label('Villes multiples')
+                                    ->options(Ville::pluck('name', 'id'))
+                                    ->searchable()
+                                    ->multiple()
+                                    ->placeholder('Sélectionner plusieurs villes')
+                                    ->helperText('Cibler les utilisateurs de plusieurs villes'),
+                            ]),
+                        
+                        Forms\Components\Section::make('Filtres d\'activité')
+                            ->schema([
+                                Forms\Components\Select::make('filters.active_users')
+                                    ->label('Utilisateurs actifs')
+                                    ->options([
+                                        'last_7_days' => 'Actifs dans les 7 derniers jours',
+                                        'last_30_days' => 'Actifs dans les 30 derniers jours',
+                                        'last_90_days' => 'Actifs dans les 90 derniers jours',
+                                    ])
+                                    ->placeholder('Tous les utilisateurs'),
+                                
+                                Forms\Components\Toggle::make('filters.has_cycle_data')
+                                    ->label('Utilisateurs avec données de cycle')
+                                    ->helperText('Cibler uniquement les utilisateurs qui suivent leur cycle'),
+                                
+                                Forms\Components\Toggle::make('filters.has_alerts')
+                                    ->label('Utilisateurs ayant créé des alertes')
+                                    ->helperText('Cibler les utilisateurs ayant déjà signalé des alertes'),
+                            ])
+                            ->columns(2),
+                        
+                        Forms\Components\Section::make('Aperçu du ciblage')
+                            ->schema([
+                                Forms\Components\Placeholder::make('estimated_reach')
+                                    ->label('Portée estimée')
+                                    ->content(function ($get) {
+                                        $filters = [
+                                            'age_min' => $get('filters.age_min'),
+                                            'age_max' => $get('filters.age_max'),
+                                            'sexe' => $get('filters.sexe'),
+                                            'ville_id' => $get('filters.ville_id'),
+                                            'villes' => $get('filters.villes'),
+                                        ];
+                                        
+                                        $query = \App\Models\Utilisateur::query();
+                                        
+                                        if ($filters['age_min']) {
+                                            $query->whereRaw('YEAR(CURDATE()) - YEAR(dob) >= ?', [$filters['age_min']]);
+                                        }
+                                        if ($filters['age_max']) {
+                                            $query->whereRaw('YEAR(CURDATE()) - YEAR(dob) <= ?', [$filters['age_max']]);
+                                        }
+                                        if ($filters['sexe']) {
+                                            $query->where('sexe', $filters['sexe']);
+                                        }
+                                        if ($filters['ville_id']) {
+                                            $query->where('ville_id', $filters['ville_id']);
+                                        }
+                                        if ($filters['villes'] && is_array($filters['villes']) && count($filters['villes']) > 0) {
+                                            $query->whereIn('ville_id', $filters['villes']);
+                                        }
+                                        
+                                        $count = $query->whereNotNull('fcm_token')->count();
+                                        
+                                        return "{$count} utilisateurs seront ciblés";
+                                    }),
+                            ]),
                     ])
                     ->visible(fn ($get) => $get('target_audience') === 'filtered')
                     ->columns(1),

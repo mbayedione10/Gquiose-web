@@ -82,4 +82,14 @@ class Utilisateur extends Model
     {
         return $this->belongsTo(Ville::class);
     }
+
+    public function menstrualCycles()
+    {
+        return $this->hasMany(MenstrualCycle::class, 'utilisateur_id');
+    }
+
+    public function notificationLogs()
+    {
+        return $this->hasMany(NotificationLog::class, 'utilisateur_id');
+    }
 }
