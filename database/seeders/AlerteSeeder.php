@@ -1,3 +1,4 @@
+
 <?php
 
 namespace Database\Seeders;
@@ -20,92 +21,162 @@ class AlerteSeeder extends Seeder
         $labe = Ville::where('name', 'Labé')->first();
         $kankan = Ville::where('name', 'Kankan')->first();
         
-        $epidemie = TypeAlerte::where('name', 'Épidémie')->first();
-        $urgence = TypeAlerte::where('name', 'Urgence Sanitaire')->first();
-        $vaccination = TypeAlerte::where('name', 'Campagne de Vaccination')->first();
-        $information = TypeAlerte::where('name', 'Information Sanitaire')->first();
-        $prevention = TypeAlerte::where('name', 'Prévention')->first();
+        // Types de violences basées sur le genre (VBG)
+        $violencePhysique = TypeAlerte::where('name', 'Violence Physique')->first();
+        $violencePsychologique = TypeAlerte::where('name', 'Violence Psychologique')->first();
+        $violenceSexuelle = TypeAlerte::where('name', 'Violence Sexuelle')->first();
+        $violenceNumerique = TypeAlerte::where('name', 'Violence Numérique')->first();
+        $harcelement = TypeAlerte::where('name', 'Harcèlement')->first();
+        $violenceEconomique = TypeAlerte::where('name', 'Violence Économique')->first();
 
         $alertes = [
             [
                 'ref' => 'ALRT-' . date('Y') . '-001',
-                'description' => 'Campagne de vaccination contre la rougeole du 1er au 15 mars. Tous les enfants de 6 mois à 15 ans sont concernés. Rendez-vous dans le centre de santé le plus proche.',
-                'type_alerte_id' => $vaccination?->id,
+                'description' => 'Victime de violences physiques répétées de la part de mon conjoint. Coups, gifles et menaces quotidiennes. J\'ai peur pour ma sécurité et celle de mes enfants.',
+                'type_alerte_id' => $violencePhysique?->id,
                 'ville_id' => $conakry?->id,
                 'utilisateur_id' => $utilisateur?->id,
-                'etat' => 'actif',
+                'etat' => 'Non approuvée',
                 'latitude' => 9.5370,
                 'longitude' => -13.6785,
+                'date_incident' => now()->subDays(2),
+                'heure_incident' => '22:30:00',
+                'relation_agresseur' => 'conjoint',
+                'impact' => json_encode(['Stress', 'Peur', 'Traumatisme', 'Blessures physiques']),
+                'anonymat_souhaite' => true,
+                'consentement_transmission' => true,
+                'conseils_lus' => false,
             ],
             [
                 'ref' => 'ALRT-' . date('Y') . '-002',
-                'description' => 'Dépistage gratuit du diabète et de l\'hypertension dans tous les centres de santé de la commune jusqu\'au 30 mars. Profitez de cette opportunité.',
-                'type_alerte_id' => $information?->id,
+                'description' => 'Mon ex-partenaire a diffusé mes photos intimes sur les réseaux sociaux sans mon consentement. Les images circulent sur WhatsApp et Facebook.',
+                'type_alerte_id' => $violenceNumerique?->id,
                 'ville_id' => $conakry?->id,
                 'utilisateur_id' => $utilisateur?->id,
-                'etat' => 'actif',
+                'etat' => 'Confirmée',
                 'latitude' => 9.5140,
                 'longitude' => -13.7120,
+                'plateformes' => json_encode(['Facebook', 'WhatsApp', 'Instagram']),
+                'nature_contenu' => json_encode(['Photos intimes', 'Messages privés']),
+                'urls_problematiques' => 'https://facebook.com/[profil-agresseur], https://wa.me/[numero]',
+                'comptes_impliques' => '@agresseur123, Profil: Jean Dupont',
+                'frequence_incidents' => 'continu',
+                'date_incident' => now()->subDays(5),
+                'heure_incident' => '14:20:00',
+                'relation_agresseur' => 'ex_partenaire',
+                'impact' => json_encode(['Humiliation', 'Dépression', 'Anxiété', 'Perte de confiance']),
+                'anonymat_souhaite' => false,
+                'consentement_transmission' => true,
+                'conseils_lus' => true,
             ],
             [
                 'ref' => 'ALRT-' . date('Y') . '-003',
-                'description' => 'Attention : Augmentation des cas de diarrhée dans la région. Buvez uniquement de l\'eau traitée, lavez-vous les mains régulièrement et consultez en cas de symptômes.',
-                'type_alerte_id' => $prevention?->id,
+                'description' => 'Harcèlement sexuel sur mon lieu de travail. Mon supérieur hiérarchique me fait des avances déplacées et menace ma carrière si je refuse.',
+                'type_alerte_id' => $harcelement?->id,
                 'ville_id' => $kindia?->id,
                 'utilisateur_id' => $utilisateur?->id,
-                'etat' => 'actif',
+                'etat' => 'Non approuvée',
                 'latitude' => 10.0570,
                 'longitude' => -12.8470,
+                'date_incident' => now()->subWeeks(1),
+                'heure_incident' => '16:00:00',
+                'relation_agresseur' => 'collegue',
+                'impact' => json_encode(['Stress', 'Peur', 'Baisse de performance', 'Insomnie']),
+                'anonymat_souhaite' => true,
+                'consentement_transmission' => true,
+                'conseils_lus' => false,
             ],
             [
                 'ref' => 'ALRT-' . date('Y') . '-004',
-                'description' => 'Début de la saison des pluies : Protégez-vous contre le paludisme. Dormez sous moustiquaire, éliminez les eaux stagnantes, consultez rapidement en cas de fièvre.',
-                'type_alerte_id' => $prevention?->id,
+                'description' => 'Mon mari contrôle tous mes revenus et m\'interdit de travailler. Je n\'ai aucun accès aux finances du ménage et dépends totalement de lui.',
+                'type_alerte_id' => $violenceEconomique?->id,
                 'ville_id' => $labe?->id,
                 'utilisateur_id' => $utilisateur?->id,
-                'etat' => 'actif',
+                'etat' => 'Non approuvée',
                 'latitude' => 11.3180,
                 'longitude' => -12.2890,
+                'date_incident' => now()->subMonths(1),
+                'heure_incident' => '10:00:00',
+                'relation_agresseur' => 'conjoint',
+                'impact' => json_encode(['Dépendance financière', 'Isolement', 'Perte d\'autonomie']),
+                'anonymat_souhaite' => false,
+                'consentement_transmission' => true,
+                'conseils_lus' => false,
             ],
             [
                 'ref' => 'ALRT-' . date('Y') . '-005',
-                'description' => 'Journée mondiale de lutte contre le SIDA le 1er décembre. Dépistage gratuit et anonyme dans tous les centres de santé.',
-                'type_alerte_id' => $information?->id,
+                'description' => 'Cyber-harcèlement par messages sur Instagram et TikTok. Menaces de mort et insultes quotidiennes de la part d\'un ex-petit ami.',
+                'type_alerte_id' => $violenceNumerique?->id,
                 'ville_id' => $kankan?->id,
                 'utilisateur_id' => $utilisateur?->id,
-                'etat' => 'actif',
+                'etat' => 'Non approuvée',
                 'latitude' => 10.3850,
                 'longitude' => -9.3060,
+                'plateformes' => json_encode(['Instagram', 'TikTok', 'Snapchat']),
+                'nature_contenu' => json_encode(['Messages', 'Commentaires', 'Messages directs']),
+                'comptes_impliques' => '@harceleur_tiktok, @menaces_insta',
+                'frequence_incidents' => 'quotidien',
+                'date_incident' => now()->subDays(1),
+                'heure_incident' => '23:45:00',
+                'relation_agresseur' => 'ex_partenaire',
+                'impact' => json_encode(['Peur', 'Anxiété', 'Insomnie', 'Stress post-traumatique']),
+                'anonymat_souhaite' => true,
+                'consentement_transmission' => true,
+                'conseils_lus' => true,
             ],
             [
                 'ref' => 'ALRT-' . date('Y') . '-006',
-                'description' => 'Consultations prénatales gratuites tout le mois de mars. Futures mamans, prenez soin de vous et de votre bébé.',
-                'type_alerte_id' => $information?->id,
+                'description' => 'Violence psychologique et insultes constantes de mon partenaire. Il me rabaisse devant nos amis et ma famille.',
+                'type_alerte_id' => $violencePsychologique?->id,
                 'ville_id' => $conakry?->id,
                 'utilisateur_id' => $utilisateur?->id,
-                'etat' => 'actif',
+                'etat' => 'Confirmée',
                 'latitude' => 9.6412,
                 'longitude' => -13.5784,
+                'date_incident' => now()->subDays(3),
+                'heure_incident' => '19:30:00',
+                'relation_agresseur' => 'conjoint',
+                'impact' => json_encode(['Dépression', 'Perte d\'estime de soi', 'Isolement social']),
+                'anonymat_souhaite' => false,
+                'consentement_transmission' => true,
+                'conseils_lus' => true,
             ],
             [
                 'ref' => 'ALRT-' . date('Y') . '-007',
-                'description' => 'Formation gratuite sur les gestes de premiers secours le samedi 15 mars au Centre de Santé de Matam. Inscription sur place.',
-                'type_alerte_id' => $information?->id,
+                'description' => 'Agression sexuelle lors d\'une soirée. L\'agresseur est une connaissance qui a profité de mon état de vulnérabilité.',
+                'type_alerte_id' => $violenceSexuelle?->id,
                 'ville_id' => $conakry?->id,
                 'utilisateur_id' => $utilisateur?->id,
-                'etat' => 'actif',
+                'etat' => 'Non approuvée',
                 'latitude' => 9.5350,
                 'longitude' => -13.6500,
+                'date_incident' => now()->subDays(7),
+                'heure_incident' => '02:15:00',
+                'relation_agresseur' => 'connaissance',
+                'impact' => json_encode(['Traumatisme', 'Peur', 'Honte', 'Culpabilité', 'Stress post-traumatique']),
+                'anonymat_souhaite' => true,
+                'consentement_transmission' => true,
+                'conseils_lus' => false,
             ],
             [
                 'ref' => 'ALRT-' . date('Y') . '-008',
-                'description' => 'Stock de médicaments antipaludéens disponibles dans tous les centres de santé. Traitement gratuit pour les enfants de moins de 5 ans.',
-                'type_alerte_id' => $information?->id,
+                'description' => 'Stalking et surveillance constante via applications de géolocalisation installées à mon insu sur mon téléphone par mon ex.',
+                'type_alerte_id' => $violenceNumerique?->id,
                 'ville_id' => $kindia?->id,
                 'utilisateur_id' => $utilisateur?->id,
-                'etat' => 'actif',
+                'etat' => 'Non approuvée',
                 'latitude' => 10.0600,
                 'longitude' => -12.8500,
+                'plateformes' => json_encode(['Applications de localisation', 'Logiciels espions']),
+                'nature_contenu' => json_encode(['Géolocalisation', 'Surveillance téléphone']),
+                'frequence_incidents' => 'continu',
+                'date_incident' => now()->subDays(10),
+                'heure_incident' => '00:00:00',
+                'relation_agresseur' => 'ex_partenaire',
+                'impact' => json_encode(['Peur', 'Paranoïa', 'Sentiment d\'insécurité', 'Violation de vie privée']),
+                'anonymat_souhaite' => true,
+                'consentement_transmission' => true,
+                'conseils_lus' => false,
             ],
         ];
 
@@ -116,6 +187,6 @@ class AlerteSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ ' . count($alertes) . ' alertes créées');
+        $this->command->info('✅ ' . count($alertes) . ' alertes VBG créées avec succès');
     }
 }
