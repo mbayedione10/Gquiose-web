@@ -20,3 +20,4 @@ yarn-error.log
 storage/app/apns/*.p8
 storage/app/firebase/*.json
 storage/app/apns/*.p8
+/attached_assets

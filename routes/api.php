@@ -74,7 +74,7 @@ Route::prefix('v1')
         Route::prefix('alertes')->group(function () {
             // Récupérer les options pour le formulaire
             Route::get('workflow-options', [App\Http\Controllers\APIAlertWorkflowController::class, 'getWorkflowOptions']);
-            
+
             // Workflow étapes
             Route::post('step1', [App\Http\Controllers\APIAlertWorkflowController::class, 'step1']);
             Route::post('step2', [App\Http\Controllers\APIAlertWorkflowController::class, 'step2']);
@@ -122,6 +122,24 @@ Route::prefix('v1')
             Route::get('/preferences/{userId}', [App\Http\Controllers\APIPushNotificationController::class, 'getPreferences']);
             Route::post('/{notificationId}/opened', [App\Http\Controllers\APIPushNotificationController::class, 'trackOpened']);
             Route::post('/{notificationId}/clicked', [App\Http\Controllers\APIPushNotificationController::class, 'trackClicked']);
+        });
+
+        // Forum routes
+        Route::post('/forum/message/sync', [APIForumController::class, 'syncMessage']);
+        Route::post('/forum/chat/sync', [APIForumController::class, 'syncChat']);
+        Route::get('/forum', [APIForumController::class, 'forum']);
+        Route::delete('/forum/chat/{id}', [APIForumController::class, 'delete']);
+
+        // Cycle menstruel routes
+        Route::prefix('cycle')->group(function () {
+            Route::post('/start', [APICycleController::class, 'startPeriod']);
+            Route::post('/end-period', [APICycleController::class, 'endPeriod']);
+            Route::post('/log-symptoms', [APICycleController::class, 'logSymptoms']);
+            Route::get('/current/{user_id}', [APICycleController::class, 'getCurrentCycle']);
+            Route::get('/history/{user_id}', [APICycleController::class, 'getHistory']);
+            Route::get('/symptoms/{user_id}', [APICycleController::class, 'getSymptoms']);
+            Route::post('/settings', [APICycleController::class, 'updateSettings']);
+            Route::post('/reminders', [APICycleController::class, 'configureReminders']);
         });
 
 
