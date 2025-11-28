@@ -50,6 +50,8 @@ class Utilisateur extends Model
         'remember_token',
     ];
 
+    protected $appends = ['name'];
+
     public function responses()
     {
         return $this->hasMany(Response::class);
@@ -59,6 +61,11 @@ class Utilisateur extends Model
 {
     return $this->prenom . " " . $this->nom;
 }
+
+    public function getNameAttribute()
+    {
+        return $this->getFullNameAttribute();
+    }
 
 
     public function alertes()
