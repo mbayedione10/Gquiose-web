@@ -37,6 +37,11 @@ class Evaluation extends Model
         return $this->hasMany(ReponseEvaluation::class);
     }
 
+    public function reponsesEvaluations()
+    {
+        return $this->hasMany(ReponseEvaluation::class);
+    }
+
     public function getContexteNomAttribute()
     {
         $contextes = [
