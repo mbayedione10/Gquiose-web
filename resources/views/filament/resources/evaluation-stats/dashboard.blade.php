@@ -93,9 +93,6 @@
                 <h1 class="text-3xl font-bold mb-2 text-white">
                     📊 Statistiques & Graphiques
                 </h1>
-                <p class="text-white/90 text-lg">
-                    Analyses détaillées des évaluations - {{ now()->format('d M Y') }}
-                </p>
             </div>
         </div>
     </div>
