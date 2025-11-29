@@ -101,6 +101,7 @@ class EvaluationResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->filters([
                 SelectFilter::make('contexte')
+                    ->label('Contexte')
                     ->options([
                         'quiz' => 'Quiz',
                         'article' => 'Article',
