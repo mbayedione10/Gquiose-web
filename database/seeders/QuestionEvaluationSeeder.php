@@ -173,6 +173,55 @@ class QuestionEvaluationSeeder extends Seeder
             ],
         ];
 
+        // Questions pour SATISFACTION ALERTE
+        $questionsAlerte = [
+            [
+                'question' => 'L\'alerte vous a-t-elle aidé ?',
+                'type' => 'yesno',
+                'formulaire_type' => 'satisfaction_alerte',
+                'options' => null,
+                'ordre' => 1,
+                'obligatoire' => true,
+                'status' => true,
+            ],
+            [
+                'question' => 'Comment évaluez-vous la rapidité de la réponse ?',
+                'type' => 'rating',
+                'formulaire_type' => 'satisfaction_alerte',
+                'options' => null,
+                'ordre' => 2,
+                'obligatoire' => true,
+                'status' => true,
+            ],
+            [
+                'question' => 'Vous êtes-vous senti(e) en sécurité après avoir utilisé le service d\'alerte ?',
+                'type' => 'yesno',
+                'formulaire_type' => 'satisfaction_alerte',
+                'options' => null,
+                'ordre' => 3,
+                'obligatoire' => true,
+                'status' => true,
+            ],
+            [
+                'question' => 'Recommanderiez-vous ce service à d\'autres personnes ?',
+                'type' => 'scale',
+                'formulaire_type' => 'satisfaction_alerte',
+                'options' => json_encode(['min' => 1, 'max' => 10]),
+                'ordre' => 4,
+                'obligatoire' => false,
+                'status' => true,
+            ],
+            [
+                'question' => 'Suggestions d\'amélioration',
+                'type' => 'text',
+                'formulaire_type' => 'satisfaction_alerte',
+                'options' => null,
+                'ordre' => 5,
+                'obligatoire' => false,
+                'status' => true,
+            ],
+        ];
+
         // Questions pour SATISFACTION STRUCTURE
         $questionsStructure = [
             [
@@ -239,6 +288,7 @@ class QuestionEvaluationSeeder extends Seeder
             $questionsGenerales,
             $questionsQuiz,
             $questionsArticle,
+            $questionsAlerte,
             $questionsStructure
         );
 
@@ -281,6 +331,7 @@ class QuestionEvaluationSeeder extends Seeder
         $this->command->info('   - ' . count($questionsGenerales) . ' questions générales');
         $this->command->info('   - ' . count($questionsQuiz) . ' questions quiz');
         $this->command->info('   - ' . count($questionsArticle) . ' questions article');
+        $this->command->info('   - ' . count($questionsAlerte) . ' questions alerte');
         $this->command->info('   - ' . count($questionsStructure) . ' questions structure');
     }
 }

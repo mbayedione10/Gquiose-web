@@ -28,77 +28,90 @@ class ReponseEvaluationSeeder extends Seeder
         }
 
         // Types de formulaires disponibles
-        $formulaireTypes = ['generale', 'satisfaction_quiz', 'satisfaction_article', 'satisfaction_structure'];
+        $formulaireTypes = ['generale', 'satisfaction_quiz', 'satisfaction_article', 'satisfaction_structure', 'satisfaction_alerte'];
 
-        // Créer 100 évaluations de test
+        // Créer 150 évaluations de test (augmenté pour plus de données)
         $evaluationsCreated = 0;
-        
-        foreach (range(1, 100) as $index) {
-            $utilisateur = $utilisateurs->random();
-            $formulaireType = $formulaireTypes[array_rand($formulaireTypes)];
-            
+
+        // Distribution réaliste des types de formulaires
+        $typeDistribution = [
+            'generale' => 30,           // 30 évaluations générales
+            'satisfaction_quiz' => 35,  // 35 quiz
+            'satisfaction_article' => 40, // 40 articles
+            'satisfaction_structure' => 25, // 25 structures
+            'satisfaction_alerte' => 20, // 20 alertes
+        ];
+
+        foreach ($typeDistribution as $formulaireType => $count) {
             // Questions pour ce type de formulaire
             $questionsFormulaire = $questions->where('formulaire_type', $formulaireType);
-            
+
             if ($questionsFormulaire->isEmpty()) {
                 continue;
             }
 
-            // Créer l'évaluation avec une date aléatoire dans les 60 derniers jours
-            $evaluation = Evaluation::create([
-                'utilisateur_id' => $utilisateur->id,
-                'contexte' => $this->getContexte($formulaireType),
-                'contexte_id' => rand(1, 10),
-                'reponses' => [],
-                'score_global' => 0,
-                'commentaire' => $this->getFaker()->optional(0.3)->sentence(),
-                'created_at' => Carbon::now()->subDays(rand(0, 60)),
-            ]);
+            for ($i = 0; $i < $count; $i++) {
+                $utilisateur = $utilisateurs->random();
 
-            $reponses = [];
-            $totalScore = 0;
-            $scoreCount = 0;
+                // Distribution réaliste des dates (plus récent = plus d'évaluations)
+                $daysAgo = $this->getRealisticDaysAgo();
 
-            // Créer des réponses pour chaque question du formulaire
-            foreach ($questionsFormulaire as $question) {
-                $reponseData = $this->generateReponse($question);
-                
-                ReponseEvaluation::create([
-                    'evaluation_id' => $evaluation->id,
-                    'question_evaluation_id' => $question->id,
-                    'reponse' => $reponseData['reponse'],
-                    'valeur_numerique' => $reponseData['valeur_numerique'],
-                    'created_at' => $evaluation->created_at,
+                // Créer l'évaluation
+                $evaluation = Evaluation::create([
+                    'utilisateur_id' => $utilisateur->id,
+                    'contexte' => $this->getContexte($formulaireType),
+                    'contexte_id' => rand(1, 20),
+                    'reponses' => [],
+                    'score_global' => 0,
+                    'commentaire' => $this->getRealisticComment($formulaireType),
+                    'created_at' => Carbon::now()->subDays($daysAgo)->subHours(rand(0, 23))->subMinutes(rand(0, 59)),
                 ]);
 
-                $reponses[] = [
-                    'question_id' => $question->id,
-                    'reponse' => $reponseData['reponse'],
-                    'valeur_numerique' => $reponseData['valeur_numerique'],
-                ];
+                $reponses = [];
+                $totalScore = 0;
+                $scoreCount = 0;
 
-                if ($reponseData['valeur_numerique'] !== null) {
-                    // Normaliser le score sur 5
-                    if ($question->type === 'scale') {
-                        $options = is_array($question->options) ? $question->options : json_decode($question->options, true);
-                        $max = $options['max'] ?? 10;
-                        $normalizedScore = ($reponseData['valeur_numerique'] / $max) * 5;
-                    } else {
-                        $normalizedScore = $reponseData['valeur_numerique'];
+                // Créer des réponses pour chaque question du formulaire
+                foreach ($questionsFormulaire as $question) {
+                    $reponseData = $this->generateReponse($question);
+
+                    ReponseEvaluation::create([
+                        'evaluation_id' => $evaluation->id,
+                        'question_evaluation_id' => $question->id,
+                        'reponse' => $reponseData['reponse'],
+                        'valeur_numerique' => $reponseData['valeur_numerique'],
+                        'created_at' => $evaluation->created_at,
+                    ]);
+
+                    $reponses[] = [
+                        'question_id' => $question->id,
+                        'reponse' => $reponseData['reponse'],
+                        'valeur_numerique' => $reponseData['valeur_numerique'],
+                    ];
+
+                    if ($reponseData['valeur_numerique'] !== null) {
+                        // Normaliser le score sur 5
+                        if ($question->type === 'scale') {
+                            $options = is_array($question->options) ? $question->options : json_decode($question->options, true);
+                            $max = $options['max'] ?? 10;
+                            $normalizedScore = ($reponseData['valeur_numerique'] / $max) * 5;
+                        } else {
+                            $normalizedScore = $reponseData['valeur_numerique'];
+                        }
+
+                        $totalScore += $normalizedScore;
+                        $scoreCount++;
                     }
-                    
-                    $totalScore += $normalizedScore;
-                    $scoreCount++;
                 }
+
+                // Mettre à jour l'évaluation avec le score global
+                $evaluation->update([
+                    'reponses' => $reponses,
+                    'score_global' => $scoreCount > 0 ? round($totalScore / $scoreCount, 2) : null,
+                ]);
+
+                $evaluationsCreated++;
             }
-
-            // Mettre à jour l'évaluation avec le score global
-            $evaluation->update([
-                'reponses' => $reponses,
-                'score_global' => $scoreCount > 0 ? round($totalScore / $scoreCount, 2) : null,
-            ]);
-
-            $evaluationsCreated++;
         }
 
         $this->command->info("✅ {$evaluationsCreated} évaluations avec réponses créées");
@@ -175,6 +188,7 @@ class ReponseEvaluationSeeder extends Seeder
             'satisfaction_quiz' => 'quiz',
             'satisfaction_article' => 'article',
             'satisfaction_structure' => 'structure',
+            'satisfaction_alerte' => 'alerte',
             default => 'generale',
         };
     }
@@ -182,5 +196,92 @@ class ReponseEvaluationSeeder extends Seeder
     private function getFaker()
     {
         return \Faker\Factory::create('fr_FR');
+    }
+
+    /**
+     * Génère une distribution réaliste des dates (plus d'évaluations récentes)
+     */
+    private function getRealisticDaysAgo(): int
+    {
+        $random = rand(1, 100);
+
+        // 40% dans les 7 derniers jours
+        if ($random <= 40) {
+            return rand(0, 7);
+        }
+        // 30% entre 8 et 30 jours
+        elseif ($random <= 70) {
+            return rand(8, 30);
+        }
+        // 20% entre 31 et 60 jours
+        elseif ($random <= 90) {
+            return rand(31, 60);
+        }
+        // 10% entre 61 et 90 jours
+        else {
+            return rand(61, 90);
+        }
+    }
+
+    /**
+     * Génère un commentaire réaliste selon le type de formulaire
+     */
+    private function getRealisticComment(string $formulaireType): ?string
+    {
+        // 40% de chance d'avoir un commentaire
+        if (rand(1, 100) > 40) {
+            return null;
+        }
+
+        $comments = match($formulaireType) {
+            'generale' => [
+                'Application très utile et facile à utiliser',
+                'Interface intuitive, je recommande',
+                'Quelques bugs à corriger mais bon dans l\'ensemble',
+                'Excellente initiative pour informer les jeunes',
+                'Très satisfait du service',
+                'Besoin de plus de contenu',
+                'Application pratique au quotidien',
+            ],
+            'satisfaction_quiz' => [
+                'Quiz très instructif, j\'ai appris beaucoup',
+                'Questions pertinentes et bien formulées',
+                'Bon niveau de difficulté',
+                'Quiz trop facile à mon goût',
+                'Excellente façon d\'apprendre',
+                'Manque d\'explications sur certaines réponses',
+                'Format ludique et éducatif',
+            ],
+            'satisfaction_article' => [
+                'Article très clair et informatif',
+                'Contenu de qualité, merci',
+                'Manque d\'exemples concrets',
+                'Informations utiles et bien présentées',
+                'Article trop long',
+                'Excellentes explications',
+                'Bon article, bien documenté',
+            ],
+            'satisfaction_structure' => [
+                'Personnel très accueillant et professionnel',
+                'Service de qualité',
+                'Temps d\'attente un peu long',
+                'Très bon accueil, je recommande',
+                'Structure propre et bien équipée',
+                'Besoin de plus de personnel',
+                'Excellente prise en charge',
+            ],
+            'satisfaction_alerte' => [
+                'Réponse rapide et efficace',
+                'Service d\'alerte très rassurant',
+                'Je me sens plus en sécurité',
+                'Excellente initiative',
+                'Délai de réponse acceptable',
+                'Service indispensable',
+                'Merci pour votre aide',
+            ],
+            default => ['Merci', 'Bon service', 'À améliorer'],
+        };
+
+        return $comments[array_rand($comments)];
     }
 }

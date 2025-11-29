@@ -37,9 +37,28 @@ class EvaluationResource extends Resource
     {
         return $form->schema([
             Card::make()->schema([
-                Forms\Components\Textarea::make('reponses')
-                    ->label('Réponses')
-                    ->disabled()
+                Forms\Components\Placeholder::make('utilisateur_info')
+                    ->label('Utilisateur')
+                    ->content(fn (Evaluation $record): string => $record->utilisateur ? $record->utilisateur->nom . ' ' . $record->utilisateur->prenom : 'N/A'),
+
+                Forms\Components\Placeholder::make('contexte_info')
+                    ->label('Contexte')
+                    ->content(fn (Evaluation $record): string => ucfirst($record->contexte)),
+
+                Forms\Components\Placeholder::make('score_info')
+                    ->label('Score Global')
+                    ->content(fn (Evaluation $record): string => $record->score_global ? number_format($record->score_global, 2) . '/5' : 'N/A'),
+
+                Forms\Components\Placeholder::make('commentaire_info')
+                    ->label('Commentaire')
+                    ->content(fn (Evaluation $record): string => $record->commentaire ?: 'Aucun commentaire'),
+
+                Forms\Components\Placeholder::make('date_info')
+                    ->label('Date de soumission')
+                    ->content(fn (Evaluation $record): string => $record->created_at->format('d/m/Y à H:i')),
+
+                Forms\Components\View::make('filament.resources.evaluation.view-reponses')
+                    ->label('Réponses détaillées')
                     ->columnSpan(12),
             ]),
         ]);
