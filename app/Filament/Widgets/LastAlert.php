@@ -67,4 +67,9 @@ class LastAlert extends BaseWidget
                 ->limit(50),
         ];
     }
+
+    protected function getTableRecordUrlUsing(): ?\Closure
+    {
+        return fn ($record) => route('filament.resources.alertes.edit', ['record' => $record]);
+    }
 }
