@@ -1,4 +1,3 @@
-
 <x-filament::page>
     <div class="space-y-6">
         <!-- En-tête du Dashboard -->
@@ -21,7 +20,7 @@
 
         <!-- Widgets -->
         <x-filament::widgets :widgets="$this->getHeaderWidgets()" :columns="$this->getHeaderWidgetsColumns()" />
-        
+
         <x-filament::widgets :widgets="$this->getFooterWidgets()" :columns="$this->getFooterWidgetsColumns()" />
     </div>
 </x-filament::page>
