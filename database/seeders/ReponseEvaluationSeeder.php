@@ -13,44 +13,38 @@ class ReponseEvaluationSeeder extends Seeder
 {
     public function run(): void
     {
-        $utilisateurs = Utilisateur::all();
-        
-        if ($utilisateurs->isEmpty()) {
-            $this->command->warn('Aucun utilisateur trouvé. Création impossible.');
-            return;
-        }
+        $this->command->info('Création d\'évaluations avec réponses...');
 
-        $questions = QuestionEvaluation::where('status', true)->get();
-        
-        if ($questions->isEmpty()) {
-            $this->command->warn('Aucune question d\'évaluation trouvée.');
-            return;
-        }
-
-        // Types de formulaires disponibles
-        $formulaireTypes = ['generale', 'satisfaction_quiz', 'satisfaction_article', 'satisfaction_structure', 'satisfaction_alerte'];
-
-        // Créer 150 évaluations de test (augmenté pour plus de données)
-        $evaluationsCreated = 0;
-
-        // Distribution réaliste des types de formulaires
-        $typeDistribution = [
-            'generale' => 30,           // 30 évaluations générales
-            'satisfaction_quiz' => 35,  // 35 quiz
-            'satisfaction_article' => 40, // 40 articles
-            'satisfaction_structure' => 25, // 25 structures
-            'satisfaction_alerte' => 20, // 20 alertes
+        // Distribution des évaluations par contexte
+        $contextes = [
+            'quiz' => 35,
+            'article' => 40,
+            'structure' => 25,
+            'generale' => 30,
+            'alerte' => 20,  // Ajout des évaluations pour le contexte alerte
         ];
 
-        foreach ($typeDistribution as $formulaireType => $count) {
-            // Questions pour ce type de formulaire
-            $questionsFormulaire = $questions->where('formulaire_type', $formulaireType);
+        $utilisateurs = Utilisateur::all();
+        $evaluationsCreated = 0;
 
-            if ($questionsFormulaire->isEmpty()) {
+        foreach ($contextes as $contexte => $count) {
+            $formulaireType = $this->mapContexteToFormulaireType($contexte);
+            $questions = QuestionEvaluation::where('status', true)
+                ->where('formulaire_type', $formulaireType)
+                ->orderBy('ordre')
+                ->get();
+
+            if ($questions->isEmpty()) {
+                $this->command->warn("Aucune question trouvée pour le formulaire de type: {$formulaireType}");
                 continue;
             }
 
             for ($i = 0; $i < $count; $i++) {
+                // Vérifier si des utilisateurs existent
+                if ($utilisateurs->isEmpty()) {
+                    $this->command->warn('Aucun utilisateur trouvé. Impossible de créer des évaluations.');
+                    return;
+                }
                 $utilisateur = $utilisateurs->random();
 
                 // Distribution réaliste des dates (plus récent = plus d'évaluations)
@@ -59,7 +53,7 @@ class ReponseEvaluationSeeder extends Seeder
                 // Créer l'évaluation
                 $evaluation = Evaluation::create([
                     'utilisateur_id' => $utilisateur->id,
-                    'contexte' => $this->getContexte($formulaireType),
+                    'contexte' => $contexte,
                     'contexte_id' => rand(1, 20),
                     'reponses' => [],
                     'score_global' => 0,
@@ -72,7 +66,7 @@ class ReponseEvaluationSeeder extends Seeder
                 $scoreCount = 0;
 
                 // Créer des réponses pour chaque question du formulaire
-                foreach ($questionsFormulaire as $question) {
+                foreach ($questions as $question) {
                     $reponseData = $this->generateReponse($question);
 
                     ReponseEvaluation::create([
@@ -93,9 +87,10 @@ class ReponseEvaluationSeeder extends Seeder
                         // Normaliser le score sur 5
                         if ($question->type === 'scale') {
                             $options = is_array($question->options) ? $question->options : json_decode($question->options, true);
-                            $max = $options['max'] ?? 10;
+                            $max = $options['max'] ?? 10; // Valeur par défaut si 'max' n'est pas défini
                             $normalizedScore = ($reponseData['valeur_numerique'] / $max) * 5;
                         } else {
+                            // Pour les autres types numériques, on suppose qu'ils sont déjà sur une échelle compatible
                             $normalizedScore = $reponseData['valeur_numerique'];
                         }
 
@@ -182,15 +177,23 @@ class ReponseEvaluationSeeder extends Seeder
         }
     }
 
-    private function getContexte(string $formulaireType): string
+    /**
+     * Mappe le contexte au type de formulaire correspondant.
+     *
+     * @param string $contexte Le contexte de l'évaluation (ex: 'quiz', 'article', 'alerte').
+     * @return string Le type de formulaire associé (ex: 'satisfaction_quiz', 'generale').
+     */
+    private function mapContexteToFormulaireType(string $contexte): string
     {
-        return match($formulaireType) {
-            'satisfaction_quiz' => 'quiz',
-            'satisfaction_article' => 'article',
-            'satisfaction_structure' => 'structure',
-            'satisfaction_alerte' => 'alerte',
-            default => 'generale',
-        };
+        $mapping = [
+            'quiz' => 'satisfaction_quiz',
+            'article' => 'satisfaction_article',
+            'structure' => 'satisfaction_structure',
+            'generale' => 'generale',
+            'alerte' => 'generale',  // Les alertes utilisent le formulaire général
+        ];
+
+        return $mapping[$contexte] ?? 'generale';
     }
 
     private function getFaker()
