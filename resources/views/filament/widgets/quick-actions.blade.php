@@ -5,17 +5,17 @@
             <h2 class="text-xl font-bold text-gray-900 dark:text-white">Actions Rapides</h2>
             
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- Créer un utilisateur -->
-                <a href="{{ route('filament.resources.utilisateurs.create') }}" 
+                <!-- Notifications Push -->
+                <a href="{{ route('filament.resources.push-notifications.create') }}" 
                    class="group flex items-center gap-3 p-4 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl hover:shadow-lg transition-all">
                     <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center text-white">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                         </svg>
                     </div>
                     <div class="flex-1">
-                        <div class="font-semibold text-gray-900 dark:text-white">Nouvel Utilisateur</div>
-                        <div class="text-sm text-gray-600 dark:text-gray-400">Ajouter un compte</div>
+                        <div class="font-semibold text-gray-900 dark:text-gray-100">Notifications</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">Envoyer notification</div>
                     </div>
                 </a>
 
@@ -28,7 +28,7 @@
                         </svg>
                     </div>
                     <div class="flex-1">
-                        <div class="font-semibold text-gray-900 dark:text-white">Gérer Alertes</div>
+                        <div class="font-semibold text-gray-900 dark:text-gray-100">Gérer Alertes</div>
                         <div class="text-sm text-gray-600 dark:text-gray-400">Voir les signalements</div>
                     </div>
                 </a>
@@ -42,7 +42,7 @@
                         </svg>
                     </div>
                     <div class="flex-1">
-                        <div class="font-semibold text-gray-900 dark:text-white">Nouvel Article</div>
+                        <div class="font-semibold text-gray-900 dark:text-gray-100">Nouvel Article</div>
                         <div class="text-sm text-gray-600 dark:text-gray-400">Publier du contenu</div>
                     </div>
                 </a>
@@ -56,7 +56,7 @@
                         </svg>
                     </div>
                     <div class="flex-1">
-                        <div class="font-semibold text-gray-900 dark:text-white">Statistiques</div>
+                        <div class="font-semibold text-gray-900 dark:text-gray-100">Statistiques</div>
                         <div class="text-sm text-gray-600 dark:text-gray-400">Analyses détaillées</div>
                     </div>
                 </a>
