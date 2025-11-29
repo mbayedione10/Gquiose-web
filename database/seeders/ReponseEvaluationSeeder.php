@@ -15,13 +15,13 @@ class ReponseEvaluationSeeder extends Seeder
     {
         $this->command->info('Création d\'évaluations avec réponses...');
 
-        // Distribution des évaluations par contexte
+        // Créer des évaluations avec réponses pour différents contextes
         $contextes = [
             'quiz' => 35,
             'article' => 40,
             'structure' => 25,
             'generale' => 30,
-            'alerte' => 20,  // Ajout des évaluations pour le contexte alerte
+            'alerte' => 20,
         ];
 
         $utilisateurs = Utilisateur::all();
@@ -109,7 +109,7 @@ class ReponseEvaluationSeeder extends Seeder
             }
         }
 
-        $this->command->info("✅ {$evaluationsCreated} évaluations avec réponses créées");
+        $this->command->info("✅ {$evaluationsCreated} évaluation avec réponses créées");
         $this->command->info('   - Total réponses: ' . ReponseEvaluation::count());
     }
 
