@@ -112,11 +112,11 @@
                         </svg>
                     </div>
                     <div class="text-right">
-                        <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ number_format($evaluations->count()) }}</div>
+                        <div class="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{{ number_format($evaluations->count()) }}</div>
                     </div>
                 </div>
-                <div class="text-sm text-gray-600 dark:text-gray-400">Total Évaluations</div>
-                <div class="mt-2 text-xs bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 px-3 py-1 rounded-full inline-block">
+                <div class="text-sm font-medium text-gray-700 dark:text-gray-300">Total Évaluations</div>
+                <div class="mt-2 text-xs bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 px-3 py-1 rounded-full inline-block">
                     Période sélectionnée
                 </div>
             </div>
@@ -132,11 +132,11 @@
                         </svg>
                     </div>
                     <div class="text-right">
-                        <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ $evaluations->avg('score_global') ? number_format($evaluations->avg('score_global'), 2) : '0.00' }}</div>
+                        <div class="text-3xl font-bold text-green-600 dark:text-green-400">{{ $evaluations->avg('score_global') ? number_format($evaluations->avg('score_global'), 2) : '0.00' }}</div>
                     </div>
                 </div>
-                <div class="text-sm text-gray-600 dark:text-gray-400">Score Moyen Global</div>
-                <div class="mt-2 text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full inline-block">
+                <div class="text-sm font-medium text-gray-700 dark:text-gray-300">Score Moyen Global</div>
+                <div class="mt-2 text-xs bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 px-3 py-1 rounded-full inline-block">
                     Sur 5.00
                 </div>
             </div>
@@ -152,11 +152,11 @@
                         </svg>
                     </div>
                     <div class="text-right">
-                        <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ number_format($totalQuestions) }}</div>
+                        <div class="text-3xl font-bold text-orange-600 dark:text-orange-400">{{ number_format($totalQuestions) }}</div>
                     </div>
                 </div>
-                <div class="text-sm text-gray-600 dark:text-gray-400">Questions au Total</div>
-                <div class="mt-2 text-xs bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 px-3 py-1 rounded-full inline-block">
+                <div class="text-sm font-medium text-gray-700 dark:text-gray-300">Questions au Total</div>
+                <div class="mt-2 text-xs bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 px-3 py-1 rounded-full inline-block">
                     Bibliothèque complète
                 </div>
             </div>
@@ -172,11 +172,11 @@
                         </svg>
                     </div>
                     <div class="text-right">
-                        <div class="text-3xl font-bold text-gray-900 dark:text-white">{{ number_format($cyclesActifs) }}</div>
+                        <div class="text-3xl font-bold text-pink-600 dark:text-pink-400">{{ number_format($cyclesActifs) }}</div>
                     </div>
                 </div>
-                <div class="text-sm text-gray-600 dark:text-gray-400">Cycles Actifs</div>
-                <div class="mt-2 text-xs bg-pink-100 dark:bg-pink-900 text-pink-800 dark:text-pink-200 px-3 py-1 rounded-full inline-block">
+                <div class="text-sm font-medium text-gray-700 dark:text-gray-300">Cycles Actifs</div>
+                <div class="mt-2 text-xs bg-pink-100 dark:bg-pink-900/50 text-pink-700 dark:text-pink-300 px-3 py-1 rounded-full inline-block">
                     Suivi en cours
                 </div>
             </div>
@@ -187,13 +187,13 @@
     <div class="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Répartition par contexte -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">📊 Répartition par Contexte</h3>
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">📊 Répartition par Contexte</h3>
             <div id="chartTypeRepartition"></div>
         </div>
 
         <!-- Scores moyens par contexte -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">⭐ Scores Moyens par Contexte</h3>
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">⭐ Scores Moyens par Contexte</h3>
             <div id="chartScoresMoyens"></div>
         </div>
     </div>
@@ -201,7 +201,7 @@
     <!-- Graphique d'évolution -->
     <div class="mb-6">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">📈 Évolution Temporelle</h3>
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">📈 Évolution Temporelle</h3>
             <div id="chartEvolution"></div>
         </div>
     </div>
@@ -209,7 +209,7 @@
     <!-- Questions les plus populaires -->
     <div class="mb-6">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">🔥 Top 5 Questions les Plus Évaluées</h3>
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">🔥 Top 5 Questions les Plus Évaluées</h3>
             <div class="space-y-3">
                 @forelse($topQuestions as $index => $question)
                     <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
@@ -234,7 +234,7 @@
     <div class="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Alertes récentes -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">🚨 5 Dernières Alertes</h3>
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">🚨 5 Dernières Alertes</h3>
             <div class="space-y-3">
                 @forelse($alertesRecentes as $alerte)
                     <div class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">
@@ -261,7 +261,7 @@
 
         <!-- Distribution des alertes -->
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">📊 Distribution des Alertes par Type</h3>
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">📊 Distribution des Alertes par Type</h3>
             <div class="space-y-3">
                 @forelse($alertesParType as $typeAlerte)
                     <div class="flex items-center gap-3">
@@ -288,7 +288,7 @@
     <!-- Notifications récentes -->
     <div class="mb-6">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">🔔 5 Dernières Notifications Push</h3>
+            <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">🔔 5 Dernières Notifications Push</h3>
             <div class="space-y-3">
                 @forelse($notificationsRecentes as $notif)
                     <div class="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors">

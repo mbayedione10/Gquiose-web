@@ -15,19 +15,19 @@
     <div class="mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl shadow-2xl p-8">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold mb-2 text-black">
+                <h1 class="text-3xl font-bold mb-2 text-white">
                     👋 Bienvenue, {{ auth()->user()->name }}
                 </h1>
-                <p class="text-black/90 text-lg">
+                <p class="text-white/90 text-lg">
                     Tableau de bord administrateur - {{ now()->format('d M Y') }}
                 </p>
             </div>
-            <div class="text-right text-black">
+            <div class="text-right text-white">
                 <div class="text-5xl font-bold">{{ now()->format('H:i') }}</div>
-                <div class="text-black/80">{{ now()->translatedFormat('l') }}</div>
+                <div class="text-white/80">{{ now()->translatedFormat('l') }}</div>
             </div>
         </div>
-    </div>
+    </div>/div>
 
     <!-- 2. Métriques clés - Grid moderne -->
     <div class="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
