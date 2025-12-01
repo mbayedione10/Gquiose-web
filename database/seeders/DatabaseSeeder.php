@@ -70,6 +70,7 @@ class DatabaseSeeder extends Seeder
         // Notifications de test
         $this->call([
             NotificationLogSeeder::class,
+            PushNotificationSeeder::class,
         ]);
     }
 }

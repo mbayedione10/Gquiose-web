@@ -4,224 +4,209 @@
 namespace Database\Seeders;
 
 use App\Models\NotificationLog;
-use App\Models\NotificationTemplate;
 use App\Models\Utilisateur;
 use Illuminate\Database\Seeder;
 
 class NotificationLogSeeder extends Seeder
 {
-    public function run(): void
+    public function run()
     {
-        // Récupérer des utilisatrices
-        $utilisatrices = Utilisateur::where('sexe', 'F')->limit(5)->get();
+        $utilisateurs = Utilisateur::all();
 
-        if ($utilisatrices->isEmpty()) {
-            $this->command->warn('Aucune utilisatrice trouvée. Créez d\'abord des utilisatrices.');
+        if ($utilisateurs->isEmpty()) {
+            $this->command->warn('Aucun utilisateur trouvé. Veuillez d\'abord exécuter UtilisateurSeeder.');
             return;
         }
 
-        // Récupérer les templates
-        $templates = NotificationTemplate::all();
+        $types = ['manual', 'automatic', 'scheduled'];
+        $categories = ['alert', 'reminder', 'health_tip', 'cycle', 'general', 'quiz', 'article', 'video'];
+        $statuses = ['sent', 'delivered', 'opened', 'clicked'];
 
-        if ($templates->isEmpty()) {
-            $this->command->warn('Aucun template de notification trouvé.');
-            return;
+        $notifications = [
+            [
+                'title' => 'Rappel de cycle',
+                'message' => 'Votre période devrait commencer dans 3 jours',
+                'category' => 'cycle',
+                'icon' => '🩸',
+            ],
+            [
+                'title' => 'Nouveau conseil santé',
+                'message' => 'Découvrez nos conseils pour une alimentation équilibrée pendant votre cycle',
+                'category' => 'health_tip',
+                'icon' => '💡',
+            ],
+            [
+                'title' => 'Nouvel article',
+                'message' => 'Un nouvel article sur la santé reproductive est disponible',
+                'category' => 'article',
+                'icon' => '📚',
+            ],
+            [
+                'title' => 'Quiz du jour',
+                'message' => 'Testez vos connaissances sur la santé reproductive',
+                'category' => 'quiz',
+                'icon' => '❓',
+            ],
+            [
+                'title' => 'Alerte confirmée',
+                'message' => 'Votre signalement a été pris en compte par nos équipes',
+                'category' => 'alert',
+                'icon' => '✅',
+            ],
+            [
+                'title' => 'Nouvelle vidéo',
+                'message' => 'Une nouvelle vidéo éducative est disponible',
+                'category' => 'video',
+                'icon' => '🎥',
+            ],
+            [
+                'title' => 'Conseil du jour',
+                'message' => 'Prenez soin de votre santé mentale et physique',
+                'category' => 'health_tip',
+                'icon' => '🩺',
+            ],
+            [
+                'title' => 'Suivi de grossesse',
+                'message' => 'N\'oubliez pas votre consultation prénatale cette semaine',
+                'category' => 'reminder',
+                'icon' => '🤰',
+            ],
+            [
+                'title' => 'Centre de santé à proximité',
+                'message' => 'Un nouveau centre de santé a été ajouté près de chez vous',
+                'category' => 'general',
+                'icon' => '🏥',
+            ],
+            [
+                'title' => 'Message important',
+                'message' => 'Vous avez reçu un nouveau message dans le forum',
+                'category' => 'general',
+                'icon' => '💬',
+            ],
+            [
+                'title' => 'Période terminée',
+                'message' => 'Votre période devrait se terminer aujourd\'hui',
+                'category' => 'cycle',
+                'icon' => '🩸',
+            ],
+            [
+                'title' => 'Ovulation prévue',
+                'message' => 'Votre période d\'ovulation commence demain',
+                'category' => 'cycle',
+                'icon' => '🔔',
+            ],
+            [
+                'title' => 'Conseil nutrition',
+                'message' => 'Pensez à bien vous hydrater pendant votre cycle',
+                'category' => 'health_tip',
+                'icon' => '💧',
+            ],
+            [
+                'title' => 'Nouveau quiz disponible',
+                'message' => 'Testez vos connaissances sur la contraception',
+                'category' => 'quiz',
+                'icon' => '❓',
+            ],
+            [
+                'title' => 'Article santé',
+                'message' => 'Les bienfaits de l\'exercice pendant les menstruations',
+                'category' => 'article',
+                'icon' => '📖',
+            ],
+            [
+                'title' => 'Rappel consultation',
+                'message' => 'N\'oubliez pas votre rendez-vous gynécologique',
+                'category' => 'reminder',
+                'icon' => '📅',
+            ],
+            [
+                'title' => 'Vidéo éducative',
+                'message' => 'Comprendre le cycle menstruel en 5 minutes',
+                'category' => 'video',
+                'icon' => '🎬',
+            ],
+            [
+                'title' => 'Alerte traitée',
+                'message' => 'Votre signalement a été résolu',
+                'category' => 'alert',
+                'icon' => '✔️',
+            ],
+            [
+                'title' => 'Conseil bien-être',
+                'message' => 'Techniques de relaxation pour soulager les douleurs',
+                'category' => 'health_tip',
+                'icon' => '🧘',
+            ],
+            [
+                'title' => 'Nouveau service',
+                'message' => 'Service de téléconsultation maintenant disponible',
+                'category' => 'general',
+                'icon' => '📱',
+            ],
+            [
+                'title' => 'Symptômes inhabituels',
+                'message' => 'Vous avez signalé des symptômes inhabituels',
+                'category' => 'alert',
+                'icon' => '⚠️',
+            ],
+            [
+                'title' => 'Article nutrition',
+                'message' => 'Les aliments à privilégier pendant vos règles',
+                'category' => 'article',
+                'icon' => '🥗',
+            ],
+            [
+                'title' => 'Quiz complété',
+                'message' => 'Félicitations ! Vous avez terminé le quiz avec succès',
+                'category' => 'quiz',
+                'icon' => '🎉',
+            ],
+            [
+                'title' => 'Rappel médicament',
+                'message' => 'N\'oubliez pas de prendre votre contraception',
+                'category' => 'reminder',
+                'icon' => '💊',
+            ],
+            [
+                'title' => 'Communauté',
+                'message' => 'Une nouvelle discussion vous intéresse dans le forum',
+                'category' => 'general',
+                'icon' => '👥',
+            ],
+        ];
+
+        foreach ($notifications as $index => $notifData) {
+            $utilisateur = $utilisateurs->random();
+            $status = $statuses[array_rand($statuses)];
+            $type = $types[array_rand($types)];
+
+            $sentAt = now()->subDays(rand(1, 30));
+            $deliveredAt = $status !== 'sent' ? $sentAt->copy()->addSeconds(rand(1, 10)) : null;
+            $openedAt = in_array($status, ['opened', 'clicked']) ? $deliveredAt->copy()->addMinutes(rand(1, 60)) : null;
+            $clickedAt = $status === 'clicked' ? $openedAt->copy()->addSeconds(rand(5, 30)) : null;
+
+            NotificationLog::create([
+                'utilisateur_id' => $utilisateur->id,
+                'notification_schedule_id' => null,
+                'title' => $notifData['title'],
+                'message' => $notifData['message'],
+                'icon' => $notifData['icon'],
+                'action' => null,
+                'image' => null,
+                'type' => $type,
+                'category' => $notifData['category'],
+                'status' => $status,
+                'sent_at' => $sentAt,
+                'delivered_at' => $deliveredAt,
+                'opened_at' => $openedAt,
+                'clicked_at' => $clickedAt,
+                'failed_at' => null,
+                'error_message' => null,
+                'platform' => $utilisateur->platform ?? 'android',
+                'fcm_message_id' => 'fcm_' . uniqid(),
+            ]);
         }
 
-        $notifications = [];
-
-        // Notification 1: Nouvel article publié
-        $template1 = $templates->where('name', 'Nouvel article publié')->first();
-        if ($template1) {
-            $notifications[] = [
-                'utilisateur_id' => $utilisatrices->random()->id,
-                'title' => $template1->title,
-                'message' => str_replace('{{sujet}}', 'la santé maternelle', $template1->message),
-                'icon' => $template1->icon,
-                'action' => $template1->action,
-                'type' => 'automatic',
-                'category' => $template1->category,
-                'status' => 'sent',
-                'sent_at' => now()->subDays(2),
-                'delivered_at' => now()->subDays(2)->addMinutes(1),
-                'platform' => 'android',
-            ];
-        }
-
-        // Notification 2: Alerte sanitaire
-        $template2 = $templates->where('name', 'Nouvelle alerte sanitaire')->first();
-        if ($template2) {
-            $notifications[] = [
-                'utilisateur_id' => $utilisatrices->random()->id,
-                'title' => $template2->title,
-                'message' => str_replace('{{message_alerte}}', 'Épidémie de paludisme dans votre zone. Prenez vos précautions.', $template2->message),
-                'icon' => $template2->icon,
-                'action' => $template2->action,
-                'type' => 'triggered',
-                'category' => $template2->category,
-                'status' => 'delivered',
-                'sent_at' => now()->subDays(5),
-                'delivered_at' => now()->subDays(5)->addMinutes(2),
-                'opened_at' => now()->subDays(5)->addHours(1),
-                'platform' => 'android',
-            ];
-        }
-
-        // Notification 3: Rappel vaccination
-        $template3 = $templates->where('name', 'Rappel vaccination')->first();
-        if ($template3) {
-            $notifications[] = [
-                'utilisateur_id' => $utilisatrices->random()->id,
-                'title' => $template3->title,
-                'message' => str_replace('{{date}}', '31 décembre 2025', $template3->message),
-                'icon' => $template3->icon,
-                'action' => $template3->action,
-                'type' => 'automatic',
-                'category' => $template3->category,
-                'status' => 'clicked',
-                'sent_at' => now()->subDays(1),
-                'delivered_at' => now()->subDays(1)->addMinutes(1),
-                'opened_at' => now()->subDays(1)->addHours(2),
-                'clicked_at' => now()->subDays(1)->addHours(2)->addMinutes(5),
-                'platform' => 'ios',
-            ];
-        }
-
-        // Notification 4: Conseil santé quotidien
-        $template4 = $templates->where('name', 'Conseil santé quotidien')->first();
-        if ($template4) {
-            $notifications[] = [
-                'utilisateur_id' => $utilisatrices->random()->id,
-                'title' => $template4->title,
-                'message' => str_replace('{{conseil}}', 'Buvez au moins 1,5 litre d\'eau par jour pour rester hydratée.', $template4->message),
-                'icon' => $template4->icon,
-                'action' => $template4->action,
-                'type' => 'automatic',
-                'category' => $template4->category,
-                'status' => 'sent',
-                'sent_at' => now()->subHours(6),
-                'delivered_at' => now()->subHours(6)->addMinutes(1),
-                'platform' => 'android',
-            ];
-        }
-
-        // Notification 5: Réponse au forum
-        $template5 = $templates->where('name', 'Réponse au forum')->first();
-        if ($template5) {
-            $notifications[] = [
-                'utilisateur_id' => $utilisatrices->random()->id,
-                'title' => $template5->title,
-                'message' => str_replace('{{auteur}}', 'Dr. Diallo', $template5->message),
-                'icon' => $template5->icon,
-                'action' => $template5->action,
-                'type' => 'triggered',
-                'category' => $template5->category,
-                'status' => 'opened',
-                'sent_at' => now()->subHours(12),
-                'delivered_at' => now()->subHours(12)->addMinutes(1),
-                'opened_at' => now()->subHours(11),
-                'platform' => 'android',
-            ];
-        }
-
-        // Notification 6: Nouvelle vidéo
-        $template6 = $templates->where('name', 'Nouvelle vidéo')->first();
-        if ($template6) {
-            $notifications[] = [
-                'utilisateur_id' => $utilisatrices->random()->id,
-                'title' => $template6->title,
-                'message' => str_replace('{{sujet}}', 'l\'allaitement maternel', $template6->message),
-                'icon' => $template6->icon,
-                'action' => $template6->action,
-                'type' => 'automatic',
-                'category' => $template6->category,
-                'status' => 'sent',
-                'sent_at' => now()->subDays(3),
-                'delivered_at' => now()->subDays(3)->addMinutes(2),
-                'platform' => 'ios',
-            ];
-        }
-
-        // Notification 7: Demande d'évaluation
-        $template7 = $templates->where('name', 'Demande d\'évaluation')->first();
-        if ($template7) {
-            $notifications[] = [
-                'utilisateur_id' => $utilisatrices->random()->id,
-                'title' => $template7->title,
-                'message' => $template7->message,
-                'icon' => $template7->icon,
-                'action' => $template7->action,
-                'type' => 'manual',
-                'category' => $template7->category,
-                'status' => 'delivered',
-                'sent_at' => now()->subDays(7),
-                'delivered_at' => now()->subDays(7)->addMinutes(1),
-                'platform' => 'android',
-            ];
-        }
-
-        // Notification 8: Dépistage gratuit
-        $template8 = $templates->where('name', 'Dépistage gratuit')->first();
-        if ($template8) {
-            $message = str_replace('{{type}}', 'VIH', $template8->message);
-            $message = str_replace('{{date_debut}}', '15 janvier', $message);
-            $message = str_replace('{{date_fin}}', '20 janvier', $message);
-            
-            $notifications[] = [
-                'utilisateur_id' => $utilisatrices->random()->id,
-                'title' => $template8->title,
-                'message' => $message,
-                'icon' => $template8->icon,
-                'action' => $template8->action,
-                'type' => 'manual',
-                'category' => $template8->category,
-                'status' => 'clicked',
-                'sent_at' => now()->subDays(4),
-                'delivered_at' => now()->subDays(4)->addMinutes(1),
-                'opened_at' => now()->subDays(4)->addHours(3),
-                'clicked_at' => now()->subDays(4)->addHours(3)->addMinutes(10),
-                'platform' => 'android',
-            ];
-        }
-
-        // Notification 9: Conseil santé (variation)
-        if ($template4) {
-            $notifications[] = [
-                'utilisateur_id' => $utilisatrices->random()->id,
-                'title' => $template4->title,
-                'message' => str_replace('{{conseil}}', 'Faites au moins 30 minutes d\'exercice physique par jour.', $template4->message),
-                'icon' => $template4->icon,
-                'action' => $template4->action,
-                'type' => 'automatic',
-                'category' => $template4->category,
-                'status' => 'failed',
-                'sent_at' => now()->subHours(2),
-                'failed_at' => now()->subHours(2)->addMinutes(1),
-                'error_message' => 'FCM token invalide',
-                'platform' => 'android',
-            ];
-        }
-
-        // Notification 10: Nouvel article (variation)
-        if ($template1) {
-            $notifications[] = [
-                'utilisateur_id' => $utilisatrices->random()->id,
-                'title' => $template1->title,
-                'message' => str_replace('{{sujet}}', 'la nutrition infantile', $template1->message),
-                'icon' => $template1->icon,
-                'action' => $template1->action,
-                'type' => 'automatic',
-                'category' => $template1->category,
-                'status' => 'pending',
-                'platform' => 'ios',
-            ];
-        }
-
-        // Créer les notifications
-        foreach ($notifications as $notification) {
-            NotificationLog::create($notification);
-        }
-
-        $this->command->info('✅ ' . count($notifications) . ' notifications créées avec succès');
+        $this->command->info('25 notifications de log créées avec succès!');
     }
 }
