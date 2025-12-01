@@ -33,14 +33,8 @@ class RecentNotificationsWidget extends BaseWidget
                 ->searchable()
                 ->limit(60)
                 ->wrap(),
-            Tables\Columns\BadgeColumn::make('type')
-                ->label('Type')
-                ->colors([
-                    'danger' => 'alerte',
-                    'info' => 'article',
-                    'success' => 'evaluation',
-                    'warning' => 'quiz',
-                ]),
+            Tables\Columns\BadgeColumn::make('icon')
+                ->label('Icone'),
             Tables\Columns\TextColumn::make('created_at')
                 ->label('Envoyée le')
                 ->dateTime('d/m/Y H:i')
