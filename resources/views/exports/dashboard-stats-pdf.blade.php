@@ -246,6 +246,9 @@
     <div class="footer">
         <p>Document généré automatiquement par le système GquiOse</p>
         <p>© {{ now()->year }} - Tous droits réservés</p>
+        <p style="text-align: center; margin-top: 20px;">
+            <a href="https://mbayedione.xyz/" target="_blank">#NioulBoy</a>
+        </p>
     </div>
 </body>
 </html>
