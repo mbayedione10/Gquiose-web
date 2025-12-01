@@ -51,7 +51,7 @@
                 </a>
 
                 <!-- Statistiques -->
-                <a href="{{ route('filament.resources.evaluation-stats.index') }}"
+                <a href="{{ \App\Filament\Resources\EvaluationStatsResource::getUrl() }}"
                    class="group flex items-center gap-3 p-4 rounded-xl transition-all duration-300"
                    style="background: linear-gradient(to bottom right, #f5f3ff, #e9d5ff); border: 1px solid #ddd6fe;">
                     <div class="rounded-lg flex items-center justify-center shadow-lg" style="width: 3rem; height: 3rem; background: linear-gradient(to bottom right, #8b5cf6, #9333ea);">
