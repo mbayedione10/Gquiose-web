@@ -73,11 +73,10 @@
             ->orderBy('reponses_evaluations_count', 'desc')
             ->take(5)
             ->get();
-
         // Alertes récentes
         $alertesRecentes = \App\Models\Alerte::with(['utilisateur', 'ville'])
             ->latest()
-            ->take(5)
+            ->take(7)
             ->get();
 
         // Distribution des alertes par type (utilisant la relation typeAlerte)
@@ -237,12 +236,9 @@
                                         {{ ucfirst($question->contexte) }}
                                     </span>
                                 @endif
-                                @if($question->type)
-                                    <span style="color: #6b7280;">
-                                        Type: {{ ucfirst($question->type) }}
-                                    </span>
+                                @if($question->question)
                                     <span>
-                                        QQuestion: {{ ucfirst ($question->question) }}
+                                        Question: {{ ucfirst ($question->question) }}
                                     </span>
                                 @endif
                             </div>
@@ -266,7 +262,7 @@
     <div class="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Alertes récentes -->
         <div class="rounded-xl shadow-lg p-6" style="background-color: #ffffff;">
-            <h3 class="text-lg font-bold mb-4" style="color: #1f2937;">🚨 5 Dernières Alertes</h3>
+            <h3 class="text-lg font-bold mb-4" style="color: #1f2937;">🚨 7 Dernières Alertes</h3>
             <div class="space-y-3">
                 @forelse($alertesRecentes as $alerte)
                     <a href="{{ route('filament.resources.alertes.edit', ['record' => $alerte->id]) }}"
