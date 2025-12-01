@@ -180,9 +180,8 @@ class NotificationLogResource extends Resource
                         'failed' => 'Échouée',
                     ]),
                 
-                Tables\Columns\TextColumn::make('platform')
+                Tables\Columns\BadgeColumn::make('platform')
                     ->label('Plateforme')
-                    ->badge()
                     ->colors([
                         'success' => 'android',
                         'primary' => 'ios',
