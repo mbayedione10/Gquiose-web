@@ -87,7 +87,7 @@ class NotificationLogResource extends Resource
                     ])
                     ->columns(2),
                 
-                Forms\Components\Card::make()
+                Forms\Components\Section::make('Détails de livraison')
                     ->schema([
                         Forms\Components\DateTimePicker::make('sent_at')
                             ->label('Envoyée le')
@@ -113,8 +113,7 @@ class NotificationLogResource extends Resource
                             ->label('FCM Message ID')
                             ->disabled(),
                     ])
-                    ->columns(2)
-                    ->heading('Détails de livraison'),
+                    ->columns(2),
             ]);
     }
 
