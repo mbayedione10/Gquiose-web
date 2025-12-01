@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Exports;
@@ -28,6 +29,8 @@ class UtilisateursExport implements FromCollection, WithHeadings, WithMapping, W
             'Ville',
             'Statut',
             'Plateforme',
+            'Méthode auth',
+            'Téléphone vérifié',
             'Date d\'inscription',
         ];
     }
@@ -44,6 +47,8 @@ class UtilisateursExport implements FromCollection, WithHeadings, WithMapping, W
             $utilisateur->ville?->name ?? 'N/A',
             $utilisateur->status ? 'Actif' : 'Inactif',
             $utilisateur->platform ?? 'N/A',
+            $utilisateur->auth_method ?? 'email',
+            $utilisateur->phone_verified_at ? 'Oui' : 'Non',
             $utilisateur->created_at->format('d/m/Y H:i'),
         ];
     }

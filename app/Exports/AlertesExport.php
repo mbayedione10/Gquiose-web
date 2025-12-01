@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Exports;
@@ -27,6 +28,10 @@ class AlertesExport implements FromCollection, WithHeadings, WithMapping, WithSt
             'Signalée par',
             'Latitude',
             'Longitude',
+            'Type de VBG',
+            'Type de violence',
+            'Relation auteur',
+            'A porté plainte',
             'Date de création',
         ];
     }
@@ -42,6 +47,10 @@ class AlertesExport implements FromCollection, WithHeadings, WithMapping, WithSt
             $alerte->utilisateur?->nom . ' ' . $alerte->utilisateur?->prenom ?? 'N/A',
             $alerte->latitude,
             $alerte->longitude,
+            $alerte->type_vbg ?? 'N/A',
+            $alerte->violence_type ?? 'N/A',
+            $alerte->relation_auteur ?? 'N/A',
+            $alerte->porte_plainte ? 'Oui' : 'Non',
             $alerte->created_at->format('d/m/Y H:i'),
         ];
     }
