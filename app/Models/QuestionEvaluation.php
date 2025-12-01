@@ -38,6 +38,23 @@ class QuestionEvaluation extends Model
         'options' => '[]',
     ];
 
+    /**
+     * Get the options attribute, ensuring it's always an array
+     */
+    public function getOptionsAttribute($value)
+    {
+        if (is_null($value) || $value === '' || $value === 'null') {
+            return [];
+        }
+        
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        
+        return is_array($value) ? $value : [];
+    }
+
     public function conditionQuestion()
     {
         return $this->belongsTo(QuestionEvaluation::class, 'condition_question_id');
