@@ -116,14 +116,19 @@ class ViewEvaluationStats extends Page
     {
         $evaluations = $this->getFilteredEvaluations();
         $stats = $this->getStats();
+        $dateDebut = $this->dateDebut;
+        $dateFin = $this->dateFin;
+        $contexte = $this->contexte;
+        $evolution = $this->getEvolution();
 
-        $pdf = Pdf::loadView('exports.evaluation-stats-pdf', [
-            'evaluations' => $evaluations,
-            'stats' => $stats,
-            'dateDebut' => $this->dateDebut,
-            'dateFin' => $this->dateFin,
-            'contexte' => $this->contexte,
-        ]);
+        $pdf = Pdf::loadView('exports.evaluation-stats-pdf', compact(
+            'evaluations',
+            'stats',
+            'dateDebut',
+            'dateFin',
+            'contexte',
+            'evolution'
+        ));
 
         return response()->streamDownload(
             fn () => print($pdf->output()),
@@ -134,7 +139,13 @@ class ViewEvaluationStats extends Page
     public function exportToExcel()
     {
         return Excel::download(
-            new EvaluationStatsExport($this->getFilteredEvaluations(), $this->getStats()),
+            new EvaluationStatsExport(
+                $this->getFilteredEvaluations(),
+                $this->getStats(),
+                $this->dateDebut,
+                $this->dateFin,
+                $this->contexte
+            ),
             'statistiques-evaluations-' . now()->format('Y-m-d') . '.xlsx'
         );
     }
@@ -165,16 +176,14 @@ class ViewEvaluationStats extends Page
         ];
     }
 
-    private function getEvolution()
+    protected function getEvolution()
     {
-        return Evaluation::selectRaw('DATE(created_at) as date, COUNT(*) as total')
+        return Evaluation::selectRaw('DATE(created_at) as date, COUNT(*) as total, AVG(score_global) as avg_score')
             ->whereBetween('created_at', [
                 Carbon::parse($this->dateDebut)->startOfDay(),
                 Carbon::parse($this->dateFin)->endOfDay(),
             ])
-            ->when($this->contexte !== 'all', function ($query) {
-                $query->where('contexte', $this->contexte);
-            })
+            ->when($this->contexte !== 'all', fn($q) => $q->where('contexte', $this->contexte))
             ->groupBy('date')
             ->orderBy('date')
             ->get();
