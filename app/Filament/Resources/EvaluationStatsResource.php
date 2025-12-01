@@ -32,10 +32,7 @@ class EvaluationStatsResource extends Resource
     public static function getPages(): array
     {
         return [
-            // The index page is now the dedicated statistics view.
             'index' => Pages\ViewEvaluationStats::route('/'),
-            // The 'view' page is removed as it's no longer relevant for this refactored resource.
-            // 'view' => Pages\ViewEvaluationStats::route('/{record}'),
         ];
     }
 
