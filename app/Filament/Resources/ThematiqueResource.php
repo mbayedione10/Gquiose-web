@@ -37,9 +37,9 @@ class ThematiqueResource extends Resource
                     ->rules(['max:255', 'string'])
                     ->required()
                     ->unique(
-                        'themes',
+                        'thematiques',
                         'name',
-                        fn(?Theme $record) => $record
+                        fn(?Thematique $record) => $record
                     )
                     ->placeholder('Nom de la thématique')
                     ->columnSpan([
