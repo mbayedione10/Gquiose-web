@@ -8,8 +8,6 @@ use App\Models\Alerte;
 use App\Models\Article;
 use App\Models\Video;
 use App\Models\Structure;
-use App\Models\Evaluation;
-use App\Models\NotificationLog;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -31,8 +29,6 @@ class DashboardStatsExport implements FromCollection, WithHeadings, WithStyles, 
         $totalArticles = Article::count();
         $totalVideos = Video::count();
         $totalStructures = Structure::count();
-        $totalEvaluations = Evaluation::count();
-        $totalNotifications = NotificationLog::count();
 
         $data->push(['TABLEAU DE BORD - STATISTIQUES GLOBALES', '', '', '']);
         $data->push(['Généré le', now()->format('d/m/Y à H:i'), '', '']);
@@ -46,26 +42,23 @@ class DashboardStatsExport implements FromCollection, WithHeadings, WithStyles, 
         $data->push(['Total Articles', $totalArticles, '', '']);
         $data->push(['Total Vidéos', $totalVideos, '', '']);
         $data->push(['Total Structures', $totalStructures, '', '']);
-        $data->push(['Total Évaluations', $totalEvaluations, '', '']);
-        $data->push(['Total Notifications Envoyées', $totalNotifications, '', '']);
         $data->push(['', '', '', '']);
 
         // Alertes récentes (7 dernières)
         $data->push(['ALERTES RÉCENTES (7 dernières)', '', '', '']);
-        $data->push(['Type', 'État', 'Utilisateur', 'Ville', 'Type VBG', 'Date']);
+        $data->push(['Type', 'État', 'Utilisateur', 'Ville', 'Date']);
 
-        $alertesRecentes = Alerte::with(['utilisateur', 'ville', 'typeAlerte'])
+        $alertesRecentes = Alerte::with(['utilisateur', 'ville'])
             ->latest()
             ->take(7)
             ->get();
 
         foreach ($alertesRecentes as $alerte) {
             $data->push([
-                $alerte->typeAlerte?->name ?? 'N/A',
+                $alerte->type ?? 'N/A',
                 $alerte->etat ?? 'En attente',
-                $alerte->utilisateur?->nom . ' ' . $alerte->utilisateur?->prenom ?? 'Inconnu',
-                $alerte->ville?->name ?? 'Inconnue',
-                $alerte->type_vbg ?? 'N/A',
+                $alerte->utilisateur?->name ?? 'Inconnu',
+                $alerte->ville?->nom ?? 'Inconnue',
                 $alerte->created_at->format('d/m/Y H:i'),
             ]);
         }
@@ -97,25 +90,6 @@ class DashboardStatsExport implements FromCollection, WithHeadings, WithStyles, 
                 $type->type_name,
                 $type->total,
                 $percentage . '%',
-                '',
-            ]);
-        }
-
-        $data->push(['', '', '', '']);
-
-        // Distribution des évaluations par contexte
-        $data->push(['DISTRIBUTION DES ÉVALUATIONS PAR CONTEXTE', '', '', '']);
-        $data->push(['Contexte', 'Nombre', 'Score Moyen', '']);
-
-        $evaluationsParContexte = Evaluation::selectRaw('contexte, COUNT(*) as total, AVG(score_global) as score_moyen')
-            ->groupBy('contexte')
-            ->get();
-
-        foreach ($evaluationsParContexte as $eval) {
-            $data->push([
-                ucfirst($eval->contexte),
-                $eval->total,
-                $eval->score_moyen ? number_format($eval->score_moyen, 2) : 'N/A',
                 '',
             ]);
         }

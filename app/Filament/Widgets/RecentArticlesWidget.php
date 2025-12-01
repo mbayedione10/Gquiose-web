@@ -29,7 +29,7 @@ class RecentArticlesWidget extends BaseWidget
                 ->searchable()
                 ->sortable()
                 ->limit(50),
-            Tables\Columns\BadgeColumn::make('rubrique.nom')
+            Tables\Columns\BadgeColumn::make('rubrique.name')
                 ->label('Rubrique')
                 ->color('primary')
                 ->default('Non classé')

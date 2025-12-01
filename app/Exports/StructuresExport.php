@@ -1,4 +1,3 @@
-
 <?php
 
 namespace App\Exports;
@@ -27,7 +26,6 @@ class StructuresExport implements FromCollection, WithHeadings, WithMapping, Wit
             'Téléphone',
             'Latitude',
             'Longitude',
-            'Description',
             'Offre de services',
             'Statut',
             'Date de création',
@@ -44,8 +42,7 @@ class StructuresExport implements FromCollection, WithHeadings, WithMapping, Wit
             $structure->phone,
             $structure->latitude,
             $structure->longitude,
-            $structure->description ?? '',
-            $structure->offre ?? '',
+            $structure->offre,
             $structure->status ? 'Actif' : 'Inactif',
             $structure->created_at->format('d/m/Y H:i'),
         ];
