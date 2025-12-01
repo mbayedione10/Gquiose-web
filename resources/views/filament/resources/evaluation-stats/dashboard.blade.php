@@ -100,7 +100,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold mb-2" style="color: #ffffff;">
-                    📊 Statistiques & Graphiques
+                    📊 Statistiques
                 </h1>
             </div>
         </div>
@@ -161,9 +161,9 @@
                         <div class="text-3xl font-bold" style="color: #ea580c;">{{ number_format($totalQuestions) }}</div>
                     </div>
                 </div>
-                <div class="text-sm font-medium" style="color: #374151;">Questions au Total</div>
+                <div class="text-sm font-medium" style="color: #374151;">Quizz au Total</div>
                 <div class="mt-2 text-xs px-3 py-1 rounded-full inline-block" style="background-color: #ffedd5; color: #9a3412;">
-                    Bibliothèque complète
+                    Bibliothèque complète des quizz
                 </div>
             </div>
         </div>

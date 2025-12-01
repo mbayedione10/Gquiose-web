@@ -23,7 +23,7 @@ class GlobalStatsWidget extends StatsOverviewWidget
                 ->color('warning'),
 
             Card::make('Questions Actives', QuestionEvaluation::where('status', true)->count())
-                ->description('Questions disponibles')
+                ->description('Evaluations disponibles')
                 ->icon('heroicon-o-question-mark-circle')
                 ->color('primary'),
 
