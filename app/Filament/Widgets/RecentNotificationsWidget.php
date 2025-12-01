@@ -28,7 +28,7 @@ class RecentNotificationsWidget extends BaseWidget
                 ->searchable()
                 ->sortable()
                 ->limit(50),
-            Tables\Columns\TextColumn::make('body')
+            Tables\Columns\TextColumn::make('message')
                 ->label('Message')
                 ->searchable()
                 ->limit(60)
