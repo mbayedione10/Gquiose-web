@@ -189,28 +189,7 @@
         </div>
     </div>
 
-    <!-- Graphiques Statistiques -->
-    <div class="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Répartition par contexte -->
-        <div class="rounded-xl shadow-lg p-6" style="background-color: #ffffff;">
-            <h3 class="text-lg font-bold mb-4" style="color: #1f2937;">📊 Répartition par Contexte</h3>
-            <div id="chartTypeRepartition"></div>
-        </div>
-
-        <!-- Scores moyens par contexte -->
-        <div class="rounded-xl shadow-lg p-6" style="background-color: #ffffff;">
-            <h3 class="text-lg font-bold mb-4" style="color: #1f2937;">⭐ Scores Moyens par Contexte</h3>
-            <div id="chartScoresMoyens"></div>
-        </div>
-    </div>
-
-    <!-- Graphique d'évolution -->
-    <div class="mb-6">
-        <div class="rounded-xl shadow-lg p-6" style="background-color: #ffffff;">
-            <h3 class="text-lg font-bold mb-4" style="color: #1f2937;">📈 Évolution Temporelle</h3>
-            <div id="chartEvolution"></div>
-        </div>
-    </div>
+    
 
     <!-- Questions les plus populaires -->
     <div class="mb-6">
@@ -504,299 +483,200 @@
         </div>
     </div>
 
+    @php
+        // Statistiques des notifications
+        $notificationStats = [
+            'total' => \App\Models\NotificationLog::count(),
+            'sent' => \App\Models\NotificationLog::where('status', 'sent')->count(),
+            'delivered' => \App\Models\NotificationLog::where('status', 'delivered')->count(),
+            'opened' => \App\Models\NotificationLog::whereNotNull('opened_at')->count(),
+            'clicked' => \App\Models\NotificationLog::whereNotNull('clicked_at')->count(),
+            'failed' => \App\Models\NotificationLog::where('status', 'failed')->count(),
+        ];
+
+        // Stats par statut
+        $statsByStatus = \App\Models\NotificationLog::selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->get();
+
+        // Stats par catégorie
+        $statsByCategory = \App\Models\NotificationLog::selectRaw('category, COUNT(*) as total')
+            ->whereNotNull('category')
+            ->groupBy('category')
+            ->orderBy('total', 'desc')
+            ->get();
+
+        // Stats par plateforme
+        $statsByPlatform = \App\Models\NotificationLog::selectRaw('platform, COUNT(*) as total')
+            ->whereNotNull('platform')
+            ->groupBy('platform')
+            ->get();
+    @endphp
+
+    <!-- Statistiques des Notifications -->
+    <div class="mb-6">
+        <div class="rounded-xl shadow-lg p-6" style="background-color: #ffffff;">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-bold" style="color: #1f2937;">📊 Statistiques des Notifications</h3>
+                <div class="px-3 py-1 rounded-full text-sm font-bold" style="background-color: #dbeafe; color: #1e40af;">
+                    Total: {{ number_format($notificationStats['total']) }}
+                </div>
+            </div>
+
+            <!-- Métriques clés des notifications -->
+            <div class="mb-6 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <!-- Total -->
+                <div class="p-4 rounded-lg text-center" style="background: linear-gradient(to bottom right, #dbeafe, #bfdbfe); border: 2px solid #3b82f6;">
+                    <div class="text-3xl font-bold mb-1" style="color: #1e40af;">{{ number_format($notificationStats['total']) }}</div>
+                    <div class="text-xs font-medium" style="color: #1e3a8a;">Total</div>
+                </div>
+
+                <!-- Envoyées -->
+                <div class="p-4 rounded-lg text-center" style="background: linear-gradient(to bottom right, #fef3c7, #fde68a); border: 2px solid #f59e0b;">
+                    <div class="text-3xl font-bold mb-1" style="color: #92400e;">{{ number_format($notificationStats['sent']) }}</div>
+                    <div class="text-xs font-medium" style="color: #78350f;">Envoyées</div>
+                </div>
+
+                <!-- Livrées -->
+                <div class="p-4 rounded-lg text-center" style="background: linear-gradient(to bottom right, #d1fae5, #a7f3d0); border: 2px solid #10b981;">
+                    <div class="text-3xl font-bold mb-1" style="color: #065f46;">{{ number_format($notificationStats['delivered']) }}</div>
+                    <div class="text-xs font-medium" style="color: #064e3b;">Livrées</div>
+                </div>
+
+                <!-- Ouvertes -->
+                <div class="p-4 rounded-lg text-center" style="background: linear-gradient(to bottom right, #e0e7ff, #c7d2fe); border: 2px solid #6366f1;">
+                    <div class="text-3xl font-bold mb-1" style="color: #4338ca;">{{ number_format($notificationStats['opened']) }}</div>
+                    <div class="text-xs font-medium" style="color: #3730a3;">Ouvertes</div>
+                </div>
+
+                <!-- Cliquées -->
+                <div class="p-4 rounded-lg text-center" style="background: linear-gradient(to bottom right, #fce7f3, #fbcfe8); border: 2px solid #ec4899;">
+                    <div class="text-3xl font-bold mb-1" style="color: #9f1239;">{{ number_format($notificationStats['clicked']) }}</div>
+                    <div class="text-xs font-medium" style="color: #831843;">Cliquées</div>
+                </div>
+
+                <!-- Échouées -->
+                <div class="p-4 rounded-lg text-center" style="background: linear-gradient(to bottom right, #fee2e2, #fecaca); border: 2px solid #ef4444;">
+                    <div class="text-3xl font-bold mb-1" style="color: #991b1b;">{{ number_format($notificationStats['failed']) }}</div>
+                    <div class="text-xs font-medium" style="color: #7f1d1d;">Échouées</div>
+                </div>
+            </div>
+
+            <!-- Graphiques des notifications -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Par Statut -->
+                <div class="rounded-lg p-4" style="background-color: #f9fafb;">
+                    <h4 class="text-md font-bold mb-3" style="color: #374151;">📈 Par Statut</h4>
+                    <div class="space-y-2">
+                        @forelse($statsByStatus as $stat)
+                            @php
+                                $percentage = $notificationStats['total'] > 0 ? round(($stat->total / $notificationStats['total']) * 100, 1) : 0;
+                                $statusConfig = [
+                                    'sent' => ['label' => 'Envoyées', 'color' => '#f59e0b', 'bg' => '#fef3c7'],
+                                    'delivered' => ['label' => 'Livrées', 'color' => '#10b981', 'bg' => '#d1fae5'],
+                                    'opened' => ['label' => 'Ouvertes', 'color' => '#6366f1', 'bg' => '#e0e7ff'],
+                                    'clicked' => ['label' => 'Cliquées', 'color' => '#ec4899', 'bg' => '#fce7f3'],
+                                    'failed' => ['label' => 'Échouées', 'color' => '#ef4444', 'bg' => '#fee2e2'],
+                                ];
+                                $config = $statusConfig[$stat->status] ?? ['label' => ucfirst($stat->status), 'color' => '#6b7280', 'bg' => '#f3f4f6'];
+                            @endphp
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span style="color: #374151;">{{ $config['label'] }}</span>
+                                    <span class="font-bold" style="color: {{ $config['color'] }};">{{ number_format($stat->total) }} ({{ $percentage }}%)</span>
+                                </div>
+                                <div class="w-full rounded-full overflow-hidden" style="height: 0.5rem; background-color: {{ $config['bg'] }};">
+                                    <div class="h-full rounded-full" style="background-color: {{ $config['color'] }}; width: {{ $percentage }}%;"></div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="text-center text-xs py-4" style="color: #9ca3af;">Aucune donnée</div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Par Catégorie -->
+                <div class="rounded-lg p-4" style="background-color: #f9fafb;">
+                    <h4 class="text-md font-bold mb-3" style="color: #374151;">📂 Par Catégorie</h4>
+                    <div class="space-y-2">
+                        @forelse($statsByCategory as $stat)
+                            @php
+                                $percentage = $notificationStats['total'] > 0 ? round(($stat->total / $notificationStats['total']) * 100, 1) : 0;
+                                $categoryConfig = [
+                                    'alert' => ['icon' => '🚨', 'color' => '#ef4444'],
+                                    'reminder' => ['icon' => '⏰', 'color' => '#f59e0b'],
+                                    'health_tip' => ['icon' => '💡', 'color' => '#10b981'],
+                                    'cycle' => ['icon' => '🩸', 'color' => '#ec4899'],
+                                    'general' => ['icon' => '📢', 'color' => '#6366f1'],
+                                    'quiz' => ['icon' => '❓', 'color' => '#8b5cf6'],
+                                    'article' => ['icon' => '📚', 'color' => '#06b6d4'],
+                                    'video' => ['icon' => '🎬', 'color' => '#f97316'],
+                                ];
+                                $config = $categoryConfig[$stat->category] ?? ['icon' => '📌', 'color' => '#6b7280'];
+                            @endphp
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span style="color: #374151;">{{ $config['icon'] }} {{ ucfirst($stat->category) }}</span>
+                                    <span class="font-bold" style="color: {{ $config['color'] }};">{{ number_format($stat->total) }} ({{ $percentage }}%)</span>
+                                </div>
+                                <div class="w-full rounded-full overflow-hidden" style="height: 0.5rem; background-color: #e5e7eb;">
+                                    <div class="h-full rounded-full" style="background-color: {{ $config['color'] }}; width: {{ $percentage }}%;"></div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="text-center text-xs py-4" style="color: #9ca3af;">Aucune donnée</div>
+                        @endforelse
+                    </div>
+                </div>
+
+                <!-- Par Plateforme -->
+                <div class="rounded-lg p-4" style="background-color: #f9fafb;">
+                    <h4 class="text-md font-bold mb-3" style="color: #374151;">📱 Par Plateforme</h4>
+                    <div class="space-y-2">
+                        @forelse($statsByPlatform as $stat)
+                            @php
+                                $percentage = $notificationStats['total'] > 0 ? round(($stat->total / $notificationStats['total']) * 100, 1) : 0;
+                                $platformConfig = [
+                                    'android' => ['icon' => '🤖', 'color' => '#10b981'],
+                                    'ios' => ['icon' => '🍎', 'color' => '#6b7280'],
+                                    'web' => ['icon' => '🌐', 'color' => '#3b82f6'],
+                                ];
+                                $config = $platformConfig[$stat->platform] ?? ['icon' => '📱', 'color' => '#6b7280'];
+                            @endphp
+                            <div>
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span style="color: #374151;">{{ $config['icon'] }} {{ ucfirst($stat->platform) }}</span>
+                                    <span class="font-bold" style="color: {{ $config['color'] }};">{{ number_format($stat->total) }} ({{ $percentage }}%)</span>
+                                </div>
+                                <div class="w-full rounded-full overflow-hidden" style="height: 0.5rem; background-color: #e5e7eb;">
+                                    <div class="h-full rounded-full" style="background-color: {{ $config['color'] }}; width: {{ $percentage }}%;"></div>
+                                </div>
+                            </div>
+                        @empty
+                            <div class="text-center text-xs py-4" style="color: #9ca3af;">Aucune donnée</div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bouton détails -->
+            <div class="mt-6 text-center">
+                <a href="{{ route('filament.resources.notification-logs.index') }}"
+                   class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all duration-200 hover:shadow-lg"
+                   style="background: linear-gradient(to right, #3b82f6, #2563eb); color: #ffffff; text-decoration: none;">
+                    📋 Voir tous les logs de notifications
+                    <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
     <!-- ApexCharts Library -->
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
     <script>
-        // Configuration des couleurs modernes
-        const modernColors = {
-            primary: ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b'],
-            gradient: {
-                blue: ['#3b82f6', '#1d4ed8'],
-                purple: ['#8b5cf6', '#6d28d9'],
-                pink: ['#ec4899', '#be185d'],
-                green: ['#10b981', '#059669'],
-            }
-        };
-
-        // Graphique de répartition par contexte (Donut moderne)
-        const chartTypeData = @json($statsByContexte->pluck('total')->toArray());
-        const chartTypeLabels = @json($statsByContexte->pluck('contexte')->map(fn($c) => ucfirst($c))->toArray());
-
-        const chartTypeOptions = {
-            series: chartTypeData,
-            chart: {
-                type: 'donut',
-                height: 380,
-                animations: {
-                    enabled: true,
-                    easing: 'easeinout',
-                    speed: 800,
-                },
-                fontFamily: 'Inter, sans-serif',
-            },
-            labels: chartTypeLabels,
-            colors: modernColors.primary,
-            legend: {
-                position: 'bottom',
-                fontSize: '14px',
-                fontWeight: 500,
-                markers: {
-                    width: 12,
-                    height: 12,
-                    radius: 6,
-                }
-            },
-            plotOptions: {
-                pie: {
-                    donut: {
-                        size: '70%',
-                        labels: {
-                            show: true,
-                            name: {
-                                fontSize: '16px',
-                                fontWeight: 600,
-                            },
-                            value: {
-                                fontSize: '24px',
-                                fontWeight: 700,
-                                formatter: function(val) {
-                                    return val;
-                                }
-                            },
-                            total: {
-                                show: true,
-                                label: 'Total',
-                                fontSize: '14px',
-                                fontWeight: 600,
-                                color: '#6b7280',
-                                formatter: function (w) {
-                                    return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            dataLabels: {
-                enabled: true,
-                formatter: function (val) {
-                    return val.toFixed(1) + '%'
-                },
-                style: {
-                    fontSize: '12px',
-                    fontWeight: 600,
-                }
-            },
-            stroke: {
-                width: 3,
-                colors: ['#fff']
-            },
-            responsive: [{
-                breakpoint: 480,
-                options: {
-                    chart: {
-                        height: 300
-                    },
-                    legend: {
-                        position: 'bottom'
-                    }
-                }
-            }]
-        };
-
-        const chartType = new ApexCharts(document.querySelector("#chartTypeRepartition"), chartTypeOptions);
-        chartType.render();
-
-        // Graphique des scores moyens (Bar moderne)
-        const scoresData = @json($scoresByType->pluck('avg_score')->map(fn($s) => round($s, 2))->toArray());
-        const scoresLabels = @json($scoresByType->pluck('contexte')->map(fn($c) => ucfirst($c))->toArray());
-
-        const chartScoresOptions = {
-            series: [{
-                name: 'Score moyen',
-                data: scoresData
-            }],
-            chart: {
-                type: 'bar',
-                height: 350,
-                toolbar: {
-                    show: true,
-                    tools: {
-                        download: true,
-                    }
-                },
-                fontFamily: 'Inter, sans-serif',
-            },
-            plotOptions: {
-                bar: {
-                    borderRadius: 10,
-                    horizontal: false,
-                    columnWidth: '60%',
-                    dataLabels: {
-                        position: 'top',
-                    },
-                    distributed: true,
-                }
-            },
-            dataLabels: {
-                enabled: true,
-                formatter: function (val) {
-                    return val.toFixed(2);
-                },
-                offsetY: -20,
-                style: {
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    colors: ["#6b7280"]
-                }
-            },
-            colors: modernColors.primary,
-            xaxis: {
-                categories: scoresLabels,
-                labels: {
-                    style: {
-                        fontSize: '12px',
-                        fontWeight: 500,
-                    }
-                }
-            },
-            yaxis: {
-                max: 5,
-                title: {
-                    text: 'Score (sur 5)',
-                    style: {
-                        fontSize: '14px',
-                        fontWeight: 600,
-                    }
-                }
-            },
-            grid: {
-                borderColor: '#e5e7eb',
-                strokeDashArray: 4,
-            },
-            legend: {
-                show: false
-            }
-        };
-
-        const chartScores = new ApexCharts(document.querySelector("#chartScoresMoyens"), chartScoresOptions);
-        chartScores.render();
-
-        // Graphique d'évolution (Area moderne)
-        const evolutionDates = @json($evolution->pluck('date')->map(fn($d) => \Carbon\Carbon::parse($d)->format('d/m'))->toArray());
-        const evolutionData = @json($evolution->pluck('total')->toArray());
-        const evolutionScores = @json($evolution->pluck('avg_score')->map(fn($s) => $s ? round($s, 2) : 0)->toArray());
-
-        const chartEvolutionOptions = {
-            series: [
-                {
-                    name: "Nombre d'évaluations",
-                    type: 'column',
-                    data: evolutionData
-                },
-                {
-                    name: 'Score moyen',
-                    type: 'line',
-                    data: evolutionScores
-                }
-            ],
-            chart: {
-                height: 350,
-                type: 'line',
-                toolbar: {
-                    show: true,
-                    tools: {
-                        download: true,
-                    }
-                },
-                zoom: {
-                    enabled: true
-                },
-                fontFamily: 'Inter, sans-serif',
-            },
-            stroke: {
-                width: [0, 4],
-                curve: 'smooth'
-            },
-            dataLabels: {
-                enabled: false
-            },
-            colors: ['#3b82f6', '#10b981'],
-            fill: {
-                type: ['solid', 'gradient'],
-                gradient: {
-                    shade: 'light',
-                    type: 'vertical',
-                    shadeIntensity: 0.4,
-                    inverseColors: false,
-                    opacityFrom: 0.8,
-                    opacityTo: 0.2,
-                }
-            },
-            xaxis: {
-                categories: evolutionDates,
-                labels: {
-                    style: {
-                        fontSize: '12px',
-                        fontWeight: 500,
-                    }
-                }
-            },
-            yaxis: [
-                {
-                    title: {
-                        text: "Nombre d'évaluations",
-                        style: {
-                            fontSize: '14px',
-                            fontWeight: 600,
-                        }
-                    },
-                    labels: {
-                        style: {
-                            fontSize: '12px',
-                            fontWeight: 500,
-                        }
-                    }
-                },
-                {
-                    opposite: true,
-                    max: 5,
-                    title: {
-                        text: 'Score moyen',
-                        style: {
-                            fontSize: '14px',
-                            fontWeight: 600,
-                        }
-                    },
-                    labels: {
-                        style: {
-                            fontSize: '12px',
-                            fontWeight: 500,
-                        }
-                    }
-                }
-            ],
-            legend: {
-                position: 'top',
-                horizontalAlign: 'left',
-                fontSize: '14px',
-                fontWeight: 500,
-                markers: {
-                    width: 12,
-                    height: 12,
-                    radius: 6,
-                }
-            },
-            grid: {
-                borderColor: '#e5e7eb',
-                strokeDashArray: 4,
-            }
-        };
-
-        const chartEvolution = new ApexCharts(document.querySelector("#chartEvolution"), chartEvolutionOptions);
-        chartEvolution.render();
-
         // Fonction pour toggle l'affichage des alertes
         function toggleAlertes() {
             const items = document.querySelectorAll('.alerte-item');

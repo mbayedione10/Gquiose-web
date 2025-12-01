@@ -16,11 +16,12 @@ use App\Filament\Resources\EvaluationStatsResource\Pages;
 class EvaluationStatsResource extends Resource
 {
     // Set model to null as this resource is for aggregated statistics, not direct model management.
-    protected static ?string $model = null;
-    protected static ?string $navigationLabel = 'Statistiques & Graphiques';
-    protected static ?string $navigationGroup = 'Évaluations';
-    protected static ?string $navigationIcon = 'heroicon-o-chart-pie';
-    protected static ?int $navigationSort = 32;
+    protected static ?string $model = QuestionEvaluation::class;
+    protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
+    protected static ?string $navigationLabel = 'Statistiques Évaluations';
+    protected static ?string $pluralModelLabel = 'Statistiques Évaluations';
+    protected static ?int $navigationSort = 3;
+    protected static ?string $navigationGroup = null;
 
     // The table method is removed as this resource will have a dedicated statistics page instead of a table view.
     // public static function table(Table $table): Table
