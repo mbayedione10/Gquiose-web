@@ -66,5 +66,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             MenstrualCycleSeeder::class,
         ]);
+
+        // Notifications de test
+        $this->call([
+            NotificationLogSeeder::class,
+        ]);
     }
 }
