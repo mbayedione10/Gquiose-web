@@ -66,6 +66,7 @@ class QuestionEvaluationResource extends Resource
                             ->required(),
                     ])
                     ->visible(fn ($get) => in_array($get('type'), ['multiple_choice']))
+                    ->default([])
                     ->columnSpan(12),
 
                 Toggle::make('status')

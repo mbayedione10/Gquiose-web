@@ -34,6 +34,10 @@ class QuestionEvaluation extends Model
         'show_if_condition_met' => 'boolean',
     ];
 
+    protected $attributes = [
+        'options' => '[]',
+    ];
+
     public function conditionQuestion()
     {
         return $this->belongsTo(QuestionEvaluation::class, 'condition_question_id');
