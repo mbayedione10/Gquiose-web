@@ -31,7 +31,9 @@ class RecentArticlesWidget extends BaseWidget
                 ->limit(50),
             Tables\Columns\BadgeColumn::make('rubrique.nom')
                 ->label('Rubrique')
-                ->color('primary'),
+                ->color('primary')
+                ->default('Non classé')
+                ->formatStateUsing(fn ($state) => $state ?? 'Non classé'),
             Tables\Columns\IconColumn::make('status')
                 ->label('Statut')
                 ->boolean()
