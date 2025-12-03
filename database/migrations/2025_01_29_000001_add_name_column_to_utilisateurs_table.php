@@ -11,7 +11,14 @@ return new class extends Migration
     {
         Schema::table('utilisateurs', function (Blueprint $table) {
             // Add a virtual generated column that concatenates prenom and nom
-            $table->string('name')->virtualAs('CONCAT(prenom, " ", nom)')->after('prenom');
+            // SQLite uses || for concatenation, MySQL uses CONCAT()
+            $connection = config('database.default');
+
+            if ($connection === 'sqlite') {
+                $table->string('name')->virtualAs('prenom || " " || nom')->after('prenom');
+            } else {
+                $table->string('name')->virtualAs('CONCAT(prenom, " ", nom)')->after('prenom');
+            }
         });
     }
 
