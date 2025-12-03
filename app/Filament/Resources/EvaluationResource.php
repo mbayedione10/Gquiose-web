@@ -19,7 +19,7 @@ class EvaluationResource extends Resource
     protected static ?string $model = Evaluation::class;
     protected static ?string $recordTitleAttribute = 'id';
     protected static ?string $navigationLabel = 'Évaluations reçues';
-    protected static ?string $navigationGroup = null;
+    protected static ?string $navigationGroup = 'Évaluations';
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
     protected static ?int $navigationSort = 2;
 
