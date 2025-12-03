@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('type_structures', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name')->unique();
-            $table->string('icon');
+            $table->string('icon')->nullable();
             $table->boolean('status');
 
             $table->timestamps();
