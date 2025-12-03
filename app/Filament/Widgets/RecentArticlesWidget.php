@@ -1,18 +1,14 @@
 <?php
 
 namespace App\Filament\Widgets;
-
 use App\Models\Article;
 use Filament\Tables;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
-
 class RecentArticlesWidget extends BaseWidget
 {
     protected static ?int $sort = 6;
-
     protected int | string | array $columnSpan = 'full';
-
     protected function getTableQuery(): Builder
     {
         return Article::query()
@@ -20,7 +16,6 @@ class RecentArticlesWidget extends BaseWidget
             ->latest()
             ->limit(15);
     }
-
     protected function getTableColumns(): array
     {
         return [
@@ -47,12 +42,10 @@ class RecentArticlesWidget extends BaseWidget
                 ->sortable(),
         ];
     }
-
     protected function getTableHeading(): string
     {
         return '15 derniers articles';
     }
-
     protected function getTableRecordUrlUsing(): ?\Closure
     {
         return fn ($record) => route('filament.resources.articles.edit', ['record' => $record]);

@@ -1,22 +1,19 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Filament\Resources\PushNotificationResource\Pages;
 use App\Models\PushNotification;
 use App\Models\NotificationTemplate;
 use App\Models\Ville;
 use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
-
 class PushNotificationResource extends Resource
 {
     protected static ?string $model = PushNotification::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-bell';
     
     protected static ?string $navigationLabel = 'Notifications Push';
@@ -24,10 +21,8 @@ class PushNotificationResource extends Resource
     protected static ?string $pluralLabel = 'Notifications Push';
     
     protected static ?string $navigationGroup = 'Notifications';
-
     protected static ?int $navigationSort = 8;
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form
             ->schema([
@@ -53,7 +48,6 @@ class PushNotificationResource extends Resource
                             }),
                     ])
                     ->columns(1),
-
                 Forms\Components\Card::make()
                     ->schema([
                         Forms\Components\TextInput::make('title')
@@ -61,14 +55,12 @@ class PushNotificationResource extends Resource
                             ->required()
                             ->maxLength(65)
                             ->helperText('Maximum 65 caractères'),
-
                         Forms\Components\Textarea::make('message')
                             ->label('Message')
                             ->required()
                             ->maxLength(240)
                             ->helperText('Maximum 240 caractères')
                             ->rows(3),
-
                         Forms\Components\Select::make('icon')
                             ->label('Icône')
                             ->options([
@@ -244,8 +236,7 @@ class PushNotificationResource extends Resource
                     ->columns(1),
             ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->columns([
@@ -342,7 +333,7 @@ class PushNotificationResource extends Resource
                 Tables\Actions\Action::make('duplicate')
                     ->label('Dupliquer')
                     ->icon('heroicon-o-document-duplicate')
-                    ->color('secondary')
+                    ->color('gray')
                     ->action(function (PushNotification $record) {
                         $newNotification = $record->replicate();
                         $newNotification->status = 'pending';
@@ -353,7 +344,6 @@ class PushNotificationResource extends Resource
                         $newNotification->clicked_count = 0;
                         $newNotification->scheduled_at = null;
                         $newNotification->save();
-
                         \Filament\Notifications\Notification::make()
                             ->title('Notification dupliquée avec succès')
                             ->success()
@@ -365,12 +355,10 @@ class PushNotificationResource extends Resource
             ])
             ->defaultSort('created_at', 'desc');
     }
-
     public static function getRelations(): array
     {
         return [];
     }
-
     public static function getPages(): array
     {
         return [

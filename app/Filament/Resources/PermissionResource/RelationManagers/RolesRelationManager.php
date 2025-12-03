@@ -1,24 +1,18 @@
 <?php
 
 namespace App\Filament\Resources\PermissionResource\RelationManagers;
-
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Resources\{Form, Table};
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Resources\RelationManagers\RelationManager;
-
 class RolesRelationManager extends RelationManager
 {
     protected static string $relationship = 'roles';
-
     protected static ?string $recordTitleAttribute = 'name';
-
-    public static function form(Form $form): Form
+    public function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Grid::make(['default' => 0])->schema([
@@ -31,7 +25,6 @@ class RolesRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 Toggle::make('status')
                     ->rules(['boolean'])
                     ->columnSpan([
@@ -42,8 +35,7 @@ class RolesRelationManager extends RelationManager
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->columns([

@@ -1,30 +1,23 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Filament\Resources\CycleSettingResource\Pages;
 use App\Models\CycleSetting;
 use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
-
 class CycleSettingResource extends Resource
 {
     protected static ?string $model = CycleSetting::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-cog';
-
     protected static ?string $navigationLabel = 'Paramètres Cycle';
-
     protected static ?string $pluralLabel = 'Paramètres Cycle';
-
     protected static ?string $navigationGroup = 'Santé';
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Card::make()->schema([
@@ -35,7 +28,6 @@ class CycleSettingResource extends Resource
                         ->searchable()
                         ->required()
                         ->columnSpan(2),
-
                     Forms\Components\TextInput::make('average_cycle_length')
                         ->label('Durée moyenne du cycle (jours)')
                         ->numeric()
@@ -43,7 +35,6 @@ class CycleSettingResource extends Resource
                         ->default(28)
                         ->minValue(21)
                         ->maxValue(45),
-
                     Forms\Components\TextInput::make('average_period_length')
                         ->label('Durée moyenne des règles (jours)')
                         ->numeric()
@@ -51,23 +42,18 @@ class CycleSettingResource extends Resource
                         ->default(5)
                         ->minValue(2)
                         ->maxValue(10),
-
                     Forms\Components\Toggle::make('track_temperature')
                         ->label('Suivre la température')
                         ->default(false),
-
                     Forms\Components\Toggle::make('track_symptoms')
                         ->label('Suivre les symptômes')
                         ->default(true),
-
                     Forms\Components\Toggle::make('track_mood')
                         ->label('Suivre l\'humeur')
                         ->default(true),
-
                     Forms\Components\Toggle::make('track_sexual_activity')
                         ->label('Suivre l\'activité sexuelle')
                         ->default(false),
-
                     Forms\Components\Toggle::make('notifications_enabled')
                         ->label('Notifications activées')
                         ->default(true),
@@ -75,8 +61,7 @@ class CycleSettingResource extends Resource
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->columns([
@@ -84,37 +69,29 @@ class CycleSettingResource extends Resource
                     ->label('Utilisatrice')
                     ->searchable()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('average_cycle_length')
                     ->label('Cycle moyen')
                     ->suffix(' j')
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('average_period_length')
                     ->label('Règles moy.')
                     ->suffix(' j')
                     ->sortable(),
-
                 Tables\Columns\IconColumn::make('track_temperature')
                     ->label('Temp.')
                     ->boolean(),
-
                 Tables\Columns\IconColumn::make('track_symptoms')
                     ->label('Symptômes')
                     ->boolean(),
-
                 Tables\Columns\IconColumn::make('track_mood')
                     ->label('Humeur')
                     ->boolean(),
-
                 Tables\Columns\IconColumn::make('track_sexual_activity')
                     ->label('Act. sex.')
                     ->boolean(),
-
                 Tables\Columns\IconColumn::make('notifications_enabled')
                     ->label('Notif.')
                     ->boolean(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Créé le')
                     ->date('d/m/Y')
@@ -134,7 +111,6 @@ class CycleSettingResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-
     public static function getPages(): array
     {
         return [

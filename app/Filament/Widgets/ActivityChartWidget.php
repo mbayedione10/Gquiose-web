@@ -1,36 +1,29 @@
 <?php
 
 namespace App\Filament\Widgets;
-
 use App\Models\Utilisateur;
 use App\Models\Alerte;
 use App\Models\Evaluation;
 use Filament\Widgets\LineChartWidget;
 use Illuminate\Support\Carbon;
-
 class ActivityChartWidget extends LineChartWidget
 {
     protected static ?string $heading = 'Activité des 7 derniers jours';
     protected static ?int $sort = 1;
-
     protected function getData(): array
     {
         $days = collect(range(6, 0))->map(function ($day) {
             return Carbon::now()->subDays($day)->format('d/m');
         });
-
         $utilisateurs = collect(range(6, 0))->map(function ($day) {
             return Utilisateur::whereDate('created_at', Carbon::now()->subDays($day))->count();
         });
-
         $alertes = collect(range(6, 0))->map(function ($day) {
             return Alerte::whereDate('created_at', Carbon::now()->subDays($day))->count();
         });
-
         $evaluations = collect(range(6, 0))->map(function ($day) {
             return Evaluation::whereDate('created_at', Carbon::now()->subDays($day))->count();
         });
-
         return [
             'datasets' => [
                 [

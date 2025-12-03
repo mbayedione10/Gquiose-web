@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\StructureResource\Pages;
+use Filament\Resources\Pages\CreateRecord;
+<?php
 
+namespace App\Filament\Resources\StructureResource\Pages;
 use App\Filament\Resources\StructureResource;
 use App\Events\NewHealthCenterAdded;
 use Filament\Actions;
-use Filament\Resources\Pages\CreateRecord;
-
 class CreateStructure extends CreateRecord
 {
     protected static string $resource = StructureResource::class;
-
     protected function afterCreate(): void
     {
         // Déclencher la notification push automatique

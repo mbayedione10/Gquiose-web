@@ -1,27 +1,23 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Models\NatureContenu;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use App\Filament\Resources\NatureContenuResource\Pages;
-
 class NatureContenuResource extends Resource
 {
     protected static ?string $model = NatureContenu::class;
-
     protected static ?string $navigationLabel = "Nature du contenu";
     protected static ?string $navigationGroup = "VBG";
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?int $navigationSort = 14;
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Card::make()->schema([
@@ -31,12 +27,10 @@ class NatureContenuResource extends Resource
                         ->required()
                         ->unique(ignoreRecord: true)
                         ->maxLength(255),
-
                     Textarea::make('description')
                         ->label('Description')
                         ->rows(3)
                         ->maxLength(65535),
-
                     Toggle::make('status')
                         ->label('Actif')
                         ->default(true)
@@ -45,8 +39,7 @@ class NatureContenuResource extends Resource
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->columns([
@@ -54,17 +47,14 @@ class NatureContenuResource extends Resource
                     ->label('Nom')
                     ->searchable()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('description')
                     ->label('Description')
                     ->limit(50)
                     ->toggleable(),
-
                 Tables\Columns\IconColumn::make('status')
                     ->label('Actif')
                     ->boolean()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Créé le')
                     ->date('d/m/Y')
@@ -86,7 +76,6 @@ class NatureContenuResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-
     public static function getPages(): array
     {
         return [

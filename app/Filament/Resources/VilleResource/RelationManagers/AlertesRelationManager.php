@@ -1,10 +1,8 @@
 <?php
 
 namespace App\Filament\Resources\VilleResource\RelationManagers;
-
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Resources\{Form, Table};
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Illuminate\Database\Eloquent\Model;
@@ -13,15 +11,11 @@ use Filament\Forms\Components\RichEditor;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\BelongsToSelect;
 use Filament\Tables\Filters\MultiSelectFilter;
-use Filament\Resources\RelationManagers\RelationManager;
-
 class AlertesRelationManager extends RelationManager
 {
     protected static string $relationship = 'alertes';
-
     protected static ?string $recordTitleAttribute = 'ref';
-
-    public static function form(Form $form): Form
+    public function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Grid::make(['default' => 0])->schema([
@@ -34,7 +28,6 @@ class AlertesRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 RichEditor::make('description')
                     ->rules(['max:255', 'string'])
                     ->placeholder('Description')
@@ -43,7 +36,6 @@ class AlertesRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 TextInput::make('latitude')
                     ->rules(['numeric'])
                     ->numeric()
@@ -53,7 +45,6 @@ class AlertesRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 TextInput::make('longitude')
                     ->rules(['numeric'])
                     ->numeric()
@@ -63,7 +54,6 @@ class AlertesRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 Select::make('type_alerte_id')
                     ->rules(['exists:type_alertes,id'])
                     ->relationship('typeAlerte', 'name')
@@ -74,7 +64,6 @@ class AlertesRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 TextInput::make('etat')
                     ->rules(['max:255', 'string'])
                     ->placeholder('Etat')
@@ -86,8 +75,7 @@ class AlertesRelationManager extends RelationManager
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->columns([
@@ -130,12 +118,10 @@ class AlertesRelationManager extends RelationManager
                                 )
                             );
                     }),
-
                 MultiSelectFilter::make('type_alerte_id')->relationship(
                     'typeAlerte',
                     'name'
                 ),
-
                 MultiSelectFilter::make('ville_id')->relationship(
                     'ville',
                     'name'

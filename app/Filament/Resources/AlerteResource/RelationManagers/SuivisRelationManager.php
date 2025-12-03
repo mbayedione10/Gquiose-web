@@ -4,97 +4,75 @@ namespace App\Filament\Resources\AlerteResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Resources\{Form, Table};
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\RichEditor;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\BelongsToSelect;
-use Filament\Tables\Filters\MultiSelectFilter;
-use Filament\Resources\RelationManagers\RelationManager;
 
 class SuivisRelationManager extends RelationManager
 {
     protected static string $relationship = 'suivis';
-
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form->schema([
-            Grid::make(['default' => 0])->schema([
+            Grid::make()->schema([
                 TextInput::make('name')
-                    ->rules(['max:255', 'string'])
-                    ->placeholder('Name')
-                    ->columnSpan([
-                        'default' => 12,
-                        'md' => 12,
-                        'lg' => 12,
-                    ]),
+                    ->label('Nom du suivi')
+                    ->required()
+                    ->maxLength(255),
 
                 RichEditor::make('observation')
-                    ->rules(['max:255', 'string'])
-                    ->placeholder('Observation')
-                    ->columnSpan([
-                        'default' => 12,
-                        'md' => 12,
-                        'lg' => 12,
-                    ]),
+                    ->label('Observation')
+                    ->columnSpanFull(),
             ]),
         ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('name')->limit(50),
-                Tables\Columns\TextColumn::make('observation')->limit(50),
-                Tables\Columns\TextColumn::make('alerte.ref')->limit(50),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Nom')
+                    ->searchable()
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('observation')
+                    ->label('Observation')
+                    ->limit(50)
+                    ->html(),
+
+                Tables\Columns\TextColumn::make('alerte.ref')
+                    ->label('Alerte')
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\Filter::make('created_at')
                     ->form([
-                        Forms\Components\DatePicker::make('created_from'),
-                        Forms\Components\DatePicker::make('created_until'),
+                        Forms\Components\DatePicker::make('created_from')->label('Du'),
+                        Forms\Components\DatePicker::make('created_until')->label('Au'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
-                            ->when(
-                                $data['created_from'],
-                                fn(
-                                    Builder $query,
-                                    $date
-                                ): Builder => $query->whereDate(
-                                    'created_at',
-                                    '>=',
-                                    $date
-                                )
-                            )
-                            ->when(
-                                $data['created_until'],
-                                fn(
-                                    Builder $query,
-                                    $date
-                                ): Builder => $query->whereDate(
-                                    'created_at',
-                                    '<=',
-                                    $date
-                                )
-                            );
+                            ->when($data['created_from'], fn($q, $date) => $q->whereDate('created_at', '>=', $date))
+                            ->when($data['created_until'], fn($q, $date) => $q->whereDate('created_at', '<=', $date));
                     }),
-
-                MultiSelectFilter::make('alerte_id')->relationship(
-                    'alerte',
-                    'ref'
-                ),
             ])
-            ->headerActions([Tables\Actions\CreateAction::make()])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
+            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
-            ->bulkActions([Tables\Actions\DeleteBulkAction::make()]);
+            ->bulkActions([
+                Tables\Actions\DeleteBulkAction::make(),
+            ]);
     }
 }

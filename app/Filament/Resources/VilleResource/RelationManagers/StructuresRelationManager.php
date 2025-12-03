@@ -1,10 +1,8 @@
 <?php
 
 namespace App\Filament\Resources\VilleResource\RelationManagers;
-
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Resources\{Form, Table};
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
@@ -14,15 +12,11 @@ use Filament\Forms\Components\RichEditor;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\BelongsToSelect;
 use Filament\Tables\Filters\MultiSelectFilter;
-use Filament\Resources\RelationManagers\RelationManager;
-
 class StructuresRelationManager extends RelationManager
 {
     protected static string $relationship = 'structures';
-
     protected static ?string $recordTitleAttribute = 'name';
-
-    public static function form(Form $form): Form
+    public function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Grid::make(['default' => 0])->schema([
@@ -34,7 +28,6 @@ class StructuresRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 RichEditor::make('description')
                     ->rules(['max:255', 'string'])
                     ->placeholder('Description')
@@ -43,7 +36,6 @@ class StructuresRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 TextInput::make('latitude')
                     ->rules(['numeric'])
                     ->numeric()
@@ -53,7 +45,6 @@ class StructuresRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 TextInput::make('longitude')
                     ->rules(['numeric'])
                     ->numeric()
@@ -63,7 +54,6 @@ class StructuresRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 TextInput::make('phone')
                     ->rules(['max:255', 'string'])
                     ->unique(
@@ -77,7 +67,6 @@ class StructuresRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 Select::make('type_structure_id')
                     ->rules(['exists:type_structures,id'])
                     ->relationship('typeStructure', 'name')
@@ -88,7 +77,6 @@ class StructuresRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 Toggle::make('status')
                     ->rules(['boolean'])
                     ->columnSpan([
@@ -96,7 +84,6 @@ class StructuresRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 TextInput::make('adresse')
                     ->rules(['max:255', 'string'])
                     ->placeholder('Adresse')
@@ -108,8 +95,7 @@ class StructuresRelationManager extends RelationManager
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->columns([
@@ -156,12 +142,10 @@ class StructuresRelationManager extends RelationManager
                                 )
                             );
                     }),
-
                 MultiSelectFilter::make('type_structure_id')->relationship(
                     'typeStructure',
                     'name'
                 ),
-
                 MultiSelectFilter::make('ville_id')->relationship(
                     'ville',
                     'name'

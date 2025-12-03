@@ -1,10 +1,9 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Models\QuestionEvaluation;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
@@ -12,18 +11,15 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Repeater;
 use App\Filament\Resources\QuestionEvaluationResource\Pages;
-
 class QuestionEvaluationResource extends Resource
 {
     protected static ?string $model = QuestionEvaluation::class;
-
     protected static ?string $recordTitleAttribute = 'question';
     protected static ?string $navigationLabel = "Questions d'évaluation";
     protected static ?string $navigationGroup = "Évaluations";
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-list';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
     protected static ?int $navigationSort = 30;
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Card::make()->schema([
@@ -33,7 +29,6 @@ class QuestionEvaluationResource extends Resource
                     ->required()
                     ->placeholder('Ex: Comment évaluez-vous cette fonctionnalité ?')
                     ->columnSpan(12),
-
                 Select::make('type')
                     ->label("Type de question")
                     ->options([
@@ -46,18 +41,15 @@ class QuestionEvaluationResource extends Resource
                     ->required()
                     ->reactive()
                     ->columnSpan(6),
-
                 TextInput::make('ordre')
                     ->label("Ordre d'affichage")
                     ->numeric()
                     ->default(0)
                     ->columnSpan(3),
-
                 Toggle::make('obligatoire')
                     ->label("Question obligatoire")
                     ->default(false)
                     ->columnSpan(3),
-
                 Repeater::make('options')
                     ->label("Options de réponse")
                     ->schema([
@@ -68,7 +60,6 @@ class QuestionEvaluationResource extends Resource
                     ->visible(fn ($get) => in_array($get('type'), ['multiple_choice']))
                     ->default([])
                     ->columnSpan(12),
-
                 Toggle::make('status')
                     ->label("Active")
                     ->default(true)
@@ -76,8 +67,7 @@ class QuestionEvaluationResource extends Resource
             ])->columns(12),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->columns([
@@ -85,7 +75,6 @@ class QuestionEvaluationResource extends Resource
                     ->label('Question')
                     ->searchable()
                     ->limit(50),
-
                 Tables\Columns\BadgeColumn::make('type')
                     ->label('Type')
                     ->enum([
@@ -95,19 +84,15 @@ class QuestionEvaluationResource extends Resource
                         'multiple_choice' => 'Choix multiple',
                         'scale' => 'Échelle',
                     ]),
-
                 Tables\Columns\TextColumn::make('ordre')
                     ->label('Ordre')
                     ->sortable(),
-
                 Tables\Columns\IconColumn::make('obligatoire')
                     ->label('Obligatoire')
                     ->boolean(),
-
                 Tables\Columns\IconColumn::make('status')
                     ->label('Active')
                     ->boolean(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Créée le')
                     ->date('d/m/Y')
@@ -127,12 +112,10 @@ class QuestionEvaluationResource extends Resource
                     ->label('Active'),
             ]);
     }
-
     public static function getRelations(): array
     {
         return [];
     }
-
     public static function getPages(): array
     {
         return [

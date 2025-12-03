@@ -1,10 +1,9 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Models\SousTypeViolenceNumerique;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Toggle;
@@ -12,17 +11,14 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Tables\Filters\TernaryFilter;
 use App\Filament\Resources\SousTypeViolenceNumeriqueResource\Pages;
-
 class SousTypeViolenceNumeriqueResource extends Resource
 {
     protected static ?string $model = SousTypeViolenceNumerique::class;
-
     protected static ?string $navigationLabel = "Sous-types Violence Numérique";
     protected static ?string $navigationGroup = "VBG";
     protected static ?string $navigationIcon = 'heroicon-o-shield-exclamation';
     protected static ?int $navigationSort = 12;
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Card::make()->schema([
@@ -32,12 +28,10 @@ class SousTypeViolenceNumeriqueResource extends Resource
                         ->required()
                         ->maxLength(255)
                         ->columnSpan(2),
-
                     Textarea::make('description')
                         ->label('Description')
                         ->rows(4)
                         ->columnSpan(2),
-
                     Toggle::make('status')
                         ->label('Actif')
                         ->default(true)
@@ -46,8 +40,7 @@ class SousTypeViolenceNumeriqueResource extends Resource
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->columns([
@@ -56,12 +49,10 @@ class SousTypeViolenceNumeriqueResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
-
                 Tables\Columns\TextColumn::make('description')
                     ->label('Description')
                     ->limit(80)
                     ->wrap(),
-
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Statut')
                     ->formatStateUsing(fn ($state) => $state ? 'Actif' : 'Inactif')
@@ -69,12 +60,10 @@ class SousTypeViolenceNumeriqueResource extends Resource
                         'success' => fn ($state) => $state === true,
                         'danger' => fn ($state) => $state === false,
                     ]),
-
                 Tables\Columns\TextColumn::make('alertes_count')
                     ->label('Nombre d\'alertes')
                     ->counts('alertes')
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Créé le')
                     ->date('d/m/Y')
@@ -96,7 +85,6 @@ class SousTypeViolenceNumeriqueResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-
     public static function getPages(): array
     {
         return [

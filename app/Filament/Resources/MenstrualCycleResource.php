@@ -1,30 +1,23 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Filament\Resources\MenstrualCycleResource\Pages;
 use App\Models\MenstrualCycle;
 use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
-
 class MenstrualCycleResource extends Resource
 {
     protected static ?string $model = MenstrualCycle::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-calendar';
-
     protected static ?string $navigationLabel = 'Cycles Menstruels';
-
     protected static ?string $pluralLabel = 'Cycles Menstruels';
-
     protected static ?string $navigationGroup = 'Santé';
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Card::make()->schema([
@@ -35,22 +28,17 @@ class MenstrualCycleResource extends Resource
                         ->searchable()
                         ->required()
                         ->columnSpan(2),
-
                     Forms\Components\DatePicker::make('period_start_date')
                         ->label('Début des règles')
                         ->required(),
-
                     Forms\Components\DatePicker::make('period_end_date')
                         ->label('Fin des règles'),
-
                     Forms\Components\TextInput::make('cycle_length')
                         ->label('Durée du cycle (jours)')
                         ->numeric(),
-
                     Forms\Components\TextInput::make('period_length')
                         ->label('Durée des règles (jours)')
                         ->numeric(),
-
                     Forms\Components\Select::make('flow_intensity')
                         ->label('Intensité du flux')
                         ->options([
@@ -58,27 +46,21 @@ class MenstrualCycleResource extends Resource
                             'modere' => 'Modéré',
                             'abondant' => 'Abondant',
                         ]),
-
                     Forms\Components\Toggle::make('is_active')
                         ->label('Cycle actif')
                         ->default(true),
-
                     Forms\Components\DatePicker::make('next_period_prediction')
                         ->label('Prédiction prochaines règles')
                         ->disabled(),
-
                     Forms\Components\DatePicker::make('ovulation_prediction')
                         ->label('Prédiction ovulation')
                         ->disabled(),
-
                     Forms\Components\DatePicker::make('fertile_window_start')
                         ->label('Début fenêtre fertile')
                         ->disabled(),
-
                     Forms\Components\DatePicker::make('fertile_window_end')
                         ->label('Fin fenêtre fertile')
                         ->disabled(),
-
                     Forms\Components\Textarea::make('notes')
                         ->label('Notes')
                         ->columnSpan(2),
@@ -86,8 +68,7 @@ class MenstrualCycleResource extends Resource
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->columns([
@@ -95,21 +76,17 @@ class MenstrualCycleResource extends Resource
                     ->label('Utilisatrice')
                     ->searchable()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('period_start_date')
                     ->label('Début des règles')
                     ->date('d/m/Y')
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('period_end_date')
                     ->label('Fin des règles')
                     ->date('d/m/Y')
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('cycle_length')
                     ->label('Durée cycle')
                     ->suffix(' j'),
-
                 Tables\Columns\BadgeColumn::make('flow_intensity')
                     ->label('Flux')
                     ->colors([
@@ -117,16 +94,13 @@ class MenstrualCycleResource extends Resource
                         'warning' => 'modere',
                         'danger' => 'abondant',
                     ]),
-
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Actif')
                     ->boolean(),
-
                 Tables\Columns\TextColumn::make('next_period_prediction')
                     ->label('Prochaines règles')
                     ->date('d/m/Y')
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Créé le')
                     ->date('d/m/Y H:i')
@@ -148,14 +122,12 @@ class MenstrualCycleResource extends Resource
             ])
             ->defaultSort('period_start_date', 'desc');
     }
-
     public static function getRelations(): array
     {
         return [
             MenstrualCycleResource\RelationManagers\SymptomsRelationManager::class,
         ];
     }
-
     public static function getPages(): array
     {
         return [

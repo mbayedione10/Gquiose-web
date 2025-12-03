@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\ConseilResource\Pages;
 
 use App\Filament\Resources\ConseilResource;
-use Filament\Pages\Actions;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListConseils extends ListRecords
@@ -12,12 +12,12 @@ class ListConseils extends ListRecords
 
     protected static ?string $title = "Liste des conseils";
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()
+            CreateAction::make()
                 ->label("Nouveau conseil")
-                ->icon("heroicon-o-plus-circle")
+                ->icon('heroicon-o-plus-circle'),
         ];
     }
 }

@@ -1,56 +1,46 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Filament\Resources\LogApiResource\Pages;
 use App\Filament\Resources\LogApiResource\RelationManagers;
 use App\Models\LogApi;
 use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-
 class LogApiResource extends Resource
 {
     protected static ?string $model = LogApi::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
-
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationLabel = "Monitoring";
-
     public static function canCreate(): bool
     {
         return false;
     }
-
     public static function canEdit(Model $record): bool
     {
         return false;
     }
-
     public static function canDelete(Model $record): bool
     {
         return false;
     }
-
     public static function canDeleteAny(): bool
     {
         return false;
     }
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form
             ->schema([
                 //
             ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->defaultSort('id', 'desc')
@@ -59,12 +49,10 @@ class LogApiResource extends Resource
                     ->label("Méthode")
                     ->searchable()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('uri')
                     ->label("API")
                     ->searchable()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label("Date")
                     ->date('d F Y H:i')
@@ -81,14 +69,12 @@ class LogApiResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-
     public static function getPages(): array
     {
         return [

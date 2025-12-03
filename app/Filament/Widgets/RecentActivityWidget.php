@@ -1,19 +1,16 @@
 <?php
 
 namespace App\Filament\Widgets;
-
 use App\Models\Alerte;
 use App\Models\Utilisateur;
 use App\Models\Evaluation;
 use Filament\Tables;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
-
 class RecentActivityWidget extends BaseWidget
 {
     protected static ?int $sort = 2;
     protected int | string | array $columnSpan = 'full';
-
     protected function getTableQuery(): Builder
     {
         return Alerte::query()
@@ -21,7 +18,6 @@ class RecentActivityWidget extends BaseWidget
             ->latest()
             ->limit(10);
     }
-
     protected function getTableColumns(): array
     {
         return [
@@ -52,7 +48,6 @@ class RecentActivityWidget extends BaseWidget
                 ->sortable(),
         ];
     }
-
     protected function getTableHeading(): string
     {
         return 'Alertes Récentes';

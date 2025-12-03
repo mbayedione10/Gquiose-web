@@ -1,43 +1,34 @@
 <?php
 
 namespace App\Filament\Resources\MessageResource\RelationManagers;
-
 use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-
 class ChatsRelationManager extends RelationManager
 {
     protected static string $relationship = 'chats';
-
     protected static ?string $recordTitleAttribute = 'message';
-
     protected function canEdit(Model $record): bool
     {
         return false;
     }
-
     protected function canCreate(): bool
     {
         return false;
     }
-
     protected function canDetach(Model $record): bool
     {
         return false;
     }
-
     protected function canAttach(): bool
     {
         return false;
     }
-
-    public static function form(Form $form): Form
+    public function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form
             ->schema([
@@ -46,24 +37,19 @@ class ChatsRelationManager extends RelationManager
                     ->maxLength(255),
             ]);
     }
-
-    public static function table(Table $table): Table
+    public function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('utilisateur.name')
                     ->label("Utilisateur")
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('message')
                     ->label("Message")
                     ->searchable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label("Date de création")
                     ->date('d F Y H:i')
-
-
             ])
             ->filters([
                 //

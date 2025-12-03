@@ -1,15 +1,12 @@
 <?php
 
 namespace App\Filament\Resources\PushNotificationResource\Widgets;
-
 use App\Models\PushNotification;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Card;
-
 class NotificationStatsWidget extends BaseWidget
 {
     public ?PushNotification $record = null;
-
     protected function getCards(): array
     {
         $deliveryRate = $this->record->sent_count > 0 
@@ -23,7 +20,6 @@ class NotificationStatsWidget extends BaseWidget
         $clickRate = $this->record->opened_count > 0 
             ? round(($this->record->clicked_count / $this->record->opened_count) * 100, 2) 
             : 0;
-
         return [
             Card::make('Taux de livraison', $deliveryRate . '%')
                 ->description($this->record->delivered_count . ' / ' . $this->record->sent_count . ' livrés')

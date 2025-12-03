@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\NotificationLogResource\Pages;
+use Filament\Resources\Pages\ViewRecord;
+<?php
 
+namespace App\Filament\Resources\NotificationLogResource\Pages;
 use App\Filament\Resources\NotificationLogResource;
 use Filament\Pages\Actions;
-use Filament\Resources\Pages\ViewRecord;
-
 class ViewNotificationLog extends ViewRecord
 {
     protected static string $resource = NotificationLogResource::class;

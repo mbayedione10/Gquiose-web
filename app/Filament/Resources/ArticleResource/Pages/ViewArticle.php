@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\ArticleResource\Pages;
 
-use Filament\Resources\Pages\ViewRecord;
 use App\Filament\Resources\ArticleResource;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewArticle extends ViewRecord
 {

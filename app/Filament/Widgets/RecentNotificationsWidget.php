@@ -1,25 +1,20 @@
 <?php
 
 namespace App\Filament\Widgets;
-
 use App\Models\PushNotification;
 use Filament\Tables;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
-
 class RecentNotificationsWidget extends BaseWidget
 {
     protected static ?int $sort = 7;
-
     protected int | string | array $columnSpan = 'full';
-
     protected function getTableQuery(): Builder
     {
         return PushNotification::query()
             ->latest()
             ->limit(10);
     }
-
     protected function getTableColumns(): array
     {
         return [
@@ -41,12 +36,10 @@ class RecentNotificationsWidget extends BaseWidget
                 ->sortable(),
         ];
     }
-
     protected function getTableHeading(): string
     {
         return 'Notifications récentes';
     }
-
     protected function getTableRecordUrlUsing(): ?\Closure
     {
         return fn ($record) => route('filament.resources.push-notifications.edit', ['record' => $record]);

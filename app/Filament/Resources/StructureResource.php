@@ -1,13 +1,12 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Models\Structure;
 use App\Models\TypeStructure;
 use App\Models\Ville;
 use App\Exports\StructuresExport;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Select;
@@ -20,26 +19,19 @@ use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\StructureResource\Pages;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
-
 class StructureResource extends Resource
 {
     protected static ?string $model = Structure::class;
-
-
     protected static ?string $recordTitleAttribute = 'name';
-
     protected static ?string $navigationLabel = "Structures sanitaires";
     protected static ?string $navigationGroup = "Santé";
-    protected static ?string $navigationIcon = 'heroicon-o-office-building';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office';
     protected static ?int $navigationSort = 40;
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Card::make()->schema([
                 Grid::make(['default' => 0])->schema([
-
-
                     Select::make('type_structure_id')
                         ->label("Type de structure")
                         ->rules(['exists:type_structures,id'])
@@ -63,7 +55,6 @@ class StructureResource extends Resource
                                     'md' => 12,
                                     'lg' => 12,
                                 ]),
-
                             Forms\Components\FileUpload::make('icon')
                                 ->maxSize(512)
                                 ->image()
@@ -74,7 +65,6 @@ class StructureResource extends Resource
                                     'md' => 12,
                                     'lg' => 12,
                                 ]),
-
                             Toggle::make('status')
                                 ->rules(['boolean'])
                                 ->required()
@@ -89,7 +79,6 @@ class StructureResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     TextInput::make('name')
                         ->rules(['max:255', 'string'])
                         ->label("Nom de la structure")
@@ -100,7 +89,6 @@ class StructureResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     Forms\Components\Textarea::make('description')
                         ->nullable()
                         ->label("Description de la structure")
@@ -110,7 +98,6 @@ class StructureResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     TextInput::make('phone')
                         ->rules(['max:255', 'string'])
                         ->label("Téléphone")
@@ -126,7 +113,6 @@ class StructureResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     Select::make('ville_id')
                         ->rules(['exists:villes,id'])
                         ->required()
@@ -148,7 +134,6 @@ class StructureResource extends Resource
                                     'md' => 12,
                                     'lg' => 12,
                                 ]),
-
                             Toggle::make('status')
                                 ->rules(['boolean'])
                                 ->required()
@@ -163,7 +148,6 @@ class StructureResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     TextInput::make('adresse')
                         ->rules(['max:255', 'string'])
                         ->required()
@@ -173,7 +157,6 @@ class StructureResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     Forms\Components\Section::make('Localisation GPS')
                         ->description('Cliquez sur la carte, recherchez une adresse, ou saisissez les coordonnées manuellement')
                         ->schema([
@@ -186,7 +169,6 @@ class StructureResource extends Resource
                                         ->step(0.000001)
                                         ->placeholder('Ex: 9.5450')
                                         ->helperText('Entre -90 et 90'),
-
                                     TextInput::make('longitude')
                                         ->label("Longitude")
                                         ->required()
@@ -195,7 +177,6 @@ class StructureResource extends Resource
                                         ->placeholder('Ex: -13.6520')
                                         ->helperText('Entre -180 et 180'),
                                 ]),
-
                             Forms\Components\Placeholder::make('map_placeholder')
                                 ->label('')
                                 ->content(function ($record) {
@@ -286,8 +267,6 @@ class StructureResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
-
                     Toggle::make('status')
                         ->rules(['boolean'])
                         ->required()
@@ -296,14 +275,11 @@ class StructureResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
-
                 ]),
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->poll('60s')
@@ -312,42 +288,32 @@ class StructureResource extends Resource
                     ->label("Structure")
                     ->searchable()
                     ->limit(50),
-
                 Tables\Columns\TextColumn::make('description')
                     ->label("Offre")
                     ->searchable()
                     ->limit(50),
-
                 Tables\Columns\TextColumn::make('phone')
                     ->label("Téléphone")
                     ->searchable()
                     ->limit(50),
-
                 Tables\Columns\TextColumn::make('typeStructure.name')
                     ->limit(50),
-
                 Tables\Columns\TextColumn::make('ville.name')
                     ->label("Ville")
                     ->sortable()
                     ->limit(50),
-
                 Tables\Columns\TextColumn::make('adresse')
                     ->searchable()
                     ->limit(50),
-
                 Tables\Columns\ToggleColumn::make('status'),
-
-
             ])
             ->filters([
                 DateRangeFilter::make('created_at'),
-
                 SelectFilter::make('type_structure_id')
                     ->relationship('typeStructure', 'name')
                     ->indicator('TypeStructure')
                     ->multiple()
                     ->label('TypeStructure'),
-
                 SelectFilter::make('ville_id')
                     ->relationship('ville', 'name')
                     ->indicator('Ville')
@@ -357,10 +323,9 @@ class StructureResource extends Resource
             ->headerActions([
                 Tables\Actions\Action::make('export_excel')
                     ->label('Exporter Excel')
-                    ->icon('heroicon-o-document-download')
+                    ->icon('heroicon-o-document-arrow-down')
                     ->color('success')
                     ->action(fn () => Excel::download(new StructuresExport(), 'structures_' . date('Y-m-d') . '.xlsx')),
-
                 Tables\Actions\Action::make('export_pdf')
                     ->label('Exporter PDF')
                     ->icon('heroicon-o-document-text')
@@ -372,12 +337,10 @@ class StructureResource extends Resource
                     }),
             ]);
     }
-
     public static function getRelations(): array
     {
         return [];
     }
-
     public static function getPages(): array
     {
         return [

@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\ThematiqueResource\Pages;
+use Filament\Resources\Pages\CreateRecord;
+<?php
 
+namespace App\Filament\Resources\ThematiqueResource\Pages;
 use App\Filament\Resources\ThematiqueResource;
 use App\Events\NewQuizPublished;
 use Filament\Actions;
-use Filament\Resources\Pages\CreateRecord;
-
 class CreateThematique extends CreateRecord
 {
     protected static string $resource = ThematiqueResource::class;
-
     protected function afterCreate(): void
     {
         // Déclencher la notification push automatique pour le nouveau quiz

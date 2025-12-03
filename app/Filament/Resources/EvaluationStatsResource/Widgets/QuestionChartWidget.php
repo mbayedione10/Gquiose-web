@@ -1,15 +1,12 @@
 <?php
 
 namespace App\Filament\Resources\EvaluationStatsResource\Widgets;
-
 use App\Models\ReponseEvaluation;
 use App\Models\QuestionEvaluation;
 use Filament\Widgets\ChartWidget;
-
 class QuestionChartWidget extends ChartWidget
 {
     public ?Model $record = null;
-
     protected function getData(): array
     {
         if (!$this->record) {
@@ -18,9 +15,7 @@ class QuestionChartWidget extends ChartWidget
                 'labels' => [],
             ];
         }
-
         $reponses = ReponseEvaluation::where('question_evaluation_id', $this->record->id)->get();
-
         if ($reponses->isEmpty()) {
             return [
                 'datasets' => [
@@ -32,7 +27,6 @@ class QuestionChartWidget extends ChartWidget
                 'labels' => ['Pas de réponses'],
             ];
         }
-
         switch ($this->record->type) {
             case 'rating':
             case 'scale':
@@ -48,26 +42,22 @@ class QuestionChartWidget extends ChartWidget
                 return $this->getTextSummary($reponses);
         }
     }
-
     protected function getType(): string
     {
         if (!$this->record) {
             return 'bar';
         }
-
         return match($this->record->type) {
             'yesno', 'multiple_choice' => 'pie',
             'rating', 'scale' => 'bar',
             default => 'bar',
         };
     }
-
     protected function getNumericChart($reponses)
     {
         $distribution = $reponses->groupBy('valeur_numerique')
             ->map->count()
             ->sortKeys();
-
         return [
             'datasets' => [
                 [
@@ -79,11 +69,9 @@ class QuestionChartWidget extends ChartWidget
             'labels' => $distribution->keys()->map(fn($v) => (string)$v)->toArray(),
         ];
     }
-
     protected function getBinaryChart($reponses)
     {
         $distribution = $reponses->groupBy('reponse')->map->count();
-
         return [
             'datasets' => [
                 [
@@ -95,11 +83,9 @@ class QuestionChartWidget extends ChartWidget
             'labels' => $distribution->keys()->toArray(),
         ];
     }
-
     protected function getMultipleChoiceChart($reponses)
     {
         $distribution = $reponses->groupBy('reponse')->map->count();
-
         return [
             'datasets' => [
                 [
@@ -111,7 +97,6 @@ class QuestionChartWidget extends ChartWidget
             'labels' => $distribution->keys()->toArray(),
         ];
     }
-
     protected function getTextSummary($reponses)
     {
         return [
@@ -125,7 +110,6 @@ class QuestionChartWidget extends ChartWidget
             'labels' => ['Total'],
         ];
     }
-
     protected function getHeading(): ?string
     {
         return $this->record ? 'Graphique : ' . $this->record->question : 'Statistiques';

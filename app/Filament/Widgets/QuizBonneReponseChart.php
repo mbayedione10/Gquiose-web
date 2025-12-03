@@ -1,19 +1,13 @@
 <?php
 
 namespace App\Filament\Widgets;
-
 use App\Models\Response;
 use Filament\Widgets\DoughnutChartWidget;
 use Illuminate\Support\Facades\DB;
-
 class QuizBonneReponseChart extends DoughnutChartWidget
 {
     protected static ?string $heading = 'Base de connaissances du Quiz par thématiques';
-
     protected static ?int $sort = 25;
-
-
-
     protected function getData(): array
     {
         $query = Response::query()
@@ -22,11 +16,8 @@ class QuizBonneReponseChart extends DoughnutChartWidget
             ->select('thematiques.name as name', DB::raw('COUNT(responses.id) as data'))
             ->where('responses.isValid', 1)
             ->groupBy('name');
-
         $labels = $query->pluck('name')->toArray();
         $data = $query->pluck('data')->toArray();
-
-
         return [
             'datasets' => [
                 [
@@ -38,5 +29,4 @@ class QuizBonneReponseChart extends DoughnutChartWidget
             'labels' => $labels,
         ];
     }
-
 }

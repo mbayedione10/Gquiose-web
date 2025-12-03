@@ -1,36 +1,29 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Filament\Resources\QuestionResource\Widgets\QuestionOverview;
 use App\Models\Question;
 use App\Models\Thematique;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
 use App\Filament\Resources\QuestionResource\Pages;
-
 class QuestionResource extends Resource
 {
     protected static ?string $model = Question::class;
-
-
     protected static ?string $recordTitleAttribute = 'name';
-
     protected static ?string $navigationLabel = "Questions";
     protected static ?string $navigationGroup = "Quiz";
     protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
     protected static ?int $navigationSort = 20;
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Card::make()->schema([
-
                 Select::make('thematique_id')
                     ->rules(['exists:thematiques,id'])
                     ->required()
@@ -55,7 +48,6 @@ class QuestionResource extends Resource
                                 'md' => 12,
                                 'lg' => 12,
                             ]),
-
                         Toggle::make('status')
                             ->label("Activée")
                             ->rules(['boolean'])
@@ -73,7 +65,6 @@ class QuestionResource extends Resource
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 TextInput::make('name')
                     ->label("Question")
                     ->rules(['max:255', 'string'])
@@ -89,7 +80,6 @@ class QuestionResource extends Resource
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 TextInput::make('reponse')
                     ->rules(['max:255', 'string'])
                     ->label("Réponse")
@@ -100,7 +90,6 @@ class QuestionResource extends Resource
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 TextInput::make('option1')
                     ->rules(['max:255', 'string'])
                     ->label("Option 1")
@@ -111,8 +100,6 @@ class QuestionResource extends Resource
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
-
                 TextInput::make('option2')
                     ->rules(['max:255', 'string'])
                     ->label("Option 2")
@@ -123,10 +110,6 @@ class QuestionResource extends Resource
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
-
-
-
                 Toggle::make('status')
                     ->label("Activée")
                     ->rules(['boolean'])
@@ -136,57 +119,45 @@ class QuestionResource extends Resource
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->poll('60s')
             ->columns([
-
                 Tables\Columns\TextColumn::make('thematique.name')
                     ->label("Thématique")
                     ->url(function (?Question  $record){
                         return ThematiqueResource::getUrl('view', $record->thematique_id);
                     })
                     ->limit(50),
-
                 Tables\Columns\TextColumn::make('name')
                     ->label("Question")
                     ->searchable()
                     ->limit(50),
-
                 Tables\Columns\TextColumn::make('reponse')
                     ->label("Réponse")
                     ->searchable()
                     ->limit(50),
-
                 Tables\Columns\TextColumn::make('option1')
                     ->label("Option 1")
                     ->searchable()
                     ->limit(50),
-
                 Tables\Columns\TextColumn::make('option2')
                     ->label("Option 2")
                     ->limit(50),
-
                 Tables\Columns\ToggleColumn::make('status')
                     ->label("Statut"),
-
-
             ]);
     }
-
     public static function getRelations(): array
     {
         return [
             QuestionResource\RelationManagers\ResponsesRelationManager::class,
         ];
     }
-
     public static function getPages(): array
     {
         return [
@@ -196,7 +167,6 @@ class QuestionResource extends Resource
             'edit' => Pages\EditQuestion::route('/{record}/edit'),
         ];
     }
-
     public static function getWidgets(): array
     {
         return [

@@ -1,32 +1,23 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Filament\Resources\NotificationLogResource\Pages;
 use App\Models\NotificationLog;
 use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Tables;
-
 class NotificationLogResource extends Resource
 {
     protected static ?string $model = NotificationLog::class;
-
     protected static ?string $navigationIcon = 'heroicon-o-clock';
-
     protected static ?string $navigationLabel = 'Historique Notifications';
-
     protected static ?string $modelLabel = 'Historique Notification';
-
     protected static ?string $pluralModelLabel = 'Historique Notifications';
-
     protected static ?string $navigationGroup = 'Notifications';
-
     protected static ?int $navigationSort = 2;
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form
             ->schema([
@@ -116,8 +107,7 @@ class NotificationLogResource extends Resource
                     ->columns(2),
             ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->columns([

@@ -1,10 +1,9 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Models\User;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
 use Livewire\Component;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Card;
@@ -14,20 +13,15 @@ use Filament\Forms\Components\TextInput;
 use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\UserResource\Pages;
-
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
-
-
     protected static ?string $recordTitleAttribute = 'name';
-
     protected static ?string $navigationLabel = "Administrateurs";
     protected static ?string $navigationGroup = "Gestion des utilisateurs";
     protected static ?string $navigationIcon = 'heroicon-o-users';
     protected static ?int $navigationSort = 100;
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Card::make()->schema([
@@ -41,7 +35,6 @@ class UserResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     TextInput::make('phone')
                         ->rules(['max:255', 'string'])
                         ->required()
@@ -56,7 +49,6 @@ class UserResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     TextInput::make('email')
                         ->rules(['email'])
                         ->required()
@@ -72,7 +64,6 @@ class UserResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     TextInput::make('password')
                         ->required()
                         ->password()
@@ -87,7 +78,6 @@ class UserResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     Select::make('role_id')
                         ->rules(['exists:roles,id'])
                         ->required()
@@ -103,8 +93,7 @@ class UserResource extends Resource
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->poll('60s')
@@ -127,7 +116,6 @@ class UserResource extends Resource
             ])
             ->filters([
                 DateRangeFilter::make('created_at'),
-
                 SelectFilter::make('role_id')
                     ->relationship('role', 'name')
                     ->indicator('Role')
@@ -135,12 +123,10 @@ class UserResource extends Resource
                     ->label('Role'),
             ]);
     }
-
     public static function getRelations(): array
     {
         return [UserResource\RelationManagers\ArticlesRelationManager::class];
     }
-
     public static function getPages(): array
     {
         return [

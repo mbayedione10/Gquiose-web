@@ -1,10 +1,8 @@
 <?php
 
 namespace App\Filament\Resources\RoleResource\RelationManagers;
-
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Resources\{Form, Table};
 use Livewire\Component;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
@@ -14,15 +12,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\BelongsToSelect;
 use Filament\Tables\Filters\MultiSelectFilter;
 use App\Filament\Resources\RoleResource\Pages;
-use Filament\Resources\RelationManagers\RelationManager;
-
 class UsersRelationManager extends RelationManager
 {
     protected static string $relationship = 'users';
-
     protected static ?string $recordTitleAttribute = 'name';
-
-    public static function form(Form $form): Form
+    public function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Grid::make(['default' => 0])->schema([
@@ -34,7 +28,6 @@ class UsersRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 TextInput::make('phone')
                     ->rules(['max:255', 'string'])
                     ->unique('users', 'phone', fn(?Model $record) => $record)
@@ -44,7 +37,6 @@ class UsersRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 TextInput::make('email')
                     ->rules(['email'])
                     ->unique('users', 'email', fn(?Model $record) => $record)
@@ -55,7 +47,6 @@ class UsersRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 TextInput::make('password')
                     ->password()
                     ->dehydrateStateUsing(fn($state) => \Hash::make($state))
@@ -72,8 +63,7 @@ class UsersRelationManager extends RelationManager
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->columns([
@@ -113,7 +103,6 @@ class UsersRelationManager extends RelationManager
                                 )
                             );
                     }),
-
                 MultiSelectFilter::make('role_id')->relationship(
                     'role',
                     'name'

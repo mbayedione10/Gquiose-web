@@ -1,10 +1,9 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Models\TypeAlerte;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Toggle;
@@ -12,19 +11,15 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\TypeAlerteResource\Pages;
-
 class TypeAlerteResource extends Resource
 {
     protected static ?string $model = TypeAlerte::class;
-
     protected static ?string $recordTitleAttribute = 'name';
-
     protected static ?string $navigationLabel = "Type d'alertes";
     protected static ?string $navigationGroup = "VBG";
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?int $navigationSort = 11;
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Card::make()->schema([
@@ -43,7 +38,6 @@ class TypeAlerteResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     Toggle::make('status')
                         ->rules(['boolean'])
                         ->required()
@@ -56,8 +50,7 @@ class TypeAlerteResource extends Resource
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->poll('60s')
@@ -72,14 +65,12 @@ class TypeAlerteResource extends Resource
             ])
             ->filters([DateRangeFilter::make('created_at')]);
     }
-
     public static function getRelations(): array
     {
         return [
             TypeAlerteResource\RelationManagers\AlertesRelationManager::class,
         ];
     }
-
     public static function getPages(): array
     {
         return [

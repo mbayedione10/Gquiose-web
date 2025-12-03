@@ -1,10 +1,9 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Models\Ville;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Toggle;
@@ -12,18 +11,14 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\VilleResource\Pages;
-
 class VilleResource extends Resource
 {
     protected static ?string $model = Ville::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-location-marker';
+    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
     protected static ?int $navigationSort = 70;
     protected static ?string $navigationGroup = "Configuration";
-
     protected static ?string $recordTitleAttribute = 'name';
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Card::make()->schema([
@@ -44,7 +39,6 @@ class VilleResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     Toggle::make('status')
                         ->label('Statut actif')
                         ->rules(['boolean'])
@@ -60,8 +54,7 @@ class VilleResource extends Resource
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->poll('60s')
@@ -114,7 +107,6 @@ class VilleResource extends Resource
             ])
             ->defaultSort('name', 'asc');
     }
-
     public static function getRelations(): array
     {
         return [
@@ -122,7 +114,6 @@ class VilleResource extends Resource
             VilleResource\RelationManagers\AlertesRelationManager::class,
         ];
     }
-
     public static function getPages(): array
     {
         return [

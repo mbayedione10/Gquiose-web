@@ -1,13 +1,12 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Filament\Resources\ThematiqueChartResource\Widgets\QuestionThematiqueChart;
 use App\Filament\Resources\ThematiqueResource\Widgets\TrueResponsePerThematiqueChart;
 use App\Models\Thematique;
 use App\Models\Theme;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Toggle;
@@ -15,20 +14,15 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\ThematiqueResource\Pages;
-
 class ThematiqueResource extends Resource
 {
     protected static ?string $model = Thematique::class;
-
-
     protected static ?string $recordTitleAttribute = 'name';
-
     protected static ?string $navigationLabel = "Thématiques";
     protected static ?string $navigationGroup = "Quiz";
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?int $navigationSort = 22;
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Card::make()->schema([
@@ -47,7 +41,6 @@ class ThematiqueResource extends Resource
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 Toggle::make('status')
                     ->label("Activée")
                     ->rules(['boolean'])
@@ -57,12 +50,10 @@ class ThematiqueResource extends Resource
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->poll('60s')
@@ -71,26 +62,21 @@ class ThematiqueResource extends Resource
                     ->label("Nom")
                     ->searchable()
                     ->limit(50),
-
                 Tables\Columns\TextColumn::make('questions_count')
                     ->label("Questions")
                     ->sortable()
                     ->counts('questions'),
-
                 Tables\Columns\IconColumn::make('status')
                     ->label("Statut")
                     ->boolean(),
             ]);
     }
-
     public static function getRelations(): array
     {
         return [
             ThematiqueResource\RelationManagers\QuestionsRelationManager::class,
         ];
     }
-
-
     public static function getPages(): array
     {
         return [
@@ -100,7 +86,6 @@ class ThematiqueResource extends Resource
             'edit' => Pages\EditThematique::route('/{record}/edit'),
         ];
     }
-
     public static function getWidgets(): array
     {
         return [

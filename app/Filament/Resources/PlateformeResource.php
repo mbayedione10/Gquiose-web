@@ -1,27 +1,23 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Models\Plateforme;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use App\Filament\Resources\PlateformeResource\Pages;
-
 class PlateformeResource extends Resource
 {
     protected static ?string $model = Plateforme::class;
-
     protected static ?string $navigationLabel = "Plateformes";
     protected static ?string $navigationGroup = "VBG";
-    protected static ?string $navigationIcon = 'heroicon-o-globe';
+    protected static ?string $navigationIcon = 'heroicon-o-globe-americas';
     protected static ?int $navigationSort = 13;
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Card::make()->schema([
@@ -31,18 +27,15 @@ class PlateformeResource extends Resource
                         ->required()
                         ->unique(ignoreRecord: true)
                         ->maxLength(255),
-
                     Textarea::make('description')
                         ->label('Description')
                         ->rows(3)
                         ->maxLength(65535),
-
                     TextInput::make('signalement_url')
                         ->label('URL de signalement')
                         ->url()
                         ->maxLength(500)
                         ->placeholder('https://...'),
-
                     Toggle::make('status')
                         ->label('Active')
                         ->default(true)
@@ -51,8 +44,7 @@ class PlateformeResource extends Resource
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->columns([
@@ -60,17 +52,14 @@ class PlateformeResource extends Resource
                     ->label('Nom')
                     ->searchable()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('description')
                     ->label('Description')
                     ->limit(50)
                     ->toggleable(),
-
                 Tables\Columns\IconColumn::make('status')
                     ->label('Active')
                     ->boolean()
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Créée le')
                     ->date('d/m/Y')
@@ -92,7 +81,6 @@ class PlateformeResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-
     public static function getPages(): array
     {
         return [

@@ -1,23 +1,17 @@
 <?php
 
 namespace App\Filament\Resources\RoleResource\RelationManagers;
-
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Resources\{Form, Table};
 use Filament\Forms\Components\Grid;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
-use Filament\Resources\RelationManagers\RelationManager;
-
 class PermissionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'permissions';
-
     protected static ?string $recordTitleAttribute = 'name';
-
-    public static function form(Form $form): Form
+    public function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Grid::make(['default' => 0])->schema([
@@ -34,7 +28,6 @@ class PermissionsRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 TextInput::make('label')
                     ->rules(['max:255', 'string'])
                     ->unique(
@@ -48,7 +41,6 @@ class PermissionsRelationManager extends RelationManager
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 TextInput::make('type')
                     ->rules(['max:255', 'string'])
                     ->placeholder('Type')
@@ -60,8 +52,7 @@ class PermissionsRelationManager extends RelationManager
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->columns([

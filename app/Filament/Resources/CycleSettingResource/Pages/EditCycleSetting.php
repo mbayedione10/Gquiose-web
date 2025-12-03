@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\CycleSettingResource\Pages;
+use Filament\Resources\Pages\EditRecord;
+<?php
 
+namespace App\Filament\Resources\CycleSettingResource\Pages;
 use App\Filament\Resources\CycleSettingResource;
 use Filament\Pages\Actions;
-use Filament\Resources\Pages\EditRecord;
-
 class EditCycleSetting extends EditRecord
 {
     protected static string $resource = CycleSettingResource::class;
-
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\DeleteAction::make(),

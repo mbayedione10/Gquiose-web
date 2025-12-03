@@ -2,41 +2,48 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CycleReminderResource\Pages;
 use App\Models\CycleReminder;
-use Filament\Forms;
-use Filament\Resources\Form;
+use App\Filament\Resources\CycleReminderResource\Pages;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Forms;
 use Filament\Tables;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TimePicker;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\TagsInput;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\BadgeColumn;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 
 class CycleReminderResource extends Resource
 {
     protected static ?string $model = CycleReminder::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-bell';
-
     protected static ?string $navigationLabel = 'Rappels Cycle';
-
     protected static ?string $pluralLabel = 'Rappels Cycle';
-
     protected static ?string $navigationGroup = 'Santé';
 
     public static function form(Form $form): Form
     {
         return $form->schema([
             Card::make()->schema([
-                Grid::make(['default' => 2])->schema([
-                    Forms\Components\Select::make('utilisateur_id')
+                Grid::make(2)->schema([
+                    Select::make('utilisateur_id')
                         ->relationship('utilisateur', 'nom')
                         ->label('Utilisatrice')
                         ->searchable()
+                        ->preload()
                         ->required()
                         ->columnSpan(2),
 
-                    Forms\Components\Select::make('reminder_type')
+                    Select::make('reminder_type')
                         ->label('Type de rappel')
                         ->options([
                             'period_approaching' => 'Règles qui approchent',
@@ -48,18 +55,19 @@ class CycleReminderResource extends Resource
                         ])
                         ->required(),
 
-                    Forms\Components\TimePicker::make('reminder_time')
+                    TimePicker::make('reminder_time')
                         ->label('Heure du rappel')
                         ->required()
                         ->default('09:00'),
 
-                    Forms\Components\Toggle::make('enabled')
+                    Toggle::make('enabled')
                         ->label('Activé')
                         ->default(true),
 
-                    Forms\Components\TagsInput::make('days_before')
-                        ->label('Jours avant (ex: 2,1 pour rappel 2 et 1 jour avant)')
+                    TagsInput::make('days_before')
+                        ->label('Jours avant')
                         ->placeholder('Ex: 2, 1')
+                        ->suggestions(['1', '2', '3', '5', '7'])
                         ->columnSpan(2),
                 ]),
             ]),
@@ -70,12 +78,12 @@ class CycleReminderResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('utilisateur.nom')
+                TextColumn::make('utilisateur.nom')
                     ->label('Utilisatrice')
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('reminder_type')
+                BadgeColumn::make('reminder_type')
                     ->label('Type')
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'period_approaching' => 'Règles approchent',
@@ -88,33 +96,32 @@ class CycleReminderResource extends Resource
                     })
                     ->colors([
                         'danger' => 'period_today',
-                        'warning' => 'period_approaching',
-                        'success' => 'ovulation_approaching',
-                        'primary' => 'fertile_window',
-                        'secondary' => 'log_symptoms',
+                        'warning' => ['period_approaching', 'ovulation_approaching'],
+                        'success' => 'fertile_window',
                         'info' => 'pill_reminder',
+                        'secondary' => 'log_symptoms',
                     ]),
 
-                Tables\Columns\TextColumn::make('reminder_time')
+                TextColumn::make('reminder_time')
                     ->label('Heure')
                     ->time('H:i')
                     ->sortable(),
 
-                Tables\Columns\IconColumn::make('enabled')
+                IconColumn::make('enabled')
                     ->label('Actif')
                     ->boolean(),
 
-                Tables\Columns\TextColumn::make('days_before')
+                TextColumn::make('days_before')
                     ->label('Jours avant')
                     ->formatStateUsing(fn ($state) => is_array($state) ? implode(', ', $state) : '-'),
 
-                Tables\Columns\TextColumn::make('created_at')
+                TextColumn::make('created_at')
                     ->label('Créé le')
-                    ->date('d/m/Y H:i')
+                    ->dateTime('d/m/Y H:i')
                     ->sortable(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('reminder_type')
+                SelectFilter::make('reminder_type')
                     ->label('Type de rappel')
                     ->options([
                         'period_approaching' => 'Règles qui approchent',
@@ -123,9 +130,10 @@ class CycleReminderResource extends Resource
                         'fertile_window' => 'Fenêtre fertile',
                         'log_symptoms' => 'Symptômes',
                         'pill_reminder' => 'Pilule',
-                    ]),
+                    ])
+                    ->multiple(),
 
-                Tables\Filters\TernaryFilter::make('enabled')
+                TernaryFilter::make('enabled')
                     ->label('Statut')
                     ->placeholder('Tous')
                     ->trueLabel('Actifs')
@@ -143,9 +151,9 @@ class CycleReminderResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCycleReminders::route('/'),
+            'index'  => Pages\ListCycleReminders::route('/'),
             'create' => Pages\CreateCycleReminder::route('/create'),
-            'edit' => Pages\EditCycleReminder::route('/{record}/edit'),
+            'edit'   => Pages\EditCycleReminder::route('/{record}/edit'),
         ];
     }
 }

@@ -1,30 +1,24 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Models\Permission;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Card;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\PermissionResource\Pages;
-
 class PermissionResource extends Resource
 {
     protected static ?string $model = Permission::class;
-
-
     protected static ?string $recordTitleAttribute = 'name';
-
     protected static ?string $navigationLabel = "Permissions";
     protected static ?string $navigationGroup = "Gestion des utilisateurs";
-    protected static ?string $navigationIcon = 'heroicon-o-adjustments';
+    protected static ?string $navigationIcon = 'heroicon-o-adjustments-vertical';
     protected static ?int $navigationSort = 102;
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Card::make()->schema([
@@ -43,7 +37,6 @@ class PermissionResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     TextInput::make('label')
                         ->rules(['max:255', 'string'])
                         ->required()
@@ -58,7 +51,6 @@ class PermissionResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     TextInput::make('type')
                         ->rules(['max:255', 'string'])
                         ->required()
@@ -72,8 +64,7 @@ class PermissionResource extends Resource
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->poll('60s')
@@ -93,14 +84,12 @@ class PermissionResource extends Resource
             ])
             ->filters([DateRangeFilter::make('created_at')]);
     }
-
     public static function getRelations(): array
     {
         return [
             PermissionResource\RelationManagers\RolesRelationManager::class,
         ];
     }
-
     public static function getPages(): array
     {
         return [

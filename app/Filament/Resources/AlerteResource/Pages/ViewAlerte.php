@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\AlerteResource\Pages;
 
-use Filament\Resources\Pages\ViewRecord;
 use App\Filament\Resources\AlerteResource;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewAlerte extends ViewRecord
 {

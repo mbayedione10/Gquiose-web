@@ -1,28 +1,23 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Filament\Resources\UserNotificationPreferenceResource\Pages;
 use App\Models\UserNotificationPreference;
 use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Tables;
-
 class UserNotificationPreferenceResource extends Resource
 {
     protected static ?string $model = UserNotificationPreference::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-adjustments';
+    protected static ?string $navigationIcon = 'heroicon-o-adjustments-vertical';
     
     protected static ?string $navigationLabel = 'Préférences Notifications';
     
     protected static ?string $navigationGroup = 'Notifications';
-
     protected static ?int $navigationSort = 9;
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form
             ->schema([
@@ -34,7 +29,6 @@ class UserNotificationPreferenceResource extends Resource
                             ->required()
                             ->searchable(),
                     ]),
-
                 Forms\Components\Card::make()
                     ->schema([
                         Forms\Components\Toggle::make('notifications_enabled')
@@ -74,7 +68,6 @@ class UserNotificationPreferenceResource extends Resource
                             ->disabled(fn ($get) => $get('do_not_disturb') === true),
                     ])
                     ->columns(2),
-
                 Forms\Components\Card::make()
                     ->schema([
                         Forms\Components\Toggle::make('do_not_disturb')
@@ -106,8 +99,7 @@ class UserNotificationPreferenceResource extends Resource
                     ->columns(3),
             ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->columns([
@@ -147,7 +139,6 @@ class UserNotificationPreferenceResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-
     public static function getPages(): array
     {
         return [

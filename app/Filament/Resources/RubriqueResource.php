@@ -1,10 +1,9 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Models\Rubrique;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Toggle;
@@ -12,25 +11,19 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\RubriqueResource\Pages;
-
 class RubriqueResource extends Resource
 {
     protected static ?string $model = Rubrique::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
-
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $recordTitleAttribute = 'name';
-
     protected static ?string $navigationLabel = "Rubriques";
     protected static ?string $navigationGroup = "Blog";
     //protected static ?string $navigationIcon = 'heroicon-o-newspaper';
     protected static ?int $navigationSort = 31;
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Card::make()->schema([
-
                 TextInput::make('name')
                     ->label("Nom")
                     ->rules(['max:255', 'string'])
@@ -46,7 +39,6 @@ class RubriqueResource extends Resource
                         'md' => 12,
                         'lg' => 12,
                     ]),
-
                 Toggle::make('status')
                     ->label("Statut")
                     ->rules(['boolean'])
@@ -59,8 +51,7 @@ class RubriqueResource extends Resource
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->poll('60s')
@@ -69,24 +60,19 @@ class RubriqueResource extends Resource
                     ->label("Nom")
                     ->searchable()
                     ->limit(50),
-
                 Tables\Columns\TextColumn::make('articles_count')
                     ->label("Articles")
                     ->counts('articles'),
-
-
                 Tables\Columns\ToggleColumn::make('status')
                     ->label("Statut"),
             ]);
     }
-
     public static function getRelations(): array
     {
         return [
             RubriqueResource\RelationManagers\ArticlesRelationManager::class,
         ];
     }
-
     public static function getPages(): array
     {
         return [

@@ -1,33 +1,26 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Filament\Resources\NotificationTemplateResource\Pages;
 use App\Filament\Resources\NotificationTemplateResource\RelationManagers;
 use App\Models\NotificationTemplate;
 use Filament\Forms;
-use Filament\Resources\Form;
-use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-
 class NotificationTemplateResource extends Resource
 {
     protected static ?string $model = NotificationTemplate::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-template';
-
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-group';
     protected static ?string $navigationLabel = 'Templates de Notifications';
-
     protected static ?string $pluralLabel = 'Templates de Notifications';
     
     protected static ?string $navigationGroup = 'Notifications';
-
     protected static ?int $navigationSort = 9;
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form
             ->schema([
@@ -37,12 +30,10 @@ class NotificationTemplateResource extends Resource
                             ->label('Nom du template')
                             ->required()
                             ->maxLength(255),
-
                         Forms\Components\Textarea::make('description')
                             ->label('Description')
                             ->maxLength(500)
                             ->rows(2),
-
                         Forms\Components\Select::make('category')
                             ->label('Catégorie')
                             ->options([
@@ -57,7 +48,6 @@ class NotificationTemplateResource extends Resource
                             ->required(),
                     ])
                     ->columns(2),
-
                 Forms\Components\Card::make()
                     ->schema([
                         Forms\Components\TextInput::make('title')
@@ -65,14 +55,12 @@ class NotificationTemplateResource extends Resource
                             ->required()
                             ->maxLength(65)
                             ->helperText('Maximum 65 caractères'),
-
                         Forms\Components\Textarea::make('message')
                             ->label('Message')
                             ->required()
                             ->maxLength(240)
                             ->helperText('Maximum 240 caractères')
                             ->rows(3),
-
                         Forms\Components\Select::make('icon')
                             ->label('Icône')
                             ->options([
@@ -96,11 +84,9 @@ class NotificationTemplateResource extends Resource
                             ])
                             ->searchable()
                             ->placeholder('Choisir un emoji'),
-
                         Forms\Components\TextInput::make('action')
                             ->label('Action (route/URL)')
                             ->maxLength(255),
-
                         Forms\Components\FileUpload::make('image')
                             ->label('Image (optionnelle)')
                             ->image()
@@ -109,8 +95,7 @@ class NotificationTemplateResource extends Resource
                     ->columns(2),
             ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->columns([
@@ -118,7 +103,6 @@ class NotificationTemplateResource extends Resource
                     ->label('Nom')
                     ->searchable()
                     ->sortable(),
-
                 Tables\Columns\BadgeColumn::make('category')
                     ->label('Catégorie')
                     ->enum([
@@ -136,15 +120,12 @@ class NotificationTemplateResource extends Resource
                         'warning' => 'health_tips',
                         'secondary' => 'admin',
                     ]),
-
                 Tables\Columns\TextColumn::make('title')
                     ->label('Titre')
                     ->searchable()
                     ->limit(40),
-
                 Tables\Columns\TextColumn::make('icon')
                     ->label('Icône'),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Créé le')
                     ->dateTime('d/m/Y H:i')

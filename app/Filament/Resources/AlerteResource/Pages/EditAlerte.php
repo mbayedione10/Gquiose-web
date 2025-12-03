@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\AlerteResource\Pages;
 
-use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\AlerteResource;
+use Filament\Resources\Pages\EditRecord;
 
 class EditAlerte extends EditRecord
 {

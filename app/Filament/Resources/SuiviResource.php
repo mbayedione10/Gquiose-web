@@ -1,10 +1,9 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Models\Suivi;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Select;
@@ -13,22 +12,16 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\SuiviResource\Pages;
-
 class SuiviResource extends Resource
 {
     protected static ?string $model = Suivi::class;
-
-
     protected static bool $shouldRegisterNavigation = false;
-
     protected static ?string $recordTitleAttribute = 'name';
-
     protected static ?string $navigationLabel = "Suivis";
     protected static ?string $navigationGroup = "VBG";
     protected static ?string $navigationIcon = 'heroicon-o-check';
     protected static ?int $navigationSort = 11;
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Card::make()->schema([
@@ -42,7 +35,6 @@ class SuiviResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     RichEditor::make('observation')
                         ->rules(['max:255', 'string'])
                         ->required()
@@ -52,7 +44,6 @@ class SuiviResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     Select::make('alerte_id')
                         ->rules(['exists:alertes,id'])
                         ->required()
@@ -68,8 +59,7 @@ class SuiviResource extends Resource
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->poll('60s')
@@ -88,7 +78,6 @@ class SuiviResource extends Resource
             ])
             ->filters([
                 DateRangeFilter::make('created_at'),
-
                 SelectFilter::make('alerte_id')
                     ->relationship('alerte', 'ref')
                     ->indicator('Alerte')
@@ -96,12 +85,10 @@ class SuiviResource extends Resource
                     ->label('Alerte'),
             ]);
     }
-
     public static function getRelations(): array
     {
         return [];
     }
-
     public static function getPages(): array
     {
         return [

@@ -1,10 +1,9 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Resources\Resource;
 use App\Models\Role;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Toggle;
@@ -12,21 +11,15 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\RoleResource\Pages;
-
 class RoleResource extends Resource
 {
     protected static ?string $model = Role::class;
-
-
     protected static ?string $recordTitleAttribute = 'name';
-
     protected static ?string $navigationLabel = "Rôles";
     protected static ?string $navigationGroup = "Gestion des utilisateurs";
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
     protected static ?int $navigationSort = 101;
-
-
-    public static function form(Form $form): Form
+    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
     {
         return $form->schema([
             Card::make()->schema([
@@ -41,7 +34,6 @@ class RoleResource extends Resource
                             'md' => 12,
                             'lg' => 12,
                         ]),
-
                     Toggle::make('status')
                         ->rules(['boolean'])
                         ->required()
@@ -54,8 +46,7 @@ class RoleResource extends Resource
             ]),
         ]);
     }
-
-    public static function table(Table $table): Table
+    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
     {
         return $table
             ->poll('60s')
@@ -70,7 +61,6 @@ class RoleResource extends Resource
             ])
             ->filters([DateRangeFilter::make('created_at')]);
     }
-
     public static function getRelations(): array
     {
         return [
@@ -78,7 +68,6 @@ class RoleResource extends Resource
             RoleResource\RelationManagers\PermissionsRelationManager::class,
         ];
     }
-
     public static function getPages(): array
     {
         return [
