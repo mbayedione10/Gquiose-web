@@ -1,9 +1,7 @@
 <?php
 
-use Filament\Resources\Pages\EditRecord;
-<?php
-
 namespace App\Filament\Resources\CycleSettingResource\Pages;
+use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\CycleSettingResource;
 use Filament\Pages\Actions;
 class EditCycleSetting extends EditRecord

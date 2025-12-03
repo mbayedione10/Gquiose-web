@@ -1,9 +1,7 @@
 <?php
 
-use Filament\Resources\Pages\ListRecords;
-<?php
-
 namespace App\Filament\Resources\CycleSettingResource\Pages;
+use Filament\Resources\Pages\ListRecords;
 use App\Filament\Resources\CycleSettingResource;
 use Filament\Pages\Actions;
 class ListCycleSettings extends ListRecords

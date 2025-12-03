@@ -1,9 +1,7 @@
 <?php
 
-use Filament\Resources\Pages\ListRecords;
-<?php
-
 namespace App\Filament\Resources\FaqResource\Pages;
+use Filament\Resources\Pages\ListRecords;
 use App\Filament\Resources\FaqResource;
 use Filament\Pages\Actions;
 class ListFaqs extends ListRecords

@@ -1,109 +1,153 @@
 <?php
 
 namespace App\Filament\Resources;
-use Filament\Resources\Resource;
-use App\Filament\Resources\InformationResource\Pages;
-use App\Filament\Resources\InformationResource\RelationManagers;
+
 use App\Models\Information;
+use App\Filament\Resources\InformationResource\Pages;
+use Filament\Resources\Resource;
 use Filament\Forms;
+use Filament\Tables;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Card;
+use Filament\Forms\Components\TagsInput;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Toggle;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TagsColumn;
+use Filament\Tables\Columns\TextColumn;
+
 class InformationResource extends Resource
 {
     protected static ?string $model = Information::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-information-circle';
-    public static function form(\Filament\Forms\Form $form): Filament\Forms\Form
+    protected static ?string $navigationLabel = 'Informations générales';
+    protected static ?string $navigationGroup = 'Configuration';
+    protected static ?int $navigationSort = 99;
+
+    public static function form(Form $form): Form
     {
-        return $form
-            ->schema([
-                Forms\Components\Card::make()
-                    ->schema([
-                        Forms\Components\TagsInput::make('email_alerte')
-                            ->label("Courriel de notification")
-                            ->placeholder("Saisir le courriel de notification")
-                            ->helperText("Ce courriel recevra un email lorsqu'une alerte est signalée")
-                            ->helperText("Taper la touche Entrez pour ajouter un courriel")
-                            ->nullable(),
-                        Forms\Components\TextInput::make("rendez_vous")
-                            ->required()
-                            ->placeholder("L'URL de prise de rendez-vous")
-                            ->label("Rendez-vous"),
-                        Forms\Components\TextInput::make("structure_url")
-                            ->nullable()
-                            ->placeholder("L'URL de prise des structures sanitaires")
-                            ->label("Structures sanitaires"),
-                        Forms\Components\TextInput::make("numero_cybercriminalite")
-                            ->nullable()
-                            ->tel()
-                            ->placeholder("Ex: 117 ou +224 XXX XXX XXX")
-                            ->label("Numéro Cybercriminalité")
-                            ->helperText("Numéro pour signaler les cas de cybercriminalité en Guinée"),
-                        Forms\Components\TextInput::make("email_cybercriminalite")
-                            ->nullable()
-                            ->email()
-                            ->placeholder("Ex: cybercrime@police.gov.gn")
-                            ->label("Email Cybercriminalité")
-                            ->helperText("Adresse email pour les signalements de cybercriminalité"),
-                        Forms\Components\FileUpload::make('image')
-                            ->label("Bannière")
-                            ->required()
-                            ->image()
-                            ->maxSize(1024),
-                        Forms\Components\FileUpload::make('splash')
-                            ->label("Image de démarrage")
-                            ->nullable()
-                            ->image()
-                            ->maxSize(1024),
-                        Forms\Components\Toggle::make('status')
-                            ->label("Activé")
-                    ])
-            ]);
+        return $form->schema([
+            Card::make()->schema([
+                TagsInput::make('email_alerte')
+                    ->label('Courriels de notification d\'alerte')
+                    ->placeholder('Saisir un email et appuyer sur Entrée')
+                    ->helperText('Ces adresses recevront un email à chaque alerte signalée')
+                    ->separator(',')
+                    ->columnSpanFull(),
+
+                TextInput::make('rendez_vous')
+                    ->label('URL de prise de rendez-vous')
+                    ->url()
+                    ->required()
+                    ->placeholder('https://...'),
+
+                TextInput::make('structure_url')
+                    ->label('URL des structures sanitaires')
+                    ->url()
+                    ->placeholder('https://...')
+                    ->nullable(),
+
+                TextInput::make('numero_cybercriminalite')
+                    ->label('Numéro Cybercriminalité')
+                    ->tel()
+                    ->placeholder('Ex: 117 ou +224 6XX XXX XXX')
+                    ->helperText('Numéro officiel pour signaler la cybercriminalité en Guinée')
+                    ->nullable(),
+
+                TextInput::make('email_cybercriminalite')
+                    ->label('Email Cybercriminalité')
+                    ->email()
+                    ->placeholder('cybercrime@police.gov.gn')
+                    ->helperText('Adresse officielle pour les signalements')
+                    ->nullable(),
+
+                FileUpload::make('image')
+                    ->label('Bannière principale')
+                    ->image()
+                    ->imageEditor()
+                    ->imageEditorAspectRatios(['16:9', '4:3'])
+                    ->maxSize(2048)
+                    ->directory('informations')
+                    ->visibility('public')
+                    ->required(),
+
+                FileUpload::make('splash')
+                    ->label('Image de démarrage (Splash Screen)')
+                    ->image()
+                    ->imageEditor()
+                    ->maxSize(2048)
+                    ->directory('informations')
+                    ->visibility('public')
+                    ->nullable(),
+
+                Toggle::make('status')
+                    ->label('Activé')
+                    ->default(true)
+                    ->inline(false),
+            ]),
+        ]);
     }
-    public static function table(\Filament\Tables\Table $table): Filament\Tables\Table
+
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('image')
-                    ->label("Image"),
-                Tables\Columns\TagsColumn::make('email_alerte')
-                    ->searchable()
-                    ->label("Notification"),
-                Tables\Columns\TextColumn::make('rendez_vous')
-                    ->label("Rendez-vous"),
-                Tables\Columns\TextColumn::make('structure_url')
-                    ->label("Structure sanitaire"),
-                Tables\Columns\TextColumn::make('numero_cybercriminalite')
-                    ->label("N° Cybercriminalité")
-                    ->default('-'),
-                Tables\Columns\TextColumn::make('email_cybercriminalite')
-                    ->label("Email Cybercriminalité")
-                    ->default('-'),
+                ImageColumn::make('image')
+                    ->label('Bannière')
+                    ->height(60)
+                    ->width(100),
+
+                TagsColumn::make('email_alerte')
+                    ->label('Notifications alerte')
+                    ->separator(',')
+                    ->limit(3),
+
+                TextColumn::make('rendez_vous')
+                    ->label('Rendez-vous')
+                    ->limit(50)
+                    ->tooltip(fn ($state) => $state)
+                    ->icon('heroicon-o-link'),
+
+                TextColumn::make('structure_url')
+                    ->label('Structures sanitaires')
+                    ->limit(50)
+                    ->tooltip(fn ($state) => $state)
+                    ->icon('heroicon-o-link'),
+
+                TextColumn::make('numero_cybercriminalite')
+                    ->label('N° Cybercriminalité')
+                    ->placeholder('—')
+                    ->icon('heroicon-o-phone'),
+
+                TextColumn::make('email_cybercriminalite')
+                    ->label('Email Cybercriminalité')
+                    ->placeholder('—')
+                    ->icon('heroicon-o-envelope'),
+
+                TextColumn::make('updated_at')
+                    ->label('Modifié le')
+                    ->dateTime('d/m/Y H:i')
+                    ->sortable(),
             ])
-            ->filters([
-                //
-            ])
+            ->defaultSort('updated_at', 'desc')
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
+
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListInformation::route('/'),
+            'index'  => Pages\ListInformation::route('/'),
             'create' => Pages\CreateInformation::route('/create'),
-            'edit' => Pages\EditInformation::route('/{record}/edit'),
+            'edit'   => Pages\EditInformation::route('/{record}/edit'),
         ];
     }
 }
