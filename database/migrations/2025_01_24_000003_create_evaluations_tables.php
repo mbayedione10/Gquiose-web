@@ -13,7 +13,7 @@ return new class extends Migration {
             $table->bigIncrements('id');
             $table->string('question');
             $table->enum('type', ['text', 'rating', 'yesno', 'multiple_choice', 'scale']);
-            $table->enum('formulaire_type', ['satisfaction_quiz', 'satisfaction_article', 'satisfaction_structure', 'generale'])->default('generale');
+            $table->enum('formulaire_type', ['satisfaction_quiz', 'satisfaction_article', 'satisfaction_structure', 'satisfaction_alerte', 'generale'])->default('generale');
             $table->json('options')->nullable(); // Pour les choix multiples
             $table->integer('ordre')->default(0);
             $table->boolean('obligatoire')->default(false);

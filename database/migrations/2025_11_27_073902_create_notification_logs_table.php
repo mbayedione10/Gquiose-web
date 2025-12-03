@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('action')->nullable();
             $table->string('image')->nullable();
 
-            $table->enum('type', ['automatic', 'manual', 'triggered'])->default('manual');
+            $table->enum('type', ['automatic', 'manual', 'triggered', 'scheduled'])->default('manual');
             $table->string('category')->nullable();
 
             // Tracking status
