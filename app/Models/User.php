@@ -41,4 +41,12 @@ class User extends Authenticatable implements FilamentUser
     {
         return in_array($this->email, config('auth.super_admins'));
     }
+
+    /*
+     * Returns whether the user is allowed to access Filament panel
+     */
+    public function canAccessPanel(\Filament\Panel $panel): bool
+    {
+        return $this->isSuperAdmin();
+    }
 }

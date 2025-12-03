@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Models\Traits;
@@ -5,9 +6,9 @@ namespace App\Models\Traits;
 trait FilamentTrait
 {
     /*
-     * Returns whether the user is allowed to access Filament
+     * Returns whether the user is allowed to access Filament panel
      */
-    public function canAccessFilament(): bool
+    public function canAccessPanel(\Filament\Panel $panel): bool
     {
         return $this->isSuperAdmin();
     }
