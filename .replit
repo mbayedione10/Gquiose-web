@@ -6,9 +6,6 @@ channel = "stable-25_05"
 packages = [
   "php83",
   "php83Packages.composer",
-  "php83Packages.pecl_http",
-  "php83Packages.raphf",
-  "php83Packages.propro",
 ]
 
 [workflows]
