@@ -108,7 +108,7 @@ return [
         'namespace' => 'App\\Filament\\Pages',
         'path' => app_path('Filament/Pages'),
         'register' => [
-            \App\Filament\Pages\Dashboard::class,
+            // Dashboard personnalisé est auto-découvert
         ],
     ],
 
