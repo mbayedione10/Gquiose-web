@@ -13,8 +13,8 @@ use App\Models\Question;
 use App\Models\Rubrique;
 use App\Models\Structure;
 use App\Models\Theme;
-use App\services\ArticleService;
-use App\services\RubriqueService;
+use App\Services\ArticleService;
+use App\Services\RubriqueService;
 use Illuminate\Support\Facades\DB;
 
 class APIArticleController extends Controller
