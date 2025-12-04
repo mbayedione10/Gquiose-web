@@ -73,7 +73,6 @@ class ArticleService
                 'rubriques.name as rubrique',
                 'users.name as author',
                 'articles.created_at')
-            ->where('articles.vedette', true)
             ->where('articles.status', true)
             ->where('articles.slug', $slug)
             ->first();
