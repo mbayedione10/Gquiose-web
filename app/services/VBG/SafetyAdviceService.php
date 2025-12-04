@@ -57,7 +57,7 @@ class SafetyAdviceService
 
     private function getGeneralAdvice(): string
     {
-        return "⚠️ CONSEILS DE SÉCURITÉ GÉNÉRAUX :\n\n" .
+        return "⚠️ CONSEILS DE SÉCURITÉ GÉNÉRAUX:\n\n" .
             "🔒 SÉCURITÉ IMMÉDIATE :\n" .
             "• Si tu es en danger immédiat, appelle la police (117) ou OPROGEM (116)\n" .
             "• Éloigne-toi de la situation dangereuse si possible\n" .
