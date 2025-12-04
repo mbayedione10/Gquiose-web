@@ -83,7 +83,8 @@ Route::prefix('v1')
         Route::get('structures', [APIStructureController::class, 'list']);
         Route::get('structures/nearby', [APIStructureController::class, 'nearby']);
 
-        /*************************  SYNC ALERTE    ***************************/
+        /*************************  ALERTES    ***************************/
+        Route::get('alertes', [APIAlertController::class, 'index']);
         Route::post('alert-sync', [APIAlertController::class, 'sync']);
 
         /*************************  WORKFLOW MULTI-ÉCRANS ALERTE VBG    ***************************/
