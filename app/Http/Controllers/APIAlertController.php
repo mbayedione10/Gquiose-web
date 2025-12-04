@@ -13,6 +13,99 @@ use Illuminate\Support\Facades\Mail;
 
 class APIAlertController extends Controller
 {
+    /**
+     * Liste toutes les alertes
+     * GET /api/v1/alertes (toutes les alertes)
+     * GET /api/v1/alertes?user_id={user_id} (alertes d'un utilisateur spécifique)
+     */
+    public function index(Request $request)
+    {
+        $userId = $request->query('user_id');
+
+        // Query de base avec les relations
+        $query = Alerte::with(['typeAlerte', 'ville', 'utilisateur'])
+            ->orderByDesc('created_at');
+
+        // Filtrer par user_id si fourni
+        if ($userId) {
+            $user = Utilisateur::find($userId);
+
+            if (!$user) {
+                return ApiResponse::error("Cet utilisateur n'existe pas", Response::HTTP_NOT_FOUND);
+            }
+
+            $query->where('utilisateur_id', $userId);
+        }
+
+        // Récupérer les alertes
+        $alertes = $query->get()
+            ->map(function ($alerte) {
+                return [
+                    'id' => $alerte->id,
+                    'ref' => $alerte->ref,
+                    'etat' => $alerte->etat,
+                    'numero_suivi' => $alerte->numero_suivi,
+                    'created_at' => $alerte->created_at,
+
+                    // Utilisateur associé
+                    'utilisateur' => [
+                        'id' => $alerte->utilisateur->id,
+                        'name' => $alerte->utilisateur->name,
+                        'email' => $alerte->utilisateur->email,
+                        'phone' => $alerte->utilisateur->phone,
+                    ],
+
+                    // Informations générales
+                    'informations_generales' => [
+                        'type_alerte' => $alerte->typeAlerte ? $alerte->typeAlerte->name : null,
+                        'description' => $alerte->description,
+                        'ville' => $alerte->ville ? $alerte->ville->name : null,
+                        'latitude' => $alerte->latitude,
+                        'longitude' => $alerte->longitude,
+                        'precision_localisation' => $alerte->precision_localisation,
+                        'rayon_approximation_km' => $alerte->rayon_approximation_km,
+                        'quartier' => $alerte->quartier,
+                        'commune' => $alerte->commune,
+                    ],
+
+                    // Violences numériques
+                    'violences_numeriques' => [
+                        'plateformes' => $alerte->plateformes,
+                        'nature_contenu' => $alerte->nature_contenu,
+                        'urls_problematiques' => $alerte->urls_problematiques,
+                        'comptes_impliques' => $alerte->comptes_impliques,
+                        'frequence_incidents' => $alerte->frequence_incidents,
+                    ],
+
+                    // Détails incident
+                    'details_incident' => [
+                        'date_incident' => $alerte->date_incident,
+                        'heure_incident' => $alerte->heure_incident,
+                        'relation_agresseur' => $alerte->relation_agresseur,
+                        'impact' => $alerte->impact,
+                    ],
+
+                    // Preuves & Conseils
+                    'preuves_conseils' => [
+                        'preuves' => $alerte->preuves,
+                        'conseils_securite' => $alerte->conseils_securite,
+                        'conseils_lus' => $alerte->conseils_lus,
+                    ],
+
+                    // Consentement
+                    'consentement' => [
+                        'anonymat_souhaite' => $alerte->anonymat_souhaite,
+                        'consentement_transmission' => $alerte->consentement_transmission,
+                    ],
+                ];
+            });
+
+        return ApiResponse::success([
+            'alertes' => $alertes,
+            'total' => $alertes->count()
+        ]);
+    }
+
     public function  sync(Request $request)
     {
         if (!isset($request['user_id']) &&  !isset($request['type']))
