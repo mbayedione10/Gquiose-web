@@ -73,6 +73,9 @@ Route::prefix('v1')
 
         Route::get('articles/categorie/{articleId}', [APIArticleController::class, 'showByRubrique']);
 
+        /*************************  RUBRIQUES    ***************************/
+        Route::get('rubriques', [APIArticleController::class, 'rubriquesWithArticles']);
+
         /*************************  SYNC Quiz    ***************************/
         Route::post('sync-quiz', [APIQuizController::class, 'sync']);
 

@@ -65,6 +65,13 @@ class APIArticleController extends Controller
 
     }
 
+    public function rubriquesWithArticles(RubriqueService $rubriqueService)
+    {
+        $rubriques = $rubriqueService->allWithArticles();
+
+        return response::success(['rubriques' => $rubriques]);
+    }
+
     public function config()
     {
         $quiz = DB::table('questions')
