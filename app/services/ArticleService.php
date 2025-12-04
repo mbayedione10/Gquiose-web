@@ -54,7 +54,7 @@ class ArticleService
                 'users.name as author',
                 'articles.created_at')
             ->where('articles.status', true)
-            ->orderByDesc('id')
+            ->orderByDesc('articles.id')
             ->get();
     }
     public function show($slug)

@@ -456,9 +456,6 @@ class SafetyAdviceService
             "• C'est très traumatisant, ne reste pas seul.e\n\n" .
             "⚠️ Les deepfakes sont une forme de VIOLENCE SEXUELLE. Ce n'est PAS de ta faute.";
     }
-}
-
-
 
     /**
      * Génère des conseils spécifiques selon le sous-type de violence numérique
