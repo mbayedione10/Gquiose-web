@@ -77,9 +77,7 @@ class APIStructureController extends Controller
                 'villes.name as ville',
                 DB::raw("$haversine AS distance")
             )
-            ->where('structures.status', true)
-            ->having('distance', '<=', $radius)
-            ->orderBy('distance', 'asc');
+            ->where('structures.status', true);
 
         // Filtrer par type de structure si spécifié
         if ($typeStructureId) {
@@ -88,11 +86,16 @@ class APIStructureController extends Controller
 
         $structures = $query->get();
 
-        // Formatter la distance avec 2 décimales
-        $structures = $structures->map(function ($structure) {
+        // Filtrer par distance et formater avec 2 décimales (après récupération pour compatibilité SQLite)
+        $structures = $structures->filter(function ($structure) use ($radius) {
+            return $structure->distance <= $radius;
+        })
+        ->map(function ($structure) {
             $structure->distance = round($structure->distance, 2);
             return $structure;
-        });
+        })
+        ->sortBy('distance')
+        ->values(); // Réindexer après tri
 
         $data = [
             "structures" => $structures,
