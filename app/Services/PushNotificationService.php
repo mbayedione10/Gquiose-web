@@ -85,11 +85,13 @@ class PushNotificationService
 
             // Filtres démographiques
             if (isset($filters['age_min'])) {
-                $query->whereRaw('YEAR(CURDATE()) - YEAR(dob) >= ?', [$filters['age_min']]);
+                $maxDate = now()->subYears($filters['age_min'])->format('Y-m-d');
+                $query->where('dob', '<=', $maxDate);
             }
 
             if (isset($filters['age_max'])) {
-                $query->whereRaw('YEAR(CURDATE()) - YEAR(dob) <= ?', [$filters['age_max']]);
+                $minDate = now()->subYears($filters['age_max'] + 1)->addDay()->format('Y-m-d');
+                $query->where('dob', '>=', $minDate);
             }
 
             if (isset($filters['sexe'])) {
