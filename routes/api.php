@@ -35,6 +35,7 @@ Route::prefix('v1')
         Route::post('login', [APIAuthController::class, 'login']);
         Route::post('register', [APIAuthController::class, 'register']);
         Route::post('code-confirmation', [APIAuthController::class, 'codeConfirmation']);
+        Route::post('resend-verification-code', [APIAuthController::class, 'resendVerificationCode']);
 
         // Password reset
         Route::post('send-password-reset-code', [APIAuthController::class, 'sendPasswordResetCode']);

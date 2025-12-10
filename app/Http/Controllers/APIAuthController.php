@@ -466,7 +466,7 @@ class APIAuthController extends Controller
     public function codeConfirmation(Request $request)
     {
         $validated = $request->validate([
-            'identifier' => 'required|string',
+            'identifier' => 'required|string', // Email ou téléphone
             'code'       => 'required|string|digits:4', // Unifié à 4 chiffres
         ]);
 
@@ -557,6 +557,109 @@ class APIAuthController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Erreur activation', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response::error('Une erreur est survenue', 500);
+        }
+    }
+
+    /**
+     * Renvoyer le code de vérification
+     */
+    public function resendVerificationCode(Request $request)
+    {
+        $validated = $request->validate([
+            'identifier' => 'required|string', // Email ou phone
+        ]);
+
+        $isEmail = filter_var($validated['identifier'], FILTER_VALIDATE_EMAIL);
+
+        // Anti-spam : vérifier qu'on n'a pas envoyé de code récemment
+        $antiSpamKey = 'resend_code_' . $validated['identifier'];
+        if (Cache::has($antiSpamKey)) {
+            $remainingTime = Cache::get($antiSpamKey) - time();
+            return response::error("Veuillez patienter {$remainingTime} secondes avant de renvoyer un code", 429);
+        }
+
+        // Rechercher l'utilisateur
+        if ($isEmail) {
+            $utilisateur = Utilisateur::where('email', $validated['identifier'])->first();
+        } else {
+            $utilisateur = Utilisateur::whereNotNull('phone')->get()->first(function ($user) use ($validated) {
+                try {
+                    return Crypt::decryptString($user->phone) === $validated['identifier'];
+                } catch (\Exception $e) {
+                    return false;
+                }
+            });
+        }
+
+        if (!$utilisateur) {
+            Log::warning('Resend code requested for non-existent user', [
+                'identifier' => $isEmail ? $validated['identifier'] : substr($validated['identifier'], 0, 4) . '****'
+            ]);
+            return response::error('Utilisateur introuvable', 404);
+        }
+
+        // Vérifier que le compte n'est pas déjà activé
+        if ($utilisateur->status) {
+            return response::error('Votre compte est déjà activé', 400);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Supprimer l'ancien code
+            Code::where('utilisateur_id', $utilisateur->id)
+                ->where($isEmail ? 'email' : 'phone', '!=', null)
+                ->delete();
+
+            // Générer nouveau code 4 chiffres
+            $codeValue = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+
+            Code::create([
+                'code'           => $codeValue,
+                'utilisateur_id' => $utilisateur->id,
+                'email'          => $isEmail ? $validated['identifier'] : null,
+                'phone'          => !$isEmail ? Crypt::encryptString($validated['identifier']) : null,
+            ]);
+
+            // Envoyer par email ou SMS
+            if ($isEmail) {
+                $fullname = trim($utilisateur->prenom . ' ' . $utilisateur->nom) ?: 'Utilisateur';
+                $title = 'Code de vérification Gquiose';
+                $content = "Bonjour {$fullname}, voici votre code de vérification pour activer votre compte Gquiose.";
+
+                Mail::to($validated['identifier'])->send(new SendCodeEmail($title, $content, $codeValue));
+            } else {
+                $smsService = new SMSService();
+                $smsSent = $smsService->sendVerificationCode($validated['identifier'], $codeValue);
+
+                if (!$smsSent) {
+                    DB::rollBack();
+                    Log::error('SMS sending failed during code resend', [
+                        'phone' => substr($validated['identifier'], 0, 4) . '****'
+                    ]);
+                    return response::error('Impossible d\'envoyer le SMS. Veuillez réessayer.', 500);
+                }
+            }
+
+            // Marquer l'anti-spam (60 secondes)
+            Cache::put($antiSpamKey, time() + 60, 60);
+
+            DB::commit();
+
+            Log::info('Verification code resent', [
+                'user_id' => $utilisateur->id,
+                'type' => $isEmail ? 'email' : 'sms'
+            ]);
+
+            return response::success([
+                'message' => 'Un nouveau code de vérification a été envoyé'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error resending verification code', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
