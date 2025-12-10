@@ -259,7 +259,7 @@ class UtilisateurResource extends Resource
                     ->visible(fn (Utilisateur $record): bool => !$record->status)
                     ->requiresConfirmation()
                     ->modalHeading('Renvoyer le code de vérification')
-                    ->modalDescription(fn (Utilisateur $record): string => 
+                    ->modalSubheading(fn (Utilisateur $record): string => 
                         "Voulez-vous renvoyer le code de vérification à " . 
                         ($record->email ?: 'ce numéro de téléphone') . " ?"
                     )
