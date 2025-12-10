@@ -1,5 +1,5 @@
 -- Script pour rendre email et phone nullable dans SQLite
--- À exécuter manuellement sur le serveur
+-- Version corrigée - NE recrée PAS les index s'ils existent déjà
 
 BEGIN TRANSACTION;
 
@@ -9,7 +9,7 @@ PRAGMA foreign_keys=OFF;
 -- 2. Renommer la table actuelle
 ALTER TABLE utilisateurs RENAME TO utilisateurs_old;
 
--- 3. Créer la nouvelle table avec les bonnes contraintes
+-- 3. Créer la nouvelle table avec les bonnes contraintes (SANS les index pour l'instant)
 CREATE TABLE utilisateurs (
     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
     nom VARCHAR(255) NOT NULL,
@@ -35,9 +35,10 @@ CREATE TABLE utilisateurs (
 -- 4. Copier toutes les données
 INSERT INTO utilisateurs SELECT * FROM utilisateurs_old;
 
--- 5. Recréer les index
-CREATE UNIQUE INDEX utilisateurs_email_unique ON utilisateurs (email);
-CREATE UNIQUE INDEX utilisateurs_phone_unique ON utilisateurs (phone);
+-- 5. Créer les index UNIQUEMENT s'ils n'existent pas
+-- Note: SQLite va ignorer l'erreur "already exists" avec CREATE INDEX IF NOT EXISTS
+CREATE UNIQUE INDEX IF NOT EXISTS utilisateurs_email_unique ON utilisateurs (email);
+CREATE UNIQUE INDEX IF NOT EXISTS utilisateurs_phone_unique ON utilisateurs (phone);
 
 -- 6. Supprimer l'ancienne table
 DROP TABLE utilisateurs_old;
