@@ -110,11 +110,28 @@ class APIAuthController extends Controller
     }
 
     /**
-     * Inscription avec type (phone, email, social)
+     * Inscription avec détection automatique du type (phone, email, social)
      */
     public function register(Request $request)
     {
-        $type = $request->input('type', 'phone');
+        // Détection automatique du type d'inscription
+        $type = $request->input('type');
+
+        if (!$type) {
+            // Auto-détection basée sur les champs présents
+            if ($request->has('access_token') && $request->has('provider')) {
+                $type = 'social';
+            } elseif ($request->has('email') && !$request->has('phone')) {
+                $type = 'email';
+            } elseif ($request->has('phone') && !$request->has('email')) {
+                $type = 'phone';
+            } elseif ($request->has('email') && $request->has('phone')) {
+                // Si les deux sont présents, privilégier email
+                $type = 'email';
+            } else {
+                return response::error('Impossible de déterminer le type d\'inscription. Veuillez fournir soit un email, soit un téléphone, soit un provider social.', 400);
+            }
+        }
 
         try {
             return match ($type) {
@@ -141,7 +158,7 @@ class APIAuthController extends Controller
         $validated = $request->validate([
             'phone'                => 'required|string|regex:/^\+224[0-9]{9}$/',
             'sexe'                 => 'required|in:M,F,Autre',
-            'age'                  => 'required|integer|min:13|max:100',
+            'dob'                  => 'required|date|before:today|after:' . now()->subYears(100)->format('Y-m-d'),
             'password'             => 'required|string|min:8|confirmed',
             'password_confirmation'=> 'required',
             'nom'                  => 'nullable|string|max:255',
@@ -151,7 +168,15 @@ class APIAuthController extends Controller
             'ville_id'             => 'nullable|exists:villes,id',
         ], [
             'phone.regex' => 'Le format du numéro doit être +224XXXXXXXXX',
+            'dob.before' => 'La date de naissance doit être antérieure à aujourd\'hui',
+            'dob.after' => 'L\'âge ne peut pas dépasser 100 ans',
         ]);
+
+        // Vérifier que l'utilisateur a au moins 13 ans
+        $age = now()->diffInYears($validated['dob']);
+        if ($age < 13) {
+            return response::error('Vous devez avoir au moins 13 ans pour vous inscrire', 400);
+        }
 
         // Vérifier unicité (on doit comparer avec déchiffrement)
         $existingUser = Utilisateur::whereNotNull('phone')->get()->first(function ($user) use ($validated) {
@@ -175,7 +200,7 @@ class APIAuthController extends Controller
 
         DB::beginTransaction();
         try {
-            $dob = now()->subYears($validated['age'])->format('Y-m-d');
+            $dob = $validated['dob'];
 
             $utilisateur = Utilisateur::create([
                 'nom'        => $validated['nom'] ?? '',
@@ -240,7 +265,7 @@ class APIAuthController extends Controller
         $validated = $request->validate([
             'email'                => 'required|email|unique:utilisateurs,email',
             'sexe'                 => 'required|in:M,F,Autre',
-            'age'                  => 'required|integer|min:13|max:100',
+            'dob'                  => 'required|date|before:today|after:' . now()->subYears(100)->format('Y-m-d'),
             'password'             => 'required|string|min:8|confirmed',
             'password_confirmation'=> 'required',
             'nom'                  => 'nullable|string|max:255',
@@ -248,7 +273,16 @@ class APIAuthController extends Controller
             'fcm_token'            => 'nullable|string',
             'platform'             => 'required|in:android,ios',
             'ville_id'             => 'nullable|exists:villes,id',
+        ], [
+            'dob.before' => 'La date de naissance doit être antérieure à aujourd\'hui',
+            'dob.after' => 'L\'âge ne peut pas dépasser 100 ans',
         ]);
+
+        // Vérifier que l'utilisateur a au moins 13 ans
+        $age = now()->diffInYears($validated['dob']);
+        if ($age < 13) {
+            return response::error('Vous devez avoir au moins 13 ans pour vous inscrire', 400);
+        }
 
         // Anti-spam : vérifier qu'on n'a pas envoyé de code récemment
         $antiSpamKey = 'email_sent_' . $validated['email'];
@@ -259,7 +293,7 @@ class APIAuthController extends Controller
 
         DB::beginTransaction();
         try {
-            $dob = now()->subYears($validated['age'])->format('Y-m-d');
+            $dob = $validated['dob'];
 
             $utilisateur = Utilisateur::create([
                 'nom'        => $validated['nom'] ?? '',
@@ -320,11 +354,20 @@ class APIAuthController extends Controller
             'provider'    => 'required|in:google,facebook,apple',
             'access_token'=> 'required|string', // Token à vérifier
             'sexe'        => 'required|in:M,F,Autre',
-            'age'         => 'required|integer|min:13|max:100',
+            'dob'         => 'required|date|before:today|after:' . now()->subYears(100)->format('Y-m-d'),
             'fcm_token'   => 'nullable|string',
             'platform'    => 'required|in:android,ios',
             'ville_id'    => 'nullable|exists:villes,id',
+        ], [
+            'dob.before' => 'La date de naissance doit être antérieure à aujourd\'hui',
+            'dob.after' => 'L\'âge ne peut pas dépasser 100 ans',
         ]);
+
+        // Vérifier que l'utilisateur a au moins 13 ans
+        $age = now()->diffInYears($validated['dob']);
+        if ($age < 13) {
+            return response::error('Vous devez avoir au moins 13 ans pour vous inscrire', 400);
+        }
 
         DB::beginTransaction();
         try {
@@ -371,7 +414,7 @@ class APIAuthController extends Controller
             }
 
             // Créer un nouveau compte
-            $dob = now()->subYears($validated['age'])->format('Y-m-d');
+            $dob = $validated['dob'];
 
             $nom = $socialData['family_name'] ?? '';
             $prenom = $socialData['given_name'] ?? ($socialData['name'] ?? '');
