@@ -17,6 +17,15 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\UtilisateurResource\Pages;
+use Filament\Notifications\Notification;
+use App\Models\Code;
+use App\Mail\SendCodeEmail;
+use App\Services\SMS\SMSService;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Crypt;
 
 class UtilisateurResource extends Resource
 {
@@ -243,6 +252,104 @@ class UtilisateurResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('resend_verification_code')
+                    ->label('Renvoyer le code')
+                    ->icon('heroicon-o-mail')
+                    ->color('warning')
+                    ->visible(fn (Utilisateur $record): bool => !$record->status)
+                    ->requiresConfirmation()
+                    ->modalHeading('Renvoyer le code de vérification')
+                    ->modalDescription(fn (Utilisateur $record): string => 
+                        "Voulez-vous renvoyer le code de vérification à " . 
+                        ($record->email ?: 'ce numéro de téléphone') . " ?"
+                    )
+                    ->modalButton('Envoyer')
+                    ->action(function (Utilisateur $record) {
+                        try {
+                            $isEmail = !empty($record->email);
+                            $identifier = $isEmail ? $record->email : Crypt::decryptString($record->phone);
+
+                            // Anti-spam
+                            $antiSpamKey = 'admin_resend_code_' . $record->id;
+                            if (Cache::has($antiSpamKey)) {
+                                Notification::make()
+                                    ->title('Trop de tentatives')
+                                    ->body('Veuillez patienter avant de renvoyer un code.')
+                                    ->warning()
+                                    ->send();
+                                return;
+                            }
+
+                            DB::beginTransaction();
+
+                            // Supprimer l'ancien code
+                            Code::where('utilisateur_id', $record->id)
+                                ->where($isEmail ? 'email' : 'phone', '!=', null)
+                                ->delete();
+
+                            // Générer nouveau code 4 chiffres
+                            $codeValue = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+
+                            Code::create([
+                                'code'           => $codeValue,
+                                'utilisateur_id' => $record->id,
+                                'email'          => $isEmail ? $identifier : null,
+                                'phone'          => !$isEmail ? Crypt::encryptString($identifier) : null,
+                            ]);
+
+                            // Envoyer par email ou SMS
+                            if ($isEmail) {
+                                $fullname = trim($record->prenom . ' ' . $record->nom) ?: 'Utilisateur';
+                                $title = 'Code de vérification Gquiose';
+                                $content = "Bonjour {$fullname}, voici votre code de vérification pour activer votre compte Gquiose.";
+
+                                Mail::to($identifier)->send(new SendCodeEmail($title, $content, $codeValue));
+                            } else {
+                                $smsService = new SMSService();
+                                $smsSent = $smsService->sendVerificationCode($identifier, $codeValue);
+
+                                if (!$smsSent) {
+                                    DB::rollBack();
+                                    Notification::make()
+                                        ->title('Erreur d\'envoi')
+                                        ->body('Impossible d\'envoyer le SMS.')
+                                        ->danger()
+                                        ->send();
+                                    return;
+                                }
+                            }
+
+                            // Marquer l'anti-spam (60 secondes)
+                            Cache::put($antiSpamKey, true, 60);
+
+                            DB::commit();
+
+                            Log::info('Admin resent verification code', [
+                                'user_id' => $record->id,
+                                'type' => $isEmail ? 'email' : 'sms',
+                                'admin_id' => auth()->id()
+                            ]);
+
+                            Notification::make()
+                                ->title('Code envoyé avec succès')
+                                ->body('Le code de vérification a été renvoyé à ' . ($isEmail ? 'l\'email' : 'le numéro de téléphone'))
+                                ->success()
+                                ->send();
+
+                        } catch (\Exception $e) {
+                            DB::rollBack();
+                            Log::error('Admin error resending verification code', [
+                                'error' => $e->getMessage(),
+                                'user_id' => $record->id
+                            ]);
+
+                            Notification::make()
+                                ->title('Erreur')
+                                ->body('Une erreur est survenue lors de l\'envoi du code.')
+                                ->danger()
+                                ->send();
+                        }
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
