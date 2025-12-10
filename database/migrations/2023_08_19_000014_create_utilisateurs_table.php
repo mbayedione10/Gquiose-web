@@ -14,8 +14,8 @@ return new class extends Migration {
             $table->bigIncrements('id');
             $table->string('nom');
             $table->string('prenom');
-            $table->string('email')->unique();
-            $table->string('phone')->unique();
+            $table->string('email')->nullable()->unique();
+            $table->string('phone')->nullable()->unique();
             $table->string('sexe');
             $table->boolean('status');
 

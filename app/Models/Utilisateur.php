@@ -26,6 +26,7 @@ class Utilisateur extends Model
         'provider_id',
         'photo',
         'email_verified_at',
+        'phone_verified_at',
         'fcm_token',
         'platform',
         'ville_id'
