@@ -25,7 +25,7 @@ class UtilisateurBonneReponseChart extends DoughnutChartWidget
             ->select('thematiques.name as name', DB::raw('COUNT(responses.id) as data'))
             ->where('responses.utilisateur_id', $this->record->id)
             ->where('responses.isValid', 1)
-            ->groupBy('name');
+            ->groupBy('thematiques.name');
 
         $labels = $query->pluck('name')->toArray();
         $data = $query->pluck('data')->toArray();

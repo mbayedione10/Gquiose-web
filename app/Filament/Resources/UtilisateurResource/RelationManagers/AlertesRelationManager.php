@@ -54,7 +54,8 @@ class AlertesRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('ref')
                     ->searchable()
-                    ->limit(50),
+                    ->limit(50)
+                    ->url(fn ($record) => \App\Filament\Resources\AlerteResource::getUrl('view', ['record' => $record])),
 
 
                 Tables\Columns\TextColumn::make("utilisateur.name")

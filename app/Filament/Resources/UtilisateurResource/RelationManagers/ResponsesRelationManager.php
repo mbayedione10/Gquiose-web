@@ -61,7 +61,8 @@ class ResponsesRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('question.name')
                     ->label("Question ")
-                    ->limit(50),
+                    ->limit(50)
+                    ->url(fn ($record) => \App\Filament\Resources\ResponseResource::getUrl('view', ['record' => $record])),
 
                 Tables\Columns\TextColumn::make('question.thematique.name')
                     ->label("Thématique")
