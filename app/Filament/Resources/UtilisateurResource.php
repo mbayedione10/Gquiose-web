@@ -108,10 +108,10 @@ class UtilisateurResource extends Resource
                             'lg' => 12,
                         ]),
 
-                    TextInput::make('dob')
+                    Forms\Components\DatePicker::make('dob')
                         ->label('Date de naissance')
-                        ->placeholder('Date de naissance ou tranche d\'âge')
-                        ->helperText('Format: JJ/MM/AAAA ou texte (ex: 18-24 ans)')
+                        ->placeholder('Date de naissance')
+                        ->displayFormat('d/m/Y')
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,
@@ -206,17 +206,7 @@ class UtilisateurResource extends Resource
 
                 Tables\Columns\TextColumn::make('dob')
                     ->label("Date de naissance")
-                    ->formatStateUsing(function ($state) {
-                        if (empty($state)) {
-                            return '-';
-                        }
-                        // Si c'est déjà du texte (ex: "18-24 ans"), l'afficher tel quel
-                        if (!strtotime($state)) {
-                            return $state;
-                        }
-                        // Sinon formater comme date
-                        return \Carbon\Carbon::parse($state)->format('d/m/Y');
-                    })
+                    ->date('d/m/Y')
                     ->sortable()
                     ->toggleable(),
 
