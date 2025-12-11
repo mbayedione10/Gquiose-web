@@ -174,6 +174,8 @@ class NotificationLogSeeder extends Seeder
             ],
         ];
 
+        $platforms = ['ios', 'android'];
+
         foreach ($notifications as $index => $notifData) {
             $utilisateur = $utilisateurs->random();
             $status = $statuses[array_rand($statuses)];
