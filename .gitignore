@@ -8,6 +8,7 @@
 .env
 .env.backup
 .env.production
+.env.gmail.example
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
@@ -21,3 +22,4 @@ storage/app/apns/*.p8
 storage/app/firebase/*.json
 storage/app/apns/*.p8
 /attached_assets
+*.md
