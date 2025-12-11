@@ -201,7 +201,7 @@ class NotificationLogSeeder extends Seeder
                 'clicked_at' => $clickedAt,
                 'failed_at' => null,
                 'error_message' => null,
-                'platform' => array_rand(['ios', 'android'])
+                'platform' => array_rand(['ios', 'android']),
                 'fcm_message_id' => 'fcm_' . uniqid(),
             ]);
         }
