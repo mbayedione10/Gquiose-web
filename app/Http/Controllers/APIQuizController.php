@@ -54,7 +54,13 @@ class APIQuizController extends Controller
             return ApiResponse::error('Utilisateur non trouvé', 404);
         }
 
-        $data = json_decode($request['responses'], true);
+        // Accepter array ou JSON string
+        $responsesData = $request->input('responses');
+        if (is_string($responsesData)) {
+            $data = json_decode($responsesData, true);
+        } else {
+            $data = $responsesData;
+        }
 
         if (!is_array($data)) {
             return ApiResponse::error('Format de réponses invalide', 422);
