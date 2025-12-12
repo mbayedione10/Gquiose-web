@@ -65,8 +65,19 @@ Route::prefix('v1')
             });
         });
 
-        /*************************  CONFIG    ***************************/
-        Route::get('config', [APIArticleController::class, 'config']);
+        /*************************  CONFIG & RESSOURCES    ***************************/
+        // Config = Informations générales (images, URLs)
+        Route::get('config', [APIArticleController::class, 'informations']);
+
+        // Endpoints séparés pour chaque ressource
+        Route::get('quiz', [APIArticleController::class, 'quiz']);
+        Route::get('thematiques', [APIArticleController::class, 'thematiques']);
+        Route::get('conseils', [APIArticleController::class, 'conseils']);
+        Route::get('structures-sante', [APIArticleController::class, 'structuresSante']);
+        Route::get('faqs', [APIArticleController::class, 'faqs']);
+
+        // Ancien endpoint combiné (pour rétrocompatibilité)
+        Route::get('config-all', [APIArticleController::class, 'config']);
 
         /*************************  ARTICLES    ***************************/
         Route::get('articles', [APIArticleController::class, 'index']);
@@ -158,8 +169,6 @@ Route::prefix('v1')
             Route::post('/settings', [APICycleController::class, 'updateSettings']);
             Route::post('/reminders', [APICycleController::class, 'configureReminders']);
         });
-
-
 
 });
 
