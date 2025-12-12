@@ -38,7 +38,7 @@ class APIAlertWorkflowController extends Controller
             $this->getUserIdentifierRules(),
             [
                 'type_alerte_id' => 'required|exists:type_alertes,id',
-                'sous_type_violence_numerique_id' => 'nullable|exists:sous_type_violence_numeriques,id',
+                'sous_type_violence_numerique_id' => 'nullable|exists:sous_types_violence_numerique,id',
             ]
         ));
 
