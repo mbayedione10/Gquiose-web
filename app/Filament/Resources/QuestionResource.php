@@ -124,8 +124,27 @@ class QuestionResource extends Resource
                         'lg' => 12,
                     ]),
 
+                TextInput::make('option3')
+                    ->rules(['max:255', 'string'])
+                    ->label("Option 3")
+                    ->nullable()
+                    ->placeholder('Mauvaise réponse 3 (optionnelle)')
+                    ->columnSpan([
+                        'default' => 12,
+                        'md' => 12,
+                        'lg' => 12,
+                    ]),
 
-
+                TextInput::make('option4')
+                    ->rules(['max:255', 'string'])
+                    ->label("Option 4")
+                    ->nullable()
+                    ->placeholder('Mauvaise réponse 4 (optionnelle)')
+                    ->columnSpan([
+                        'default' => 12,
+                        'md' => 12,
+                        'lg' => 12,
+                    ]),
 
                 Toggle::make('status')
                     ->label("Activée")
@@ -172,6 +191,16 @@ class QuestionResource extends Resource
                 Tables\Columns\TextColumn::make('option2')
                     ->label("Option 2")
                     ->limit(50),
+
+                Tables\Columns\TextColumn::make('option3')
+                    ->label("Option 3")
+                    ->limit(50)
+                    ->default('-'),
+
+                Tables\Columns\TextColumn::make('option4')
+                    ->label("Option 4")
+                    ->limit(50)
+                    ->default('-'),
 
                 Tables\Columns\ToggleColumn::make('status')
                     ->label("Statut"),
