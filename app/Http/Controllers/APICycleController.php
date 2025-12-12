@@ -21,18 +21,27 @@ class APICycleController extends Controller
      */
     public function startPeriod(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:utilisateurs,id',
-            'period_start_date' => 'required|date',
-            'flow_intensity' => 'nullable|in:leger,modere,abondant',
-            'notes' => 'nullable|string|max:500',
-        ]);
+        $validator = Validator::make($request->all(), array_merge(
+            $this->getUserIdentifierRules(),
+            [
+                'period_start_date' => 'required|date',
+                'flow_intensity' => 'nullable|in:leger,modere,abondant',
+                'notes' => 'nullable|string|max:500',
+            ]
+        ));
 
         if ($validator->fails()) {
             return ApiResponse::error($validator->errors()->first(), 400);
         }
 
-        $user = Utilisateur::find($request->user_id);
+        if (!$this->hasUserIdentifier($request)) {
+            return ApiResponse::error('Veuillez fournir user_id, email ou phone', 400);
+        }
+
+        $user = $this->resolveUser($request);
+        if (!$user) {
+            return ApiResponse::error('Utilisateur introuvable', 404);
+        }
         
         // Récupérer ou créer les paramètres
         $settings = CycleSetting::firstOrCreate(
@@ -102,16 +111,27 @@ class APICycleController extends Controller
      */
     public function endPeriod(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:utilisateurs,id',
-            'period_end_date' => 'required|date',
-        ]);
+        $validator = Validator::make($request->all(), array_merge(
+            $this->getUserIdentifierRules(),
+            [
+                'period_end_date' => 'required|date',
+            ]
+        ));
 
         if ($validator->fails()) {
             return ApiResponse::error($validator->errors()->first(), 400);
         }
 
-        $cycle = MenstrualCycle::where('utilisateur_id', $request->user_id)
+        if (!$this->hasUserIdentifier($request)) {
+            return ApiResponse::error('Veuillez fournir user_id, email ou phone', 400);
+        }
+
+        $user = $this->resolveUser($request);
+        if (!$user) {
+            return ApiResponse::error('Utilisateur introuvable', 404);
+        }
+
+        $cycle = MenstrualCycle::where('utilisateur_id', $user->id)
             ->where('is_active', true)
             ->whereNull('period_end_date')
             ->first();
@@ -138,33 +158,44 @@ class APICycleController extends Controller
      */
     public function logSymptoms(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:utilisateurs,id',
-            'symptom_date' => 'required|date',
-            'physical_symptoms' => 'nullable|array',
-            'physical_symptoms.*' => 'string|in:crampes,fatigue,maux_tete,nausee,sensibilite_seins,ballonnements,douleurs_dos,acne',
-            'pain_level' => 'nullable|integer|min:0|max:10',
-            'mood' => 'nullable|array',
-            'mood.*' => 'string|in:joyeuse,triste,irritable,anxieuse,calme,energique,stresse',
-            'discharge_type' => 'nullable|in:aucune,creamy,sticky,watery,egg_white',
-            'temperature' => 'nullable|numeric|min:35|max:42',
-            'sexual_activity' => 'nullable|boolean',
-            'contraception_used' => 'nullable|boolean',
-            'notes' => 'nullable|string|max:500',
-        ]);
+        $validator = Validator::make($request->all(), array_merge(
+            $this->getUserIdentifierRules(),
+            [
+                'symptom_date' => 'required|date',
+                'physical_symptoms' => 'nullable|array',
+                'physical_symptoms.*' => 'string|in:crampes,fatigue,maux_tete,nausee,sensibilite_seins,ballonnements,douleurs_dos,acne',
+                'pain_level' => 'nullable|integer|min:0|max:10',
+                'mood' => 'nullable|array',
+                'mood.*' => 'string|in:joyeuse,triste,irritable,anxieuse,calme,energique,stresse',
+                'discharge_type' => 'nullable|in:aucune,creamy,sticky,watery,egg_white',
+                'temperature' => 'nullable|numeric|min:35|max:42',
+                'sexual_activity' => 'nullable|boolean',
+                'contraception_used' => 'nullable|boolean',
+                'notes' => 'nullable|string|max:500',
+            ]
+        ));
 
         if ($validator->fails()) {
             return ApiResponse::error($validator->errors()->first(), 400);
         }
 
+        if (!$this->hasUserIdentifier($request)) {
+            return ApiResponse::error('Veuillez fournir user_id, email ou phone', 400);
+        }
+
+        $user = $this->resolveUser($request);
+        if (!$user) {
+            return ApiResponse::error('Utilisateur introuvable', 404);
+        }
+
         // Trouver le cycle actif
-        $activeCycle = MenstrualCycle::where('utilisateur_id', $request->user_id)
+        $activeCycle = MenstrualCycle::where('utilisateur_id', $user->id)
             ->where('is_active', true)
             ->first();
 
         $symptom = CycleSymptom::updateOrCreate(
             [
-                'utilisateur_id' => $request->user_id,
+                'utilisateur_id' => $user->id,
                 'symptom_date' => $request->symptom_date,
             ],
             [
@@ -188,21 +219,28 @@ class APICycleController extends Controller
 
     /**
      * Obtenir le cycle actuel et les prédictions
-     * GET /api/v1/cycle/current/{user_id}
+     * GET /api/v1/cycle/current/{user_id?}
+     * Supporte aussi: ?email=xxx ou ?phone=xxx
      */
-    public function getCurrentCycle($userId)
+    public function getCurrentCycle(Request $request, $userId = null)
     {
-        $user = Utilisateur::find($userId);
-        if (!$user) {
-            return ApiResponse::error('Utilisateur introuvable', 404);
+        // Priorité: paramètre URL > query params
+        if ($userId) {
+            $user = Utilisateur::find($userId);
+        } else {
+            $user = $this->resolveUser($request);
         }
 
-        $cycle = MenstrualCycle::where('utilisateur_id', $userId)
+        if (!$user) {
+            return ApiResponse::error('Utilisateur introuvable. Fournir user_id, email ou phone', 404);
+        }
+
+        $cycle = MenstrualCycle::where('utilisateur_id', $user->id)
             ->where('is_active', true)
             ->with('symptoms')
             ->first();
 
-        $settings = CycleSetting::where('utilisateur_id', $userId)->first();
+        $settings = CycleSetting::where('utilisateur_id', $user->id)->first();
 
         if (!$cycle) {
             return ApiResponse::success([
@@ -236,13 +274,25 @@ class APICycleController extends Controller
 
     /**
      * Obtenir l'historique des cycles
-     * GET /api/v1/cycle/history/{user_id}
+     * GET /api/v1/cycle/history/{user_id?}
+     * Supporte aussi: ?email=xxx ou ?phone=xxx
      */
-    public function getHistory($userId, Request $request)
+    public function getHistory(Request $request, $userId = null)
     {
+        // Priorité: paramètre URL > query params
+        if ($userId) {
+            $user = Utilisateur::find($userId);
+        } else {
+            $user = $this->resolveUser($request);
+        }
+
+        if (!$user) {
+            return ApiResponse::error('Utilisateur introuvable. Fournir user_id, email ou phone', 404);
+        }
+
         $limit = $request->input('limit', 6);
 
-        $cycles = MenstrualCycle::where('utilisateur_id', $userId)
+        $cycles = MenstrualCycle::where('utilisateur_id', $user->id)
             ->orderBy('period_start_date', 'desc')
             ->limit($limit)
             ->get();
@@ -255,14 +305,26 @@ class APICycleController extends Controller
 
     /**
      * Obtenir les symptômes d'une période
-     * GET /api/v1/cycle/symptoms/{user_id}
+     * GET /api/v1/cycle/symptoms/{user_id?}
+     * Supporte aussi: ?email=xxx ou ?phone=xxx
      */
-    public function getSymptoms($userId, Request $request)
+    public function getSymptoms(Request $request, $userId = null)
     {
+        // Priorité: paramètre URL > query params
+        if ($userId) {
+            $user = Utilisateur::find($userId);
+        } else {
+            $user = $this->resolveUser($request);
+        }
+
+        if (!$user) {
+            return ApiResponse::error('Utilisateur introuvable. Fournir user_id, email ou phone', 404);
+        }
+
         $startDate = $request->input('start_date', Carbon::now()->subDays(30)->format('Y-m-d'));
         $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
 
-        $symptoms = CycleSymptom::where('utilisateur_id', $userId)
+        $symptoms = CycleSymptom::where('utilisateur_id', $user->id)
             ->whereBetween('symptom_date', [$startDate, $endDate])
             ->orderBy('symptom_date', 'desc')
             ->get();
@@ -282,23 +344,34 @@ class APICycleController extends Controller
      */
     public function updateSettings(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:utilisateurs,id',
-            'average_cycle_length' => 'nullable|integer|min:21|max:35',
-            'average_period_length' => 'nullable|integer|min:2|max:10',
-            'track_temperature' => 'nullable|boolean',
-            'track_symptoms' => 'nullable|boolean',
-            'track_mood' => 'nullable|boolean',
-            'track_sexual_activity' => 'nullable|boolean',
-            'notifications_enabled' => 'nullable|boolean',
-        ]);
+        $validator = Validator::make($request->all(), array_merge(
+            $this->getUserIdentifierRules(),
+            [
+                'average_cycle_length' => 'nullable|integer|min:21|max:35',
+                'average_period_length' => 'nullable|integer|min:2|max:10',
+                'track_temperature' => 'nullable|boolean',
+                'track_symptoms' => 'nullable|boolean',
+                'track_mood' => 'nullable|boolean',
+                'track_sexual_activity' => 'nullable|boolean',
+                'notifications_enabled' => 'nullable|boolean',
+            ]
+        ));
 
         if ($validator->fails()) {
             return ApiResponse::error($validator->errors()->first(), 400);
         }
 
+        if (!$this->hasUserIdentifier($request)) {
+            return ApiResponse::error('Veuillez fournir user_id, email ou phone', 400);
+        }
+
+        $user = $this->resolveUser($request);
+        if (!$user) {
+            return ApiResponse::error('Utilisateur introuvable', 404);
+        }
+
         $settings = CycleSetting::updateOrCreate(
-            ['utilisateur_id' => $request->user_id],
+            ['utilisateur_id' => $user->id],
             $request->only([
                 'average_cycle_length',
                 'average_period_length',
@@ -311,7 +384,7 @@ class APICycleController extends Controller
         );
 
         // Recalculer les prédictions du cycle actif
-        $activeCycle = MenstrualCycle::where('utilisateur_id', $request->user_id)
+        $activeCycle = MenstrualCycle::where('utilisateur_id', $user->id)
             ->where('is_active', true)
             ->first();
 
@@ -334,28 +407,39 @@ class APICycleController extends Controller
      */
     public function configureReminders(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:utilisateurs,id',
-            'reminders' => 'required|array',
-            'reminders.*.type' => 'required|in:period_approaching,period_today,ovulation_approaching,fertile_window,log_symptoms,pill_reminder',
-            'reminders.*.time' => 'required|date_format:H:i',
-            'reminders.*.enabled' => 'required|boolean',
-            'reminders.*.days_before' => 'nullable|array',
-        ]);
+        $validator = Validator::make($request->all(), array_merge(
+            $this->getUserIdentifierRules(),
+            [
+                'reminders' => 'required|array',
+                'reminders.*.type' => 'required|in:period_approaching,period_today,ovulation_approaching,fertile_window,log_symptoms,pill_reminder',
+                'reminders.*.time' => 'required|date_format:H:i',
+                'reminders.*.enabled' => 'required|boolean',
+                'reminders.*.days_before' => 'nullable|array',
+            ]
+        ));
 
         if ($validator->fails()) {
             return ApiResponse::error($validator->errors()->first(), 400);
         }
 
+        if (!$this->hasUserIdentifier($request)) {
+            return ApiResponse::error('Veuillez fournir user_id, email ou phone', 400);
+        }
+
+        $user = $this->resolveUser($request);
+        if (!$user) {
+            return ApiResponse::error('Utilisateur introuvable', 404);
+        }
+
         DB::beginTransaction();
         try {
             // Supprimer les anciens rappels
-            CycleReminder::where('utilisateur_id', $request->user_id)->delete();
+            CycleReminder::where('utilisateur_id', $user->id)->delete();
 
             // Créer les nouveaux
             foreach ($request->reminders as $reminder) {
                 CycleReminder::create([
-                    'utilisateur_id' => $request->user_id,
+                    'utilisateur_id' => $user->id,
                     'reminder_type' => $reminder['type'],
                     'reminder_time' => $reminder['time'],
                     'enabled' => $reminder['enabled'],
@@ -399,5 +483,49 @@ class APICycleController extends Controller
                 ]
             );
         }
+    }
+
+    /**
+     * Résoudre un utilisateur par user_id, email ou phone
+     * @param Request $request
+     * @return Utilisateur|null
+     */
+    protected function resolveUser(Request $request): ?Utilisateur
+    {
+        if ($request->has('user_id')) {
+            return Utilisateur::find($request->user_id);
+        }
+
+        if ($request->has('email')) {
+            return Utilisateur::where('email', $request->email)->first();
+        }
+
+        if ($request->has('phone')) {
+            return Utilisateur::where('phone', $request->phone)->first();
+        }
+
+        return null;
+    }
+
+    /**
+     * Valider qu'au moins un identifiant utilisateur est fourni
+     * @param Request $request
+     * @return array Règles de validation pour l'identifiant
+     */
+    protected function getUserIdentifierRules(): array
+    {
+        return [
+            'user_id' => 'nullable|exists:utilisateurs,id',
+            'email' => 'nullable|email|exists:utilisateurs,email',
+            'phone' => 'nullable|string|exists:utilisateurs,phone',
+        ];
+    }
+
+    /**
+     * Vérifier qu'au moins un identifiant est présent
+     */
+    protected function hasUserIdentifier(Request $request): bool
+    {
+        return $request->hasAny(['user_id', 'email', 'phone']);
     }
 }

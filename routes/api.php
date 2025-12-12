@@ -152,9 +152,9 @@ Route::prefix('v1')
             Route::post('/start', [APICycleController::class, 'startPeriod']);
             Route::post('/end-period', [APICycleController::class, 'endPeriod']);
             Route::post('/log-symptoms', [APICycleController::class, 'logSymptoms']);
-            Route::get('/current/{user_id}', [APICycleController::class, 'getCurrentCycle']);
-            Route::get('/history/{user_id}', [APICycleController::class, 'getHistory']);
-            Route::get('/symptoms/{user_id}', [APICycleController::class, 'getSymptoms']);
+            Route::get('/current/{user_id?}', [APICycleController::class, 'getCurrentCycle']);
+            Route::get('/history/{user_id?}', [APICycleController::class, 'getHistory']);
+            Route::get('/symptoms/{user_id?}', [APICycleController::class, 'getSymptoms']);
             Route::post('/settings', [APICycleController::class, 'updateSettings']);
             Route::post('/reminders', [APICycleController::class, 'configureReminders']);
         });
