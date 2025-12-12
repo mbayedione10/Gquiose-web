@@ -83,10 +83,16 @@ class APIQuizController extends Controller
                     $actualResponseValue = $question->reponse;
                 } elseif (strpos($userResponse, 'option') === 0) {
                     // Vérifie si c'est une option (option1, option2, option3, etc.)
-                    if (property_exists($question, $userResponse) && !empty($question->{$userResponse})) {
+                    \Log::info("Checking option: {$userResponse} for question {$question->id}");
+                    \Log::info("Property exists: " . (property_exists($question, $userResponse) ? 'yes' : 'no'));
+                    \Log::info("Value: " . var_export($question->{$userResponse}, true));
+                    
+                    if (property_exists($question, $userResponse) && $question->{$userResponse} !== null && $question->{$userResponse} !== '') {
                         $actualResponseValue = $question->{$userResponse};
+                        \Log::info("Valid option, value: {$actualResponseValue}");
                     } else {
                         // Option invalide ou vide
+                        \Log::error("Invalid option: {$userResponse} for question {$question->id}");
                         $errors[] = [
                             'questionId' => $data[$i]['questionId'],
                             'error' => "Option invalide: {$userResponse} n'existe pas pour cette question"
@@ -106,7 +112,7 @@ class APIQuizController extends Controller
                 $reponse->question_id = $question->id;
                 $reponse->utilisateur_id = $user->id;
                 $reponse->reponse = $actualResponseValue;
-                $reponse->isValid = ($actualResponseValue === $question->reponse); 
+                $reponse->isValid = ($actualResponseValue === $question->reponse);
                 $reponse->save();
                 $savedCount++;
             }
