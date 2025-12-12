@@ -7,6 +7,20 @@ use App\Models\TypeAlerte;
 class SafetyAdviceService
 {
     /**
+     * Génère des conseils de sécurité pour une alerte donnée
+     *
+     * @param \App\Models\Alerte $alerte
+     * @return string
+     */
+    public function getAdviceForAlert($alerte): string
+    {
+        return $this->generateSafetyAdvice(
+            $alerte->type_alerte_id,
+            $alerte->sous_type_violence_numerique_id
+        );
+    }
+
+    /**
      * Génère des conseils de sécurité automatiques basés sur le type de violence
      *
      * @param int|null $typeAlerteId
