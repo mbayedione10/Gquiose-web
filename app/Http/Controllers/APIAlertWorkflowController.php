@@ -172,7 +172,7 @@ class APIAlertWorkflowController extends Controller
             );
 
             if (!$validation['valid']) {
-                return response::error('Coordonnées GPS invalides: ' . implode(', ', $validation['errors']), 422);
+                return ApiResponse::error('Coordonnées GPS invalides: ' . implode(', ', $validation['errors']), 422);
             }
 
             // Préparer la localisation sécurisée (avec anonymisation)
