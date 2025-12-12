@@ -67,6 +67,7 @@ class APIQuizController extends Controller
         }
 
         $savedCount = 0;
+        $errors = [];
 
         for ($i = 0; $i < count($data); $i++)
         {
@@ -74,19 +75,52 @@ class APIQuizController extends Controller
 
             if ($question != null)
             {
+                $userResponse = $data[$i]['reponse'];
+                $actualResponseValue = null;
+
+                // Valider et récupérer la valeur réelle de la réponse dynamiquement
+                if ($userResponse === 'reponse') {
+                    $actualResponseValue = $question->reponse;
+                } elseif (strpos($userResponse, 'option') === 0) {
+                    // Vérifie si c'est une option (option1, option2, option3, etc.)
+                    if (property_exists($question, $userResponse) && !empty($question->{$userResponse})) {
+                        $actualResponseValue = $question->{$userResponse};
+                    } else {
+                        // Option invalide ou vide
+                        $errors[] = [
+                            'questionId' => $data[$i]['questionId'],
+                            'error' => "Option invalide: {$userResponse} n'existe pas pour cette question"
+                        ];
+                        continue;
+                    }
+                } else {
+                    // Format de réponse invalide
+                    $errors[] = [
+                        'questionId' => $data[$i]['questionId'],
+                        'error' => "Format de réponse invalide: {$userResponse}. Utilisez 'option1', 'option2', etc., ou 'reponse'"
+                    ];
+                    continue;
+                }
+
                 $reponse = new Response();
                 $reponse->question_id = $question->id;
                 $reponse->utilisateur_id = $user->id;
-                $reponse->reponse = $data[$i]['reponse'];
-                $reponse->isValid = ($data[$i]['reponse'] === $question->reponse); 
+                $reponse->reponse = $actualResponseValue;
+                $reponse->isValid = ($actualResponseValue === $question->reponse); 
                 $reponse->save();
                 $savedCount++;
             }
         }
 
-        return ApiResponse::success([
+        $response = [
             'message' => 'Réponses synchronisées avec succès',
             'saved_count' => $savedCount
-        ]);
+        ];
+
+        if (!empty($errors)) {
+            $response['errors'] = $errors;
+        }
+
+        return ApiResponse::success($response);
     }
 }
