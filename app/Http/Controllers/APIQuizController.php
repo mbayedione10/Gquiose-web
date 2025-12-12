@@ -78,7 +78,7 @@ class APIQuizController extends Controller
                 $reponse->question_id = $question->id;
                 $reponse->utilisateur_id = $user->id;
                 $reponse->reponse = $data[$i]['reponse'];
-                $reponse->isValid = ($reponseValue === $question->reponse); 
+                $reponse->isValid = ($data[$i]['reponse'] === $question->reponse); 
                 $reponse->save();
                 $savedCount++;
             }
