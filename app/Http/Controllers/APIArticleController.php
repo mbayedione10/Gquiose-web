@@ -163,6 +163,8 @@ class APIArticleController extends Controller
                 'questions.reponse',
                 'questions.option1',
                 'questions.option2',
+                'questions.option3',
+                'questions.option4',
                 'thematiques.id as thematique_id',
                 'thematiques.name as thematique'
             )
