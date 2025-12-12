@@ -30,20 +30,31 @@ class APIAlertWorkflowController extends Controller
     /**
      * Étape 1 : Sélection du type de violence
      * POST /api/v1/alertes/step1
+     * Accepte: utilisateur_id, email ou phone pour identifier l'utilisateur
      */
     public function step1(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'utilisateur_id' => 'required|exists:utilisateurs,id',
-            'type_alerte_id' => 'required|exists:type_alertes,id',
-            'sous_type_violence_numerique_id' => 'nullable|exists:sous_type_violence_numeriques,id',
-        ]);
+        $validator = Validator::make($request->all(), array_merge(
+            $this->getUserIdentifierRules(),
+            [
+                'type_alerte_id' => 'required|exists:type_alertes,id',
+                'sous_type_violence_numerique_id' => 'nullable|exists:sous_type_violence_numeriques,id',
+            ]
+        ));
 
         if ($validator->fails()) {
             return ApiResponse::error($validator->errors()->first(), Response::HTTP_BAD_REQUEST);
         }
 
-        $user = Utilisateur::find($request->utilisateur_id);
+        if (!$this->hasUserIdentifier($request)) {
+            return ApiResponse::error('Veuillez fournir utilisateur_id, email ou phone', Response::HTTP_BAD_REQUEST);
+        }
+
+        $user = $this->resolveUser($request);
+        if (!$user) {
+            return ApiResponse::error('Utilisateur introuvable', Response::HTTP_NOT_FOUND);
+        }
+
         $typeAlerte = TypeAlerte::find($request->type_alerte_id);
 
         // Créer une alerte en brouillon
@@ -224,8 +235,8 @@ class APIAlertWorkflowController extends Controller
     {
         $alerte = Alerte::with(['typeAlerte', 'sousTypeViolenceNumerique'])->find($alerte_id);
 
-        if (!$alerte || $alerte->etat !== 'Brouillon') {
-            return ApiResponse::error("Alerte introuvable ou déjà soumise", Response::HTTP_NOT_FOUND);
+        if (!$alerte) {
+            return ApiResponse::error("Alerte introuvable", Response::HTTP_NOT_FOUND);
         }
 
         // Générer les conseils de sécurité automatiques
@@ -250,8 +261,8 @@ class APIAlertWorkflowController extends Controller
     {
         $alerte = Alerte::with(['ville'])->find($alerte_id);
 
-        if (!$alerte || $alerte->etat !== 'Brouillon') {
-            return ApiResponse::error("Alerte introuvable ou déjà soumise", Response::HTTP_NOT_FOUND);
+        if (!$alerte) {
+            return ApiResponse::error("Alerte introuvable", Response::HTTP_NOT_FOUND);
         }
 
         $structures = [];
@@ -401,5 +412,45 @@ class APIAlertWorkflowController extends Controller
                 'difficultes_professionnelles', 'autre'
             ]
         ]);
+    }
+
+    /**
+     * Résoudre un utilisateur par utilisateur_id, email ou phone
+     */
+    protected function resolveUser(Request $request): ?Utilisateur
+    {
+        if ($request->has('utilisateur_id')) {
+            return Utilisateur::find($request->utilisateur_id);
+        }
+
+        if ($request->has('email')) {
+            return Utilisateur::where('email', $request->email)->first();
+        }
+
+        if ($request->has('phone')) {
+            return Utilisateur::where('phone', $request->phone)->first();
+        }
+
+        return null;
+    }
+
+    /**
+     * Règles de validation pour l'identifiant utilisateur
+     */
+    protected function getUserIdentifierRules(): array
+    {
+        return [
+            'utilisateur_id' => 'nullable|exists:utilisateurs,id',
+            'email' => 'nullable|email|exists:utilisateurs,email',
+            'phone' => 'nullable|string|exists:utilisateurs,phone',
+        ];
+    }
+
+    /**
+     * Vérifier qu'au moins un identifiant est présent
+     */
+    protected function hasUserIdentifier(Request $request): bool
+    {
+        return $request->hasAny(['utilisateur_id', 'email', 'phone']);
     }
 }
