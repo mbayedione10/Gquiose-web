@@ -92,8 +92,7 @@ Route::prefix('v1')
         Route::post('sync-quiz', [APIQuizController::class, 'sync']);
 
         /*************************  SYNC STRUCTURE    ***************************/
-        Route::get('structures', [APIStructureController::class, 'list']);
-        Route::get('structures/nearby', [APIStructureController::class, 'nearby']);
+        // Deprecated: Use /structures-sante instead
 
         /*************************  ALERTES    ***************************/
         Route::get('alertes', [APIAlertController::class, 'index']);
