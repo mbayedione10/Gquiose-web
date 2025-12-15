@@ -603,20 +603,20 @@
                             @php
                                 $percentage = $notificationStats['total'] > 0 ? round(($stat->total / $notificationStats['total']) * 100, 1) : 0;
                                 $categoryConfig = [
-                                    'alert' => ['icon' => '🚨', 'color' => '#ef4444'],
-                                    'reminder' => ['icon' => '⏰', 'color' => '#f59e0b'],
-                                    'health_tip' => ['icon' => '💡', 'color' => '#10b981'],
-                                    'cycle' => ['icon' => '🩸', 'color' => '#ec4899'],
-                                    'general' => ['icon' => '📢', 'color' => '#6366f1'],
-                                    'quiz' => ['icon' => '❓', 'color' => '#8b5cf6'],
-                                    'article' => ['icon' => '📚', 'color' => '#06b6d4'],
-                                    'video' => ['icon' => '🎬', 'color' => '#f97316'],
+                                    'alert' => ['icon' => '🚨', 'color' => '#ef4444', 'label' => 'Alerte'],
+                                    'reminder' => ['icon' => '⏰', 'color' => '#f59e0b', 'label' => 'Rappel'],
+                                    'health_tip' => ['icon' => '💡', 'color' => '#10b981', 'label' => 'Conseil Santé'],
+                                    'cycle' => ['icon' => '🩸', 'color' => '#ec4899', 'label' => 'Cycle'],
+                                    'general' => ['icon' => '📢', 'color' => '#6366f1', 'label' => 'Général'],
+                                    'quiz' => ['icon' => '❓', 'color' => '#8b5cf6', 'label' => 'Quiz'],
+                                    'article' => ['icon' => '📚', 'color' => '#06b6d4', 'label' => 'Article'],
+                                    'video' => ['icon' => '🎬', 'color' => '#f97316', 'label' => 'Vidéo'],
                                 ];
-                                $config = $categoryConfig[$stat->category] ?? ['icon' => '📌', 'color' => '#6b7280'];
+                                $config = $categoryConfig[$stat->category] ?? ['icon' => '📌', 'color' => '#6b7280', 'label' => ucfirst($stat->category)];
                             @endphp
                             <div>
                                 <div class="flex justify-between text-xs mb-1">
-                                    <span style="color: #374151;">{{ $config['icon'] }} {{ ucfirst($stat->category) }}</span>
+                                    <span style="color: #374151;">{{ $config['icon'] }} {{ $config['label'] }}</span>
                                     <span class="font-bold" style="color: {{ $config['color'] }};">{{ number_format($stat->total) }} ({{ $percentage }}%)</span>
                                 </div>
                                 <div class="w-full rounded-full overflow-hidden" style="height: 0.5rem; background-color: #e5e7eb;">
