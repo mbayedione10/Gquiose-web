@@ -271,6 +271,7 @@ class APIAuthController extends Controller
     {
         $validated = $request->validate([
             'email'                => 'required|email|unique:utilisateurs,email',
+            'phone'                => 'nullable|string|regex:/^\+224[0-9]{9}$/',
             'sexe'                 => 'required|in:M,F,Autre',
             'dob'                  => 'required|date|before:today|after:' . now()->subYears(100)->format('Y-m-d'),
             'password'             => 'required|string|min:8|confirmed',
@@ -283,12 +284,28 @@ class APIAuthController extends Controller
         ], [
             'dob.before' => 'La date de naissance doit être antérieure à aujourd\'hui',
             'dob.after' => 'L\'âge ne peut pas dépasser 100 ans',
+            'phone.regex' => 'Le format du numéro doit être +224XXXXXXXXX',
         ]);
 
         // Vérifier que l'utilisateur a au moins 13 ans
         $age = now()->diffInYears($validated['dob']);
         if ($age < 13) {
             return response::error('Vous devez avoir au moins 13 ans pour vous inscrire', 400);
+        }
+
+        // Vérifier unicité du phone si fourni
+        if (!empty($validated['phone'])) {
+            $existingUser = Utilisateur::whereNotNull('phone')->get()->first(function ($user) use ($validated) {
+                try {
+                    return Crypt::decryptString($user->phone) === $validated['phone'];
+                } catch (\Exception $e) {
+                    return false;
+                }
+            });
+
+            if ($existingUser) {
+                return response::error('Ce numéro de téléphone est déjà utilisé', 409);
+            }
         }
 
         // Anti-spam : vérifier qu'on n'a pas envoyé de code récemment
@@ -306,6 +323,7 @@ class APIAuthController extends Controller
                 'nom'        => $validated['nom'] ?? '',
                 'prenom'     => $validated['prenom'] ?? '',
                 'email'      => $validated['email'],
+                'phone'      => !empty($validated['phone']) ? Crypt::encryptString($validated['phone']) : null,
                 'sexe'       => $validated['sexe'],
                 'dob'        => $dob,
                 'password'   => bcrypt($validated['password']),
@@ -430,6 +448,7 @@ class APIAuthController extends Controller
                 'nom'         => $nom,
                 'prenom'      => $prenom,
                 'email'       => $socialData['email'],
+                'phone'       => null,
                 'sexe'        => $validated['sexe'],
                 'dob'         => $dob,
                 'provider'    => $validated['provider'],
