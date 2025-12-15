@@ -320,10 +320,9 @@ class APIAuthController extends Controller
             ]);
 
             $fullname = trim($utilisateur->prenom . ' ' . $utilisateur->nom) ?: 'Utilisateur';
-            $title = 'Code de vérification Gquiose';
-            $content = "Bonjour {$fullname}, voici votre code de vérification pour activer votre compte Gquiose.";
+            $title = 'Bienvenue sur G Qui Ose !';
+            $content = "Félicitations {$fullname} ! Vous êtes à un pas de rejoindre notre communauté. Utilisez le code ci-dessous pour activer votre compte et commencer votre aventure avec G Qui Ose.";
 
-            // Correction: passer les 3 paramètres
             Mail::to($utilisateur->email)->send(new SendCodeEmail($title, $content, $codeValue));
 
             // Marquer l'anti-spam (60 secondes)
@@ -616,8 +615,8 @@ class APIAuthController extends Controller
             // Envoyer par email ou SMS
             if ($isEmail) {
                 $fullname = trim($utilisateur->prenom . ' ' . $utilisateur->nom) ?: 'Utilisateur';
-                $title = 'Code de vérification Gquiose';
-                $content = "Bonjour {$fullname}, voici votre code de vérification pour activer votre compte Gquiose.";
+                $title = 'Nouveau code de vérification G Qui Ose';
+                $content = "{$fullname}, vous avez demandé un nouveau code de vérification. Utilisez le code ci-dessous pour finaliser l'activation de votre compte G Qui Ose.";
 
                 Mail::to($validated['identifier'])->send(new SendCodeEmail($title, $content, $codeValue));
             } else {
@@ -711,8 +710,8 @@ class APIAuthController extends Controller
             // Envoyer par email ou SMS
             if ($isEmail) {
                 $fullname = trim($utilisateur->prenom . ' ' . $utilisateur->nom) ?: 'Utilisateur';
-                $title = 'Réinitialisation de mot de passe Gquiose';
-                $content = "Bonjour {$fullname}, voici votre code de réinitialisation de mot de passe.";
+                $title = 'Réinitialisation de votre mot de passe G Qui Ose';
+                $content = "{$fullname}, nous avons reçu une demande de réinitialisation de votre mot de passe. Utilisez le code ci-dessous pour créer un nouveau mot de passe sécurisé.";
 
                 Mail::to($validated['identifier'])->send(new SendCodeEmail($title, $content, $codeValue));
             } else {
