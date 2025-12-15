@@ -140,13 +140,20 @@ class APIAuthController extends Controller
                 'social' => $this->registerBySocial($request),
                 default  => response::error('Type d\'inscription invalide', 400),
             };
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response::error($e->errors(), 422);
         } catch (\Exception $e) {
             Log::error('Erreur inscription', [
                 'type' => $type,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            return response::error('Une erreur est survenue lors de l\'inscription', 500);
+
+            $message = 'Une erreur est survenue lors de l\'inscription';
+            if (config('app.debug')) {
+                $message .= ' : ' . $e->getMessage();
+            }
+            return response::error($message, 500);
         }
     }
 
