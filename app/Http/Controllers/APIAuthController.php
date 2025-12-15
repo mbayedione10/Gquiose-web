@@ -154,7 +154,7 @@ class APIAuthController extends Controller
     private function registerByPhone(Request $request)
     {
         $validated = $request->validate([
-            'phone'                => 'required|string|regex:/^\+224[0-9]{9}$/',
+            'phone'                => 'required|string|regex:/^\+?[0-9]{8,15}$/',
             'sexe'                 => 'required|in:M,F,Autre',
             'dob'                  => 'required|date|before:today|after:' . now()->subYears(100)->format('Y-m-d'),
             'password'             => 'required|string|min:8|confirmed',
@@ -165,7 +165,7 @@ class APIAuthController extends Controller
             'platform'             => 'required|in:android,ios',
             'ville_id'             => 'nullable|exists:villes,id',
         ], [
-            'phone.regex' => 'Le format du numéro doit être +224XXXXXXXXX',
+            'phone.regex' => 'Le numéro doit contenir entre 8 et 15 chiffres',
             'dob.before' => 'La date de naissance doit être antérieure à aujourd\'hui',
             'dob.after' => 'L\'âge ne peut pas dépasser 100 ans',
         ]);
@@ -254,7 +254,7 @@ class APIAuthController extends Controller
     {
         $validated = $request->validate([
             'email'                => 'required|email|unique:utilisateurs,email',
-            'phone'                => 'nullable|string|regex:/^\+224[0-9]{9}$/',
+            'phone'                => 'nullable|string|regex:/^\+?[0-9]{8,15}$/',
             'sexe'                 => 'required|in:M,F,Autre',
             'dob'                  => 'required|date|before:today|after:' . now()->subYears(100)->format('Y-m-d'),
             'password'             => 'required|string|min:8|confirmed',
@@ -267,7 +267,7 @@ class APIAuthController extends Controller
         ], [
             'dob.before' => 'La date de naissance doit être antérieure à aujourd\'hui',
             'dob.after' => 'L\'âge ne peut pas dépasser 100 ans',
-            'phone.regex' => 'Le format du numéro doit être +224XXXXXXXXX',
+            'phone.regex' => 'Le numéro doit contenir entre 8 et 15 chiffres',
             'platform.required' => 'La plateforme est requise',
             'platform.in' => 'La plateforme doit être android ou ios',
         ]);
