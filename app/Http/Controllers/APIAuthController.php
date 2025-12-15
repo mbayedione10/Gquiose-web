@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Crypt;
 
 class APIAuthController extends Controller
 {
@@ -34,17 +33,9 @@ class APIAuthController extends Controller
         $isEmail = filter_var($validated['identifier'], FILTER_VALIDATE_EMAIL);
         $field = $isEmail ? 'email' : 'phone';
 
-        // Si c'est un téléphone, on doit le chiffrer pour comparer
         $identifier = $validated['identifier'];
         if (!$isEmail) {
-            // Pour la recherche, on doit parcourir car phone est chiffré
-            $client = Utilisateur::whereNotNull('phone')->get()->first(function ($user) use ($identifier) {
-                try {
-                    return Crypt::decryptString($user->phone) === $identifier;
-                } catch (\Exception $e) {
-                    return false;
-                }
-            });
+            $client = Utilisateur::where('phone', $identifier)->first();
         } else {
             $client = Utilisateur::where('email', $identifier)->first();
         }
@@ -185,16 +176,8 @@ class APIAuthController extends Controller
             return response::error('Vous devez avoir au moins 13 ans pour vous inscrire', 400);
         }
 
-        // Vérifier unicité (on doit comparer avec déchiffrement)
-        $existingUser = Utilisateur::whereNotNull('phone')->get()->first(function ($user) use ($validated) {
-            try {
-                return Crypt::decryptString($user->phone) === $validated['phone'];
-            } catch (\Exception $e) {
-                return false;
-            }
-        });
-
-        if ($existingUser) {
+        // Vérifier unicité du phone
+        if (Utilisateur::where('phone', $validated['phone'])->exists()) {
             return response::error('Ce numéro est déjà utilisé', 409);
         }
 
@@ -212,7 +195,7 @@ class APIAuthController extends Controller
             $utilisateur = Utilisateur::create([
                 'nom'        => $validated['nom'] ?? '',
                 'prenom'     => $validated['prenom'] ?? '',
-                'phone'      => Crypt::encryptString($validated['phone']), // Chiffrement
+                'phone'      => $validated['phone'],
                 'sexe'       => $validated['sexe'],
                 'dob'        => $dob,
                 'password'   => bcrypt($validated['password']),
@@ -228,7 +211,7 @@ class APIAuthController extends Controller
             Code::create([
                 'code'           => $codeValue,
                 'utilisateur_id' => $utilisateur->id,
-                'phone'          => Crypt::encryptString($validated['phone']), // Chiffré aussi
+                'phone'          => $validated['phone'],
             ]);
 
             // Envoyer le SMS
@@ -285,6 +268,8 @@ class APIAuthController extends Controller
             'dob.before' => 'La date de naissance doit être antérieure à aujourd\'hui',
             'dob.after' => 'L\'âge ne peut pas dépasser 100 ans',
             'phone.regex' => 'Le format du numéro doit être +224XXXXXXXXX',
+            'platform.required' => 'La plateforme est requise',
+            'platform.in' => 'La plateforme doit être android ou ios',
         ]);
 
         // Vérifier que l'utilisateur a au moins 13 ans
@@ -295,15 +280,7 @@ class APIAuthController extends Controller
 
         // Vérifier unicité du phone si fourni
         if (!empty($validated['phone'])) {
-            $existingUser = Utilisateur::whereNotNull('phone')->get()->first(function ($user) use ($validated) {
-                try {
-                    return Crypt::decryptString($user->phone) === $validated['phone'];
-                } catch (\Exception $e) {
-                    return false;
-                }
-            });
-
-            if ($existingUser) {
+            if (Utilisateur::where('phone', $validated['phone'])->exists()) {
                 return response::error('Ce numéro de téléphone est déjà utilisé', 409);
             }
         }
@@ -323,7 +300,7 @@ class APIAuthController extends Controller
                 'nom'        => $validated['nom'] ?? '',
                 'prenom'     => $validated['prenom'] ?? '',
                 'email'      => $validated['email'],
-                'phone'      => !empty($validated['phone']) ? Crypt::encryptString($validated['phone']) : null,
+                'phone'      => $validated['phone'] ?? null,
                 'sexe'       => $validated['sexe'],
                 'dob'        => $dob,
                 'password'   => bcrypt($validated['password']),
@@ -516,19 +493,11 @@ class APIAuthController extends Controller
                 ->latest()
                 ->first();
         } else {
-            // Pour phone, on doit déchiffrer
-            $codeRecord = Code::whereNotNull('phone')
+            $codeRecord = Code::where('phone', $validated['identifier'])
                 ->where('code', $validated['code'])
                 ->where('created_at', '>=', now()->subMinutes(10))
                 ->latest()
-                ->get()
-                ->first(function ($code) use ($validated) {
-                    try {
-                        return Crypt::decryptString($code->phone) === $validated['identifier'];
-                    } catch (\Exception $e) {
-                        return false;
-                    }
-                });
+                ->first();
         }
 
         if (!$codeRecord) {
@@ -612,13 +581,7 @@ class APIAuthController extends Controller
         if ($isEmail) {
             $utilisateur = Utilisateur::where('email', $validated['identifier'])->first();
         } else {
-            $utilisateur = Utilisateur::whereNotNull('phone')->get()->first(function ($user) use ($validated) {
-                try {
-                    return Crypt::decryptString($user->phone) === $validated['identifier'];
-                } catch (\Exception $e) {
-                    return false;
-                }
-            });
+            $utilisateur = Utilisateur::where('phone', $validated['identifier'])->first();
         }
 
         if (!$utilisateur) {
@@ -647,7 +610,7 @@ class APIAuthController extends Controller
                 'code'           => $codeValue,
                 'utilisateur_id' => $utilisateur->id,
                 'email'          => $isEmail ? $validated['identifier'] : null,
-                'phone'          => !$isEmail ? Crypt::encryptString($validated['identifier']) : null,
+                'phone'          => !$isEmail ? $validated['identifier'] : null,
             ]);
 
             // Envoyer par email ou SMS
@@ -715,13 +678,7 @@ class APIAuthController extends Controller
         if ($isEmail) {
             $utilisateur = Utilisateur::where('email', $validated['identifier'])->first();
         } else {
-            $utilisateur = Utilisateur::whereNotNull('phone')->get()->first(function ($user) use ($validated) {
-                try {
-                    return Crypt::decryptString($user->phone) === $validated['identifier'];
-                } catch (\Exception $e) {
-                    return false;
-                }
-            });
+            $utilisateur = Utilisateur::where('phone', $validated['identifier'])->first();
         }
 
         if (!$utilisateur) {
@@ -748,7 +705,7 @@ class APIAuthController extends Controller
                 'code'           => $codeValue,
                 'utilisateur_id' => $utilisateur->id,
                 'email'          => $isEmail ? $validated['identifier'] : null,
-                'phone'          => !$isEmail ? Crypt::encryptString($validated['identifier']) : null,
+                'phone'          => !$isEmail ? $validated['identifier'] : null,
             ]);
 
             // Envoyer par email ou SMS
@@ -823,18 +780,11 @@ class APIAuthController extends Controller
                 ->latest()
                 ->first();
         } else {
-            $codeRecord = Code::whereNotNull('phone')
+            $codeRecord = Code::where('phone', $validated['identifier'])
                 ->where('code', $validated['code'])
                 ->where('created_at', '>=', now()->subMinutes(10))
                 ->latest()
-                ->get()
-                ->first(function ($code) use ($validated) {
-                    try {
-                        return Crypt::decryptString($code->phone) === $validated['identifier'];
-                    } catch (\Exception $e) {
-                        return false;
-                    }
-                });
+                ->first();
         }
 
         if (!$codeRecord) {
