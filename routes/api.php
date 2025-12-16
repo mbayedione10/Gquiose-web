@@ -27,7 +27,6 @@ use App\Http\Controllers\APIEvaluationStatsController; // Added for evaluation s
 */
 
 Route::prefix('v1')
-    ->middleware('log.route')
     ->group(function(){
 
         /*************************  AUTH    ***************************/
