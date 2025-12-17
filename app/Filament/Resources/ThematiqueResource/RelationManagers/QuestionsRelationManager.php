@@ -7,7 +7,8 @@ use App\Filament\Resources\ThematiqueResource;
 use App\Models\Question;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Resources\{Form, Table};
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
@@ -41,7 +42,7 @@ class QuestionsRelationManager extends RelationManager
 
 
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form->schema([
             Grid::make(['default' => 0])->schema([
@@ -84,7 +85,7 @@ class QuestionsRelationManager extends RelationManager
         ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -92,7 +93,7 @@ class QuestionsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('name')
                     ->label("Question")
                     ->url(function (?Question  $record){
-                        return QuestionResource::getUrl('view', $record->id);
+                        return QuestionResource::getUrl('view', ['record' => $record->id]);
                     })
                     ->searchable()
                     ->limit(50),

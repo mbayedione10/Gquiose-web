@@ -7,12 +7,12 @@ use App\Filament\Resources\ThemeResource\RelationManagers;
 use App\Models\Thematique;
 use App\Models\Theme;
 use Filament\Forms;
-use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -22,7 +22,7 @@ class ThemeResource extends Resource
 {
     protected static ?string $model = Theme::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationLabel = "Thèmes";
     protected static ?string $navigationGroup = "Forum";
     protected static ?int $navigationSort = 75;
@@ -31,7 +31,7 @@ class ThemeResource extends Resource
     {
         return $form
             ->schema([
-                Card::make()->schema([
+                Section::make()->schema([
                     TextInput::make('name')
                         ->label("Thématique")
                         ->rules(['max:255', 'string'])

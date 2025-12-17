@@ -137,18 +137,27 @@ class APIAlertController extends Controller
 
         if ($info != null && $info->email_alerte != null)
         {
-            $objet = "Nouvelle alerte signalée";
-            $greeting = "Bonjour ";
-            $content = "Une nouvelle alerte vient d'être signalée. \n\n";
-            $content .= "Ref: " .$alerte->ref."\n\n";
-            $content .= "Type: " .$alerte->type."\n\n";
+            $objet = "🚨 Nouvelle alerte signalée - Réf: " . $alerte->ref;
+            $greeting = "Bonjour,";
+            $content = "Une nouvelle alerte vient d'être signalée sur la plateforme Génération Qui Ose.\n\n";
+            $content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+            $content .= "📋 DÉTAILS DE L'ALERTE\n";
+            $content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+            $content .= "🔖 Référence: " . $alerte->ref . "\n\n";
+            $content .= "📌 Type: " . $alerte->type . "\n\n";
 
-            if ($alerte->description != null)
-                $content .= "Description: " .$alerte->description."\n\n";
+            if ($alerte->description != null) {
+                $content .= "📝 Description: " . $alerte->description . "\n\n";
+            }
 
-            $content .= "Utilisateur: " .$user->name.  "\n\n";
-            $content .= "Numéro de téléphone: " .$user->phone.  "\n\n";
-            $content .= "Courriel: " .$user->email.  "\n\n";
+            $content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+            $content .= "👤 INFORMATIONS DE L'UTILISATEUR\n";
+            $content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+            $content .= "👤 Nom: " . $user->name . "\n\n";
+            $content .= "📞 Téléphone: " . $user->phone . "\n\n";
+            $content .= "📧 Email: " . ($user->email ?? 'Non renseigné') . "\n\n";
+            $content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+            $content .= "⚠️ Merci de traiter cette alerte dans les plus brefs délais.";
 
             $emails = $info->email_alerte;
             $first = $emails[0];

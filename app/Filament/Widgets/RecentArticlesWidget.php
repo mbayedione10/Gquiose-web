@@ -29,7 +29,7 @@ class RecentArticlesWidget extends BaseWidget
                 ->searchable()
                 ->sortable()
                 ->limit(50),
-            Tables\Columns\BadgeColumn::make('rubrique.name')
+            Tables\Columns\TextColumn::make('rubrique.name')
                 ->label('Rubrique')
                 ->color('primary')
                 ->default('Non classé')
@@ -55,6 +55,6 @@ class RecentArticlesWidget extends BaseWidget
 
     protected function getTableRecordUrlUsing(): ?\Closure
     {
-        return fn ($record) => route('filament.resources.articles.edit', ['record' => $record]);
+        return fn ($record) => route('filament.admin.resources.articles.edit', ['record' => $record]);
     }
 }

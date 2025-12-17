@@ -7,14 +7,15 @@ use App\Models\Alerte;
 use App\Exports\AlertesExport;
 use Illuminate\Console\View\Components\Alert;
 use Filament\{Notifications\Notification, Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\DatePicker;
@@ -261,7 +262,7 @@ class AlerteResource extends Resource
                                 ->columnSpan(2),
                         ]),
                     ]),
-                ])->icon('heroicon-o-device-mobile'),
+                ])->icon('heroicon-o-device-phone-mobile'),
 
                 // TAB 3: Détails de l'incident
                 Tabs\Tab::make('Détails incident')->schema([
@@ -405,7 +406,7 @@ class AlerteResource extends Resource
                     ->toggleable()
                     ->tooltip(fn (Alerte $record): string => $record->anonymat_souhaite ? 'Anonymat souhaité' : 'Pas d\'anonymat'),
 
-                Tables\Columns\BadgeColumn::make('etat')
+                Tables\Columns\TextColumn::make('etat')
                     ->label("État")
                     ->colors([
                         'warning' => static fn ($state): bool => $state === 'Non approuvée',
@@ -457,7 +458,7 @@ class AlerteResource extends Resource
                 Tables\Actions\Action::make('rejeter')
                     ->label("Rejetez")
                     ->requiresConfirmation()
-                    ->icon('heroicon-o-x')
+                    ->icon('heroicon-o-x-mark')
                     ->color('danger')
                     ->visible(function (Alerte $record){
                         return $record->etat == "Non approuvée";
@@ -556,7 +557,7 @@ class AlerteResource extends Resource
             ->headerActions([
                 Tables\Actions\Action::make('export_excel')
                     ->label('Exporter Excel')
-                    ->icon('heroicon-o-document-download')
+                    ->icon('heroicon-o-document-arrow-down')
                     ->color('success')
                     ->action(fn () => Excel::download(new AlertesExport(), 'alertes_' . date('Y-m-d') . '.xlsx')),
 

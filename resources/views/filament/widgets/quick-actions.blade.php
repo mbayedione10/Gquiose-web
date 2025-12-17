@@ -6,7 +6,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <!-- Notifications Push -->
-                <a href="{{ route('filament.resources.push-notifications.create') }}"
+                <a href="{{ route('filament.admin.resources.push-notifications.create') }}"
                    class="group flex items-center gap-3 p-4 rounded-xl transition-all duration-300"
                    style="background: linear-gradient(to bottom right, #ecfeff, #dbeafe); border: 1px solid #a5f3fc;">
                     <div class="rounded-lg flex items-center justify-center shadow-lg" style="width: 3rem; height: 3rem; background: linear-gradient(to bottom right, #06b6d4, #2563eb);">
@@ -21,7 +21,7 @@
                 </a>
 
                 <!-- Nouvelle alerte -->
-                <a href="{{ route('filament.resources.alertes.index') }}"
+                <a href="{{ route('filament.admin.resources.alertes.index') }}"
                    class="group flex items-center gap-3 p-4 rounded-xl transition-all duration-300"
                    style="background: linear-gradient(to bottom right, #fff1f2, #fecaca); border: 1px solid #fecdd3;">
                     <div class="rounded-lg flex items-center justify-center shadow-lg" style="width: 3rem; height: 3rem; background: linear-gradient(to bottom right, #f43f5e, #dc2626);">
@@ -36,7 +36,7 @@
                 </a>
 
                 <!-- Nouvel article -->
-                <a href="{{ route('filament.resources.articles.create') }}"
+                <a href="{{ route('filament.admin.resources.articles.create') }}"
                    class="group flex items-center gap-3 p-4 rounded-xl transition-all duration-300"
                    style="background: linear-gradient(to bottom right, #ecfdf5, #ccfbf1); border: 1px solid #a7f3d0;">
                     <div class="rounded-lg flex items-center justify-center shadow-lg" style="width: 3rem; height: 3rem; background: linear-gradient(to bottom right, #10b981, #0d9488);">

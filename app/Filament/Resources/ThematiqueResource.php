@@ -7,9 +7,11 @@ use App\Filament\Resources\ThematiqueResource\Widgets\TrueResponsePerThematiqueC
 use App\Models\Thematique;
 use App\Models\Theme;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
@@ -25,13 +27,13 @@ class ThematiqueResource extends Resource
 
     protected static ?string $navigationLabel = "Thématiques";
     protected static ?string $navigationGroup = "Quiz";
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?int $navigationSort = 22;
 
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Card::make()->schema([
+            Section::make()->schema([
                 TextInput::make('name')
                     ->label("Thématique")
                     ->rules(['max:255', 'string'])

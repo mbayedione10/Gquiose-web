@@ -4,12 +4,11 @@ namespace App\Filament\Resources;
 use App\Models\Evaluation;
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
-use Filament\Forms\Components\Card;
+use Filament\Tables\Table;
+use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Model;
 use App\Filament\Resources\EvaluationResource\Pages;
@@ -36,7 +35,7 @@ class EvaluationResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Card::make()->schema([
+            Section::make()->schema([
                 Forms\Components\Placeholder::make('utilisateur_info')
                     ->label('Utilisateur')
                     ->content(fn (Evaluation $record): string => $record->utilisateur ? $record->utilisateur->nom . ' ' . $record->utilisateur->prenom : 'N/A'),
@@ -73,15 +72,17 @@ class EvaluationResource extends Resource
                     ->label('Utilisateur')
                     ->searchable(['nom', 'prenom']),
 
-                BadgeColumn::make('contexte')
+                TextColumn::make('contexte')
                     ->label('Contexte')
-                    ->enum([
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => match($state) {
                         'quiz' => 'Quiz',
                         'article' => 'Article',
                         'structure' => 'Structure',
                         'generale' => 'Générale',
                         'alerte' => 'Alerte',
-                    ]),
+                        default => $state,
+                    }),
 
                 TextColumn::make('score_global')
                     ->label('Score')

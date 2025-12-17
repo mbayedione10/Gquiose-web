@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\UtilisateurResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -37,7 +37,7 @@ class AlertesRelationManager extends RelationManager
         return false;
     }
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -47,7 +47,7 @@ class AlertesRelationManager extends RelationManager
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->defaultSort('id', 'desc')
@@ -67,7 +67,7 @@ class AlertesRelationManager extends RelationManager
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('etat')
+                Tables\Columns\TextColumn::make('etat')
                     ->label("État")
                     ->colors([
                         'warning' => static fn ($state): bool => $state === 'Non approuvée',
