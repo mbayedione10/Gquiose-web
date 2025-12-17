@@ -110,6 +110,19 @@ class EvaluationResource extends Resource
                         'generale' => 'Générale',
                         'alerte' => 'Alerte',
                     ]),
+
+                SelectFilter::make('question_evaluation_id')
+                    ->label('Question')
+                    ->options(fn () => \App\Models\QuestionEvaluation::pluck('question', 'id'))
+                    ->searchable()
+                    ->query(function ($query, array $data) {
+                        if ($data['value']) {
+                            return $query->whereHas('reponsesEvaluations', function ($q) use ($data) {
+                                $q->where('question_evaluation_id', $data['value']);
+                            });
+                        }
+                        return $query;
+                    }),
             ]);
     }
 

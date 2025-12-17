@@ -197,7 +197,7 @@
             <h3 class="text-lg font-bold mb-4" style="color: #1f2937;">🔥 Top 5 Questions les Plus Évaluées</h3>
             <div class="space-y-3">
                 @forelse($topQuestions as $index => $question)
-                    <a href="{{ route('filament.admin.resources.question-evaluations.edit', ['record' => $question->id]) }}"
+                    <a href="{{ route('filament.admin.resources.evaluations.index', ['tableFilters[question_evaluation_id][value]' => $question->id]) }}"
                        class="flex items-center gap-4 p-4 rounded-lg transition-all duration-200 hover:shadow-md"
                        style="background-color: #f9fafb; text-decoration: none; display: flex;">
                         <div class="flex-shrink-0 rounded-full flex items-center justify-center font-bold text-lg"
