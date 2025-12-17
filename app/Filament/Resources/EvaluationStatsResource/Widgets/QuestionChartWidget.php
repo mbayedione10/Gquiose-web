@@ -126,7 +126,7 @@ class QuestionChartWidget extends ChartWidget
         ];
     }
 
-    protected function getHeading(): ?string
+    public function getHeading(): ?string
     {
         return $this->record ? 'Graphique : ' . $this->record->question : 'Statistiques';
     }

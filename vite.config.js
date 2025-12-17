@@ -8,4 +8,11 @@ export default defineConfig({
             'resources/js/app.js',
         ]),
     ],
+    css: {
+        preprocessorOptions: {
+            scss: {
+                silenceDeprecations: ['legacy-js-api', 'import', 'global-builtin', 'color-functions', 'abs-percent'],
+            },
+        },
+    },
 });

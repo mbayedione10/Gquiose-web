@@ -4,7 +4,7 @@ namespace App\Filament\Resources\PushNotificationResource\Pages;
 
 use App\Filament\Resources\PushNotificationResource;
 use App\Models\PushNotification;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 use Rap2hpoutre\FastExcel\FastExcel;
 
@@ -12,13 +12,13 @@ class ListPushNotifications extends ListRecords
 {
     protected static string $resource = PushNotificationResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make(),
             Actions\Action::make('export')
                 ->label('Exporter en Excel')
-                ->icon('heroicon-o-download')
+                ->icon('heroicon-o-arrow-down-tray')
                 ->color('success')
                 ->action(function () {
                     return $this->exportToExcel();

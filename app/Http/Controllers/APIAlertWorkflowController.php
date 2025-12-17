@@ -270,12 +270,19 @@ class APIAlertWorkflowController extends Controller
 
         // Structures à proximité (si géolocalisation disponible)
         if ($alerte->latitude && $alerte->longitude) {
+            $lat = $alerte->latitude;
+            $lng = $alerte->longitude;
+            $radius = 50; // km
+
             $structures = Structure::select('structures.*')
                 ->selectRaw(
                     '(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance',
-                    [$alerte->latitude, $alerte->longitude, $alerte->latitude]
+                    [$lat, $lng, $lat]
                 )
-                ->having('distance', '<', 50) // 50 km de rayon
+                ->whereRaw(
+                    '(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) < ?',
+                    [$lat, $lng, $lat, $radius]
+                )
                 ->orderBy('distance')
                 ->with('typeStructure')
                 ->limit(10)
@@ -343,26 +350,36 @@ class APIAlertWorkflowController extends Controller
         if ($info && $info->email_alerte) {
             try {
                 $user = $alerte->utilisateur;
-                $objet = "Nouvelle alerte VBG signalée";
-                $greeting = "Bonjour ";
-                $content = "Une nouvelle alerte VBG vient d'être signalée.\n\n";
-                $content .= "Numéro de suivi: " . $alerte->numero_suivi . "\n";
-                $content .= "Réf: " . $alerte->ref . "\n";
-                $content .= "Type: " . $alerte->typeAlerte->name . "\n\n";
+                $objet = "🚨 Alerte VBG signalée - N° " . $alerte->numero_suivi;
+                $greeting = "Bonjour,";
+                $content = "Une nouvelle alerte de Violence Basée sur le Genre (VBG) vient d'être signalée sur la plateforme Génération Qui Ose.\n\n";
+                $content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+                $content .= "📋 DÉTAILS DE L'ALERTE\n";
+                $content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+                $content .= "🔢 Numéro de suivi: " . $alerte->numero_suivi . "\n\n";
+                $content .= "🔖 Référence: " . $alerte->ref . "\n\n";
+                $content .= "📌 Type: " . $alerte->typeAlerte->name . "\n\n";
 
                 if ($alerte->sousTypeViolenceNumerique) {
-                    $content .= "Sous-type: " . $alerte->sousTypeViolenceNumerique->nom . "\n\n";
+                    $content .= "📎 Sous-type: " . $alerte->sousTypeViolenceNumerique->nom . "\n\n";
                 }
 
-                $content .= "Description: " . $alerte->description . "\n\n";
+                $content .= "📝 Description: " . $alerte->description . "\n\n";
 
-                if (!$alerte->anonymat_souhaite) {
-                    $content .= "Utilisateur: " . $user->name . "\n";
-                    $content .= "Téléphone: " . $user->phone . "\n";
-                    $content .= "Email: " . $user->email . "\n";
+                $content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+                $content .= "👤 INFORMATIONS DU SIGNALEMENT\n";
+                $content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+
+                if (!$alerte->anonymat_souhaite && $user) {
+                    $content .= "👤 Nom: " . $user->name . "\n\n";
+                    $content .= "📞 Téléphone: " . $user->phone . "\n\n";
+                    $content .= "📧 Email: " . ($user->email ?? 'Non renseigné') . "\n\n";
                 } else {
-                    $content .= "Signalement anonyme\n";
+                    $content .= "🔒 Signalement anonyme - Confidentialité respectée\n\n";
                 }
+
+                $content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+                $content .= "⚠️ Merci de traiter cette alerte avec la plus grande attention et dans les plus brefs délais.";
 
                 $emails = $info->email_alerte;
                 $first = $emails[0];

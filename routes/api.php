@@ -161,9 +161,14 @@ Route::prefix('v1')
             Route::post('/start', [APICycleController::class, 'startPeriod']);
             Route::post('/end-period', [APICycleController::class, 'endPeriod']);
             Route::post('/log-symptoms', [APICycleController::class, 'logSymptoms']);
+            // GET avec user_id en URL ou query params (?email=xxx ou ?phone=xxx)
             Route::get('/current/{user_id?}', [APICycleController::class, 'getCurrentCycle']);
             Route::get('/history/{user_id?}', [APICycleController::class, 'getHistory']);
             Route::get('/symptoms/{user_id?}', [APICycleController::class, 'getSymptoms']);
+            // POST avec JSON body {"email": "xxx"} ou {"phone": "xxx"}
+            Route::post('/current', [APICycleController::class, 'getCurrentCycle']);
+            Route::post('/history', [APICycleController::class, 'getHistory']);
+            Route::post('/symptoms', [APICycleController::class, 'getSymptoms']);
             Route::post('/settings', [APICycleController::class, 'updateSettings']);
             Route::post('/reminders', [APICycleController::class, 'configureReminders']);
         });

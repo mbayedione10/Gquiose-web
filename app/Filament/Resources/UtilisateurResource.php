@@ -9,9 +9,11 @@ use App\Filament\Resources\UtilisateurResource\Widgets\ViewUtilisateurOverview;
 use App\Models\Utilisateur;
 use Faker\Provider\Text;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
@@ -43,7 +45,7 @@ class UtilisateurResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Card::make()->schema([
+            Section::make()->schema([
                 Grid::make(['default' => 0])->schema([
                     TextInput::make('nom')
                         ->rules(['max:255', 'string'])
@@ -219,7 +221,7 @@ class UtilisateurResource extends Resource
                     ->label("Statut")
                     ->boolean(),
 
-                Tables\Columns\BadgeColumn::make('platform')
+                Tables\Columns\TextColumn::make('platform')
                     ->label("Plateforme")
                     ->colors([
                         'success' => 'android',
@@ -228,7 +230,7 @@ class UtilisateurResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\BadgeColumn::make('provider')
+                Tables\Columns\TextColumn::make('provider')
                     ->label("Méthode")
                     ->colors([
                         'warning' => fn ($state) => $state !== null,
@@ -255,7 +257,7 @@ class UtilisateurResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('resend_verification_code')
                     ->label('Renvoyer le code')
-                    ->icon('heroicon-o-mail')
+                    ->icon('heroicon-o-envelope')
                     ->color('warning')
                     ->visible(fn (Utilisateur $record): bool => !$record->status)
                     ->requiresConfirmation()

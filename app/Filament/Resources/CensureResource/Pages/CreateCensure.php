@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\CensureResource\Pages;
 
 use App\Filament\Resources\CensureResource;
-use Filament\Pages\Actions;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateCensure extends CreateRecord

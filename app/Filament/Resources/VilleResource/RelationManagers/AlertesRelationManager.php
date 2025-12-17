@@ -4,7 +4,8 @@ namespace App\Filament\Resources\VilleResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Resources\{Form, Table};
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
 use Illuminate\Database\Eloquent\Model;
@@ -21,7 +22,7 @@ class AlertesRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'ref';
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form->schema([
             Grid::make(['default' => 0])->schema([
@@ -87,7 +88,7 @@ class AlertesRelationManager extends RelationManager
         ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -33,7 +33,7 @@ class RecentNotificationsWidget extends BaseWidget
                 ->searchable()
                 ->limit(60)
                 ->wrap(),
-            Tables\Columns\BadgeColumn::make('icon')
+            Tables\Columns\TextColumn::make('icon')
                 ->label('Icone'),
             Tables\Columns\TextColumn::make('created_at')
                 ->label('Envoyée le')
@@ -49,6 +49,6 @@ class RecentNotificationsWidget extends BaseWidget
 
     protected function getTableRecordUrlUsing(): ?\Closure
     {
-        return fn ($record) => route('filament.resources.push-notifications.edit', ['record' => $record]);
+        return fn ($record) => route('filament.admin.resources.push-notifications.edit', ['record' => $record]);
     }
 }

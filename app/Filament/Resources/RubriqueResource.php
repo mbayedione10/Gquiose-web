@@ -4,9 +4,11 @@ namespace App\Filament\Resources;
 
 use App\Models\Rubrique;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
@@ -17,7 +19,7 @@ class RubriqueResource extends Resource
 {
     protected static ?string $model = Rubrique::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-collection';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -29,7 +31,7 @@ class RubriqueResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Card::make()->schema([
+            Section::make()->schema([
 
                 TextInput::make('name')
                     ->label("Nom")

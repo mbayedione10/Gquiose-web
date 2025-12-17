@@ -26,6 +26,11 @@ class AuthServiceProvider extends ServiceProvider
             return 'App\\Policies\\' . class_basename($modelClass) . 'Policy';
         });
 
+        // Laravel Pulse access authorization
+        Gate::define('viewPulse', function ($user) {
+            return $user->isSuperAdmin() || in_array($user->role?->name, ['admin', 'super-admin', 'Admin', 'Super Admin']);
+        });
+
         $this->registerPolicies();
     }
 }

@@ -7,9 +7,11 @@ use App\Models\TypeStructure;
 use App\Models\Ville;
 use App\Exports\StructuresExport;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Database\Eloquent\Model;
@@ -30,13 +32,13 @@ class StructureResource extends Resource
 
     protected static ?string $navigationLabel = "Structures sanitaires";
     protected static ?string $navigationGroup = "Santé";
-    protected static ?string $navigationIcon = 'heroicon-o-office-building';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office';
     protected static ?int $navigationSort = 40;
 
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Card::make()->schema([
+            Section::make()->schema([
                 Grid::make(['default' => 0])->schema([
 
 
@@ -357,7 +359,7 @@ class StructureResource extends Resource
             ->headerActions([
                 Tables\Actions\Action::make('export_excel')
                     ->label('Exporter Excel')
-                    ->icon('heroicon-o-document-download')
+                    ->icon('heroicon-o-document-arrow-down')
                     ->color('success')
                     ->action(fn () => Excel::download(new StructuresExport(), 'structures_' . date('Y-m-d') . '.xlsx')),
 

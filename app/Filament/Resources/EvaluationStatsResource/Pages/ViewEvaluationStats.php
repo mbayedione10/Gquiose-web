@@ -5,7 +5,7 @@ namespace App\Filament\Resources\EvaluationStatsResource\Pages;
 use App\Filament\Resources\EvaluationStatsResource;
 use App\Models\Evaluation;
 use Carbon\Carbon;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Resources\Pages\Page;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -44,24 +44,24 @@ class ViewEvaluationStats extends Page
         ];
     }
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('exportPdf')
                 ->label('Exporter PDF')
-                ->icon('heroicon-o-document-download')
+                ->icon('heroicon-o-document-arrow-down')
                 ->color('danger')
                 ->action('exportToPdf'),
 
             Action::make('exportExcel')
                 ->label('Exporter Excel')
-                ->icon('heroicon-o-table')
+                ->icon('heroicon-o-table-cells')
                 ->color('success')
                 ->action('exportToExcel'),
 
             Action::make('filtres')
                 ->label('Filtrer')
-                ->icon('heroicon-o-filter')
+                ->icon('heroicon-o-funnel')
                 ->form([
                     Select::make('periode')
                         ->label('Période prédéfinie')

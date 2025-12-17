@@ -312,7 +312,10 @@ class APIArticleController extends Controller
                 '(6371 * acos(cos(radians(?)) * cos(radians(structures.latitude)) * cos(radians(structures.longitude) - radians(?)) + sin(radians(?)) * sin(radians(structures.latitude)))) AS distance',
                 [$lat, $lng, $lat]
             )
-            ->having('distance', '<', $rayon)
+            ->whereRaw(
+                '(6371 * acos(cos(radians(?)) * cos(radians(structures.latitude)) * cos(radians(structures.longitude) - radians(?)) + sin(radians(?)) * sin(radians(structures.latitude)))) < ?',
+                [$lat, $lng, $lat, $rayon]
+            )
             ->orderBy('distance');
         }
 

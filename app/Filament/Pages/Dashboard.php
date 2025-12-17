@@ -3,7 +3,7 @@
 namespace App\Filament\Pages;
 
 use Filament\Pages\Dashboard as BaseDashboard;
-use Filament\Pages\Actions\Action;
+use Filament\Actions\Action;
 use App\Exports\DashboardStatsExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -19,18 +19,18 @@ class Dashboard extends BaseDashboard
     protected static string $view = 'filament.pages.dashboard';
     protected static ?int $navigationSort = -2;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             Action::make('exportPdf')
                 ->label('Exporter PDF')
-                ->icon('heroicon-o-document-download')
+                ->icon('heroicon-o-document-arrow-down')
                 ->color('danger')
                 ->action('exportToPdf'),
 
             Action::make('exportExcel')
                 ->label('Exporter Excel')
-                ->icon('heroicon-o-table')
+                ->icon('heroicon-o-table-cells')
                 ->color('success')
                 ->action('exportToExcel'),
         ];

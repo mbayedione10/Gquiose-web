@@ -4,7 +4,8 @@ namespace App\Filament\Resources\RoleResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Tables;
-use Filament\Resources\{Form, Table};
+use Filament\Forms\Form;
+use Filament\Tables\Table;
 use Livewire\Component;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
@@ -22,7 +23,7 @@ class UsersRelationManager extends RelationManager
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form->schema([
             Grid::make(['default' => 0])->schema([
@@ -73,7 +74,7 @@ class UsersRelationManager extends RelationManager
         ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

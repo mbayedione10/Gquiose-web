@@ -5,11 +5,11 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\MenstrualCycleResource\Pages;
 use App\Models\MenstrualCycle;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
-use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Grid;
 
 class MenstrualCycleResource extends Resource
@@ -27,7 +27,7 @@ class MenstrualCycleResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Card::make()->schema([
+            Section::make()->schema([
                 Grid::make(['default' => 2])->schema([
                     Forms\Components\Select::make('utilisateur_id')
                         ->relationship('utilisateur', 'nom')
@@ -110,7 +110,7 @@ class MenstrualCycleResource extends Resource
                     ->label('Durée cycle')
                     ->suffix(' j'),
 
-                Tables\Columns\BadgeColumn::make('flow_intensity')
+                Tables\Columns\TextColumn::make('flow_intensity')
                     ->label('Flux')
                     ->colors([
                         'success' => 'leger',

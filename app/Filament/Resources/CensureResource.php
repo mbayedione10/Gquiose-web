@@ -7,9 +7,9 @@ use App\Filament\Resources\CensureResource\RelationManagers;
 use App\Models\Censure;
 use App\Models\Conseil;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -18,7 +18,7 @@ class CensureResource extends Resource
 {
     protected static ?string $model = Censure::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-ban';
+    protected static ?string $navigationIcon = 'heroicon-o-no-symbol';
 
     protected static ?string $navigationGroup = "Forum";
 
@@ -28,7 +28,7 @@ class CensureResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make()
+                Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\TextInput::make("name")
                             ->label("Censure")

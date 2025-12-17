@@ -1,12 +1,10 @@
 <x-mail::message>
 # {{ $greeting }}
 
-Bonjour,
-
 Nous vous informons d'une nouvelle notification importante :
 
 <x-mail::panel>
-{{ $content }}
+{!! nl2br(e($content)) !!}
 </x-mail::panel>
 
 Merci de votre attention et de votre engagement.
