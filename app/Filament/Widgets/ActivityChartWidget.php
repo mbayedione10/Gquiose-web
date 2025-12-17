@@ -12,6 +12,7 @@ class ActivityChartWidget extends LineChartWidget
 {
     protected static ?string $heading = 'Activité des 7 derniers jours';
     protected static ?int $sort = 1;
+    protected int | string | array $columnSpan = 'full';
 
     protected function getData(): array
     {
