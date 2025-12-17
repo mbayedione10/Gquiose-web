@@ -20,7 +20,7 @@ class StatsOverviewWidget extends BaseWidget
         return [
             Stat::make('Utilisateurs', Utilisateur::count())
                 ->description(Utilisateur::where('status', true)->count() . ' actifs')
-                ->descriptionIcon('heroicon-s-trending-up')
+                ->descriptionIcon('heroicon-s-arrow-trending-up')
                 ->color('success')
                 ->chart([7, 12, 15, 18, 22, 25, Utilisateur::count()]),
 

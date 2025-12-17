@@ -5,18 +5,18 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CycleSettingResource\Pages;
 use App\Models\CycleSetting;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
-use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Grid;
 
 class CycleSettingResource extends Resource
 {
     protected static ?string $model = CycleSetting::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cog';
+    protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     protected static ?string $navigationLabel = 'Paramètres Cycle';
 
@@ -27,7 +27,7 @@ class CycleSettingResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Card::make()->schema([
+            Section::make()->schema([
                 Grid::make(['default' => 2])->schema([
                     Forms\Components\Select::make('utilisateur_id')
                         ->relationship('utilisateur', 'nom')

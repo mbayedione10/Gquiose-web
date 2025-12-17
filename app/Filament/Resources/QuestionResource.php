@@ -6,9 +6,11 @@ use App\Filament\Resources\QuestionResource\Widgets\QuestionOverview;
 use App\Models\Question;
 use App\Models\Thematique;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
@@ -29,7 +31,7 @@ class QuestionResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Card::make()->schema([
+            Section::make()->schema([
 
                 Select::make('thematique_id')
                     ->rules(['exists:thematiques,id'])
@@ -169,7 +171,7 @@ class QuestionResource extends Resource
                 Tables\Columns\TextColumn::make('thematique.name')
                     ->label("Thématique")
                     ->url(function (?Question  $record){
-                        return ThematiqueResource::getUrl('view', $record->thematique_id);
+                        return ThematiqueResource::getUrl('view', ['record' => $record->thematique_id]);
                     })
                     ->limit(50),
 

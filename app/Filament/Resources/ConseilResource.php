@@ -7,9 +7,9 @@ use App\Filament\Resources\ConseilResource\RelationManagers;
 use App\Models\Conseil;
 use App\Models\Rubrique;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -27,7 +27,7 @@ class ConseilResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make()
+                Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Select::make('categorie')
                             ->label('Catégorie')

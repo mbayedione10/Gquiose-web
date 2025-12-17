@@ -5,16 +5,16 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserNotificationPreferenceResource\Pages;
 use App\Models\UserNotificationPreference;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 
 class UserNotificationPreferenceResource extends Resource
 {
     protected static ?string $model = UserNotificationPreference::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-adjustments';
+    protected static ?string $navigationIcon = 'heroicon-o-adjustments-horizontal';
     
     protected static ?string $navigationLabel = 'Préférences Notifications';
     
@@ -26,7 +26,7 @@ class UserNotificationPreferenceResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make()
+                Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Select::make('utilisateur_id')
                             ->label('Utilisateur')
@@ -35,7 +35,7 @@ class UserNotificationPreferenceResource extends Resource
                             ->searchable(),
                     ]),
 
-                Forms\Components\Card::make()
+                Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Toggle::make('notifications_enabled')
                             ->label('Notifications activées')
@@ -75,7 +75,7 @@ class UserNotificationPreferenceResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Card::make()
+                Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Toggle::make('do_not_disturb')
                             ->label('Mode Ne pas déranger')

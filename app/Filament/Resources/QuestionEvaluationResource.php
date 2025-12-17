@@ -4,8 +4,10 @@ namespace App\Filament\Resources;
 
 use App\Models\QuestionEvaluation;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
-use Filament\Forms\Components\Card;
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
@@ -20,13 +22,13 @@ class QuestionEvaluationResource extends Resource
     protected static ?string $recordTitleAttribute = 'question';
     protected static ?string $navigationLabel = "Questions d'évaluation";
     protected static ?string $navigationGroup = "Évaluations";
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-list';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
     protected static ?int $navigationSort = 30;
 
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Card::make()->schema([
+            Section::make()->schema([
                 TextInput::make('question')
                     ->label("Question")
                     ->rules(['required', 'max:500', 'string'])
@@ -86,15 +88,17 @@ class QuestionEvaluationResource extends Resource
                     ->searchable()
                     ->limit(50),
 
-                Tables\Columns\BadgeColumn::make('type')
+                Tables\Columns\TextColumn::make('type')
                     ->label('Type')
-                    ->enum([
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => match($state) {
                         'text' => 'Texte',
                         'rating' => 'Note',
                         'yesno' => 'Oui/Non',
                         'multiple_choice' => 'Choix multiple',
                         'scale' => 'Échelle',
-                    ]),
+                        default => $state,
+                    }),
 
                 Tables\Columns\TextColumn::make('ordre')
                     ->label('Ordre')

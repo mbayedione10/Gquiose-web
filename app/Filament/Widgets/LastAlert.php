@@ -46,7 +46,7 @@ class LastAlert extends BaseWidget
                 ->searchable()
                 ->sortable(),
 
-            Tables\Columns\BadgeColumn::make('etat')
+            Tables\Columns\TextColumn::make('etat')
                 ->label("État")
                 ->colors([
                     'warning' => static fn ($state): bool => $state === 'Non approuvée',
@@ -70,6 +70,6 @@ class LastAlert extends BaseWidget
 
     protected function getTableRecordUrlUsing(): ?\Closure
     {
-        return fn ($record) => route('filament.resources.alertes.edit', ['record' => $record]);
+        return fn ($record) => route('filament.admin.resources.alertes.edit', ['record' => $record]);
     }
 }

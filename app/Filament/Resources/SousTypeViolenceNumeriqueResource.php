@@ -4,9 +4,11 @@ namespace App\Filament\Resources;
 
 use App\Models\SousTypeViolenceNumerique;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -25,7 +27,7 @@ class SousTypeViolenceNumeriqueResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Card::make()->schema([
+            Section::make()->schema([
                 Grid::make(2)->schema([
                     TextInput::make('nom')
                         ->label('Nom du sous-type')
@@ -62,7 +64,7 @@ class SousTypeViolenceNumeriqueResource extends Resource
                     ->limit(80)
                     ->wrap(),
 
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->label('Statut')
                     ->formatStateUsing(fn ($state) => $state ? 'Actif' : 'Inactif')
                     ->colors([

@@ -197,7 +197,7 @@
             <h3 class="text-lg font-bold mb-4" style="color: #1f2937;">🔥 Top 5 Questions les Plus Évaluées</h3>
             <div class="space-y-3">
                 @forelse($topQuestions as $index => $question)
-                    <a href="{{ route('filament.resources.question-evaluations.edit', ['record' => $question->id]) }}"
+                    <a href="{{ route('filament.admin.resources.question-evaluations.edit', ['record' => $question->id]) }}"
                        class="flex items-center gap-4 p-4 rounded-lg transition-all duration-200 hover:shadow-md"
                        style="background-color: #f9fafb; text-decoration: none; display: flex;">
                         <div class="flex-shrink-0 rounded-full flex items-center justify-center font-bold text-lg"
@@ -244,7 +244,7 @@
             <h3 class="text-lg font-bold mb-4" style="color: #1f2937;">🚨 7 Dernières Alertes</h3>
             <div class="space-y-3">
                 @forelse($alertesRecentes as $alerte)
-                    <a href="{{ route('filament.resources.alertes.edit', ['record' => $alerte->id]) }}"
+                    <a href="{{ route('filament.admin.resources.alertes.edit', ['record' => $alerte->id]) }}"
                        class="flex items-start gap-3 p-3 rounded-lg transition-all duration-200 hover:shadow-md"
                        style="background-color: #f9fafb; text-decoration: none; display: flex;">
                         <div class="flex-shrink-0 rounded-lg flex items-center justify-center"
@@ -439,7 +439,7 @@
                     <!-- Bouton d'action -->
                     <div class="mt-4 pt-4" style="border-top: 2px solid #e5e7eb;">
                         <div class="text-center">
-                            <a href="{{ route('filament.resources.alertes.index') }}"
+                            <a href="{{ route('filament.admin.resources.alertes.index') }}"
                                class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all duration-200 hover:shadow-lg"
                                style="background: linear-gradient(to right, #f43f5e, #dc2626); color: #ffffff; text-decoration: none;">
                                 📋 Voir toutes les alertes
@@ -661,7 +661,7 @@
 
             <!-- Bouton détails -->
             <div class="mt-6 text-center">
-                <a href="{{ route('filament.resources.notification-logs.index') }}"
+                <a href="{{ route('filament.admin.resources.notification-logs.index') }}"
                    class="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-bold transition-all duration-200 hover:shadow-lg"
                    style="background: linear-gradient(to right, #3b82f6, #2563eb); color: #ffffff; text-decoration: none;">
                     📋 Voir tous les logs de notifications

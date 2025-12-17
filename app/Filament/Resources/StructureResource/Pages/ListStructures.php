@@ -6,8 +6,8 @@ use App\Models\Structure;
 use App\Models\Ville;
 use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
-use Filament\Pages\Actions\Action;
-use Filament\Pages\Actions\CreateAction;
+use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use App\Filament\Traits\HasDescendingOrder;
 use App\Filament\Resources\StructureResource;
@@ -22,7 +22,7 @@ class ListStructures extends ListRecords
 
     protected static string $resource = StructureResource::class;
 
-    protected function getActions(): array
+    protected function getHeaderActions(): array
     {
         return [
             CreateAction::make()
@@ -32,7 +32,7 @@ class ListStructures extends ListRecords
             Action::make('import')
                 ->label("Importer un fichier excel")
                 ->color("success")
-                ->icon('heroicon-o-arrow-circle-down')
+                ->icon('heroicon-o-arrow-down-circle')
                 ->requiresConfirmation()
                 ->form([
 

@@ -7,9 +7,9 @@ use App\Models\PushNotification;
 use App\Models\NotificationTemplate;
 use App\Models\Ville;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -31,7 +31,7 @@ class PushNotificationResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make()
+                Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Select::make('template_id')
                             ->label('Utiliser un template')
@@ -54,7 +54,7 @@ class PushNotificationResource extends Resource
                     ])
                     ->columns(1),
 
-                Forms\Components\Card::make()
+                Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\TextInput::make('title')
                             ->label('Titre')
@@ -104,7 +104,7 @@ class PushNotificationResource extends Resource
                     ])
                     ->columns(2),
                 
-                Forms\Components\Card::make()
+                Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Select::make('type')
                             ->label('Type')
@@ -134,7 +134,7 @@ class PushNotificationResource extends Resource
                     ])
                     ->columns(2),
                 
-                Forms\Components\Card::make()
+                Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Section::make('Filtres démographiques')
                             ->schema([
@@ -261,31 +261,37 @@ class PushNotificationResource extends Resource
                     ->limit(50)
                     ->searchable(),
                 
-                Tables\Columns\BadgeColumn::make('type')
+                Tables\Columns\TextColumn::make('type')
                     ->label('Type')
-                    ->enum([
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => match($state) {
                         'manual' => 'Manuel',
                         'automatic' => 'Automatique',
                         'scheduled' => 'Programmé',
-                    ])
-                    ->colors([
-                        'primary' => 'manual',
-                        'warning' => 'automatic',
-                        'success' => 'scheduled',
-                    ]),
-                
-                Tables\Columns\BadgeColumn::make('status')
+                        default => $state,
+                    })
+                    ->color(fn ($state) => match($state) {
+                        'manual' => 'primary',
+                        'automatic' => 'warning',
+                        'scheduled' => 'success',
+                        default => 'gray',
+                    }),
+
+                Tables\Columns\TextColumn::make('status')
                     ->label('Statut')
-                    ->enum([
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => match($state) {
                         'pending' => 'En attente',
                         'sent' => 'Envoyé',
                         'failed' => 'Échoué',
-                    ])
-                    ->colors([
-                        'warning' => 'pending',
-                        'success' => 'sent',
-                        'danger' => 'failed',
-                    ]),
+                        default => $state,
+                    })
+                    ->color(fn ($state) => match($state) {
+                        'pending' => 'warning',
+                        'sent' => 'success',
+                        'failed' => 'danger',
+                        default => 'gray',
+                    }),
                 
                 Tables\Columns\TextColumn::make('sent_count')
                     ->label('Envoyés')
