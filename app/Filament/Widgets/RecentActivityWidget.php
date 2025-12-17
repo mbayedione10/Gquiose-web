@@ -38,7 +38,7 @@ class RecentActivityWidget extends BaseWidget
                 ->label('Ville')
                 ->searchable(),
             
-            Tables\Columns\BadgeColumn::make('etat')
+            Tables\Columns\TextColumn::make('etat')
                 ->label('État')
                 ->colors([
                     'warning' => 'En attente',

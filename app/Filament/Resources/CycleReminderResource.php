@@ -5,11 +5,11 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CycleReminderResource\Pages;
 use App\Models\CycleReminder;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
-use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Grid;
 
 class CycleReminderResource extends Resource
@@ -27,7 +27,7 @@ class CycleReminderResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Card::make()->schema([
+            Section::make()->schema([
                 Grid::make(['default' => 2])->schema([
                     Forms\Components\Select::make('utilisateur_id')
                         ->relationship('utilisateur', 'nom')
@@ -75,7 +75,7 @@ class CycleReminderResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('reminder_type')
+                Tables\Columns\TextColumn::make('reminder_type')
                     ->label('Type')
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'period_approaching' => 'Règles approchent',

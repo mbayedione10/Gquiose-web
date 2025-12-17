@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\MenstrualCycleResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 
 class SymptomsRelationManager extends RelationManager
@@ -16,7 +16,7 @@ class SymptomsRelationManager extends RelationManager
 
     protected static ?string $title = 'Symptômes';
 
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form->schema([
             Forms\Components\DatePicker::make('symptom_date')
@@ -66,7 +66,7 @@ class SymptomsRelationManager extends RelationManager
         ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -75,7 +75,7 @@ class SymptomsRelationManager extends RelationManager
                     ->date('d/m/Y')
                     ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('pain_level')
+                Tables\Columns\TextColumn::make('pain_level')
                     ->label('Douleur')
                     ->colors([
                         'success' => '1',

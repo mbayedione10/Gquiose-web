@@ -47,6 +47,7 @@ class DatabaseSeeder extends Seeder
             ConseilSeeder::class,
             FaqSeeder::class,
             VideoSeeder::class,
+            QuestionSeeder::class,
         ]);
 
         // Système

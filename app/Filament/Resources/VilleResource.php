@@ -4,9 +4,11 @@ namespace App\Filament\Resources;
 
 use App\Models\Ville;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Toggle;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
@@ -17,7 +19,7 @@ class VilleResource extends Resource
 {
     protected static ?string $model = Ville::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-location-marker';
+    protected static ?string $navigationIcon = 'heroicon-o-map-pin';
     protected static ?int $navigationSort = 70;
     protected static ?string $navigationGroup = "Configuration";
 
@@ -26,7 +28,7 @@ class VilleResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Card::make()->schema([
+            Section::make()->schema([
                 Grid::make(['default' => 0])->schema([
                     TextInput::make('name')
                         ->label('Nom de la ville')
@@ -79,13 +81,13 @@ class VilleResource extends Resource
                     ->boolean()
                     ->sortable(),
                     
-                Tables\Columns\BadgeColumn::make('structures_count')
+                Tables\Columns\TextColumn::make('structures_count')
                     ->label('Structures')
                     ->counts('structures')
                     ->color('success')
                     ->toggleable(),
                     
-                Tables\Columns\BadgeColumn::make('alertes_count')
+                Tables\Columns\TextColumn::make('alertes_count')
                     ->label('Alertes')
                     ->counts('alertes')
                     ->color('warning')

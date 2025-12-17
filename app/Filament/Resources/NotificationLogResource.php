@@ -5,9 +5,9 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\NotificationLogResource\Pages;
 use App\Models\NotificationLog;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 
 class NotificationLogResource extends Resource
@@ -30,7 +30,7 @@ class NotificationLogResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make()
+                Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Select::make('utilisateur_id')
                             ->label('Utilisateur')
@@ -139,17 +139,19 @@ class NotificationLogResource extends Resource
                 Tables\Columns\TextColumn::make('icon')
                     ->label('Icône'),
                 
-                Tables\Columns\BadgeColumn::make('category')
+                Tables\Columns\TextColumn::make('category')
                     ->label('Catégorie')
-                    ->colors([
-                        'danger' => 'alert',
-                        'warning' => 'reminder',
-                        'success' => 'health_tip',
-                        'primary' => 'cycle',
-                        'secondary' => 'general',
-                        'info' => fn ($state) => in_array($state, ['quiz', 'article', 'video']),
-                    ])
-                    ->enum([
+                    ->badge()
+                    ->color(fn ($state) => match($state) {
+                        'alert' => 'danger',
+                        'reminder' => 'warning',
+                        'health_tip' => 'success',
+                        'cycle' => 'primary',
+                        'general' => 'gray',
+                        'quiz', 'article', 'video' => 'info',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn ($state) => match($state) {
                         'alert' => 'Alerte',
                         'reminder' => 'Rappel',
                         'health_tip' => 'Conseil',
@@ -158,33 +160,39 @@ class NotificationLogResource extends Resource
                         'quiz' => 'Quiz',
                         'article' => 'Article',
                         'video' => 'Vidéo',
-                    ]),
+                        default => $state,
+                    }),
                 
-                Tables\Columns\BadgeColumn::make('status')
+                Tables\Columns\TextColumn::make('status')
                     ->label('Statut')
-                    ->colors([
-                        'secondary' => 'pending',
-                        'primary' => 'sent',
-                        'success' => 'delivered',
-                        'info' => 'opened',
-                        'warning' => 'clicked',
-                        'danger' => 'failed',
-                    ])
-                    ->enum([
+                    ->badge()
+                    ->color(fn ($state) => match($state) {
+                        'pending' => 'gray',
+                        'sent' => 'primary',
+                        'delivered' => 'success',
+                        'opened' => 'info',
+                        'clicked' => 'warning',
+                        'failed' => 'danger',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn ($state) => match($state) {
                         'pending' => 'En attente',
                         'sent' => 'Envoyée',
                         'delivered' => 'Livrée',
                         'opened' => 'Ouverte',
                         'clicked' => 'Cliquée',
                         'failed' => 'Échouée',
-                    ]),
+                        default => $state,
+                    }),
                 
-                Tables\Columns\BadgeColumn::make('platform')
+                Tables\Columns\TextColumn::make('platform')
                     ->label('Plateforme')
-                    ->colors([
-                        'success' => 'android',
-                        'primary' => 'ios',
-                    ]),
+                    ->badge()
+                    ->color(fn ($state) => match($state) {
+                        'android' => 'success',
+                        'ios' => 'primary',
+                        default => 'gray',
+                    }),
                 
                 Tables\Columns\TextColumn::make('sent_at')
                     ->label('Envoyée le')

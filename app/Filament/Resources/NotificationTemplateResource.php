@@ -6,9 +6,9 @@ use App\Filament\Resources\NotificationTemplateResource\Pages;
 use App\Filament\Resources\NotificationTemplateResource\RelationManagers;
 use App\Models\NotificationTemplate;
 use Filament\Forms;
-use Filament\Resources\Form;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Resources\Table;
+use Filament\Tables\Table;
 use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -17,7 +17,7 @@ class NotificationTemplateResource extends Resource
 {
     protected static ?string $model = NotificationTemplate::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-template';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-group';
 
     protected static ?string $navigationLabel = 'Templates de Notifications';
 
@@ -31,7 +31,7 @@ class NotificationTemplateResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Card::make()
+                Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label('Nom du template')
@@ -58,7 +58,7 @@ class NotificationTemplateResource extends Resource
                     ])
                     ->columns(2),
 
-                Forms\Components\Card::make()
+                Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\TextInput::make('title')
                             ->label('Titre')
@@ -119,23 +119,26 @@ class NotificationTemplateResource extends Resource
                     ->searchable()
                     ->sortable(),
 
-                Tables\Columns\BadgeColumn::make('category')
+                Tables\Columns\TextColumn::make('category')
                     ->label('Catégorie')
-                    ->enum([
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => match($state) {
                         'cycle' => 'Cycle menstruel',
                         'content' => 'Nouveaux contenus',
                         'forum' => 'Forum',
                         'health_tips' => 'Conseils santé',
                         'admin' => 'Admin',
                         'other' => 'Autre',
-                    ])
-                    ->colors([
-                        'danger' => 'cycle',
-                        'success' => 'content',
-                        'primary' => 'forum',
-                        'warning' => 'health_tips',
-                        'secondary' => 'admin',
-                    ]),
+                        default => $state,
+                    })
+                    ->color(fn ($state) => match($state) {
+                        'cycle' => 'danger',
+                        'content' => 'success',
+                        'forum' => 'primary',
+                        'health_tips' => 'warning',
+                        'admin' => 'gray',
+                        default => 'gray',
+                    }),
 
                 Tables\Columns\TextColumn::make('title')
                     ->label('Titre')

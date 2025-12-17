@@ -5,9 +5,11 @@ namespace App\Filament\Resources;
 use App\Models\Response;
 use Illuminate\Database\Eloquent\Model;
 use Filament\{Tables, Forms};
-use Filament\Resources\{Form, Table, Resource};
+use Filament\Forms\Form;
+use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Card;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
@@ -24,7 +26,7 @@ class ResponseResource extends Resource
 
     protected static ?string $navigationLabel = "Réponses";
     protected static ?string $navigationGroup = "Quiz";
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-check';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
     protected static ?int $navigationSort = 21;
 
 
@@ -51,7 +53,7 @@ class ResponseResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Card::make()->schema([
+            Section::make()->schema([
                 Select::make('question_id')
                     ->rules(['exists:questions,id'])
                     ->required()
