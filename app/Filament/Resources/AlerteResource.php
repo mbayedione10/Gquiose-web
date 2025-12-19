@@ -372,26 +372,58 @@ class AlerteResource extends Resource
                             ->icon('heroicon-o-paper-clip')
                             ->collapsible()
                             ->schema([
-                                Placeholder::make('preuves_info')
+                                Placeholder::make('preuves_list')
                                     ->label('')
-                                    ->content(function (?Alerte $record): string {
-                                        if (!$record || !$record->preuves) {
-                                            return 'Aucune preuve fournie';
+                                    ->content(function (?Alerte $record): \Illuminate\Support\HtmlString {
+                                        if (!$record || !$record->preuves || count($record->preuves) === 0) {
+                                            return new \Illuminate\Support\HtmlString(
+                                                '<p class="text-gray-500">Aucune preuve fournie</p>'
+                                            );
                                         }
-                                        $count = count($record->preuves);
-                                        return "{$count} fichier(s) de preuve fourni(s)";
-                                    }),
 
-                                Repeater::make('preuves')
-                                    ->label('Liste des preuves')
-                                    ->schema([
-                                        TextInput::make('path')
-                                            ->label('Chemin du fichier')
-                                            ->disabled(),
-                                    ])
-                                    ->disabled()
-                                    ->defaultItems(0)
-                                    ->hidden(fn (?Alerte $record): bool => !$record || !$record->preuves),
+                                        $evidenceService = app(\App\Services\VBG\EvidenceSecurityService::class);
+                                        $html = '<div class="space-y-4">';
+
+                                        foreach ($record->preuves as $index => $preuve) {
+                                            $name = $preuve['original_name'] ?? 'Fichier ' . ($index + 1);
+                                            $type = $preuve['type'] ?? 'Inconnu';
+                                            $size = isset($preuve['size']) ? round($preuve['size'] / 1024, 2) . ' Ko' : 'N/A';
+                                            $isImage = str_starts_with($type, 'image/');
+
+                                            $html .= '<div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">';
+                                            $html .= '<div class="flex items-center justify-between mb-3">';
+                                            $html .= '<div>';
+                                            $html .= '<p class="font-medium text-sm">' . e($name) . '</p>';
+                                            $html .= '<p class="text-xs text-gray-500">' . e($type) . ' • ' . $size . '</p>';
+                                            $html .= '</div>';
+                                            $html .= '</div>';
+
+                                            // Afficher l'image directement si c'est une image
+                                            if ($isImage) {
+                                                try {
+                                                    $content = $evidenceService->retrieveEvidence($preuve['path']);
+                                                    if ($content) {
+                                                        $base64 = base64_encode($content);
+                                                        $html .= '<img src="data:' . $type . ';base64,' . $base64 . '" class="max-w-full rounded-lg shadow-md" style="max-height: 400px;" alt="' . e($name) . '">';
+                                                    } else {
+                                                        $html .= '<p class="text-red-500 text-sm">Erreur: impossible de déchiffrer le fichier</p>';
+                                                    }
+                                                } catch (\Exception $e) {
+                                                    $html .= '<p class="text-red-500 text-sm">Erreur: ' . e($e->getMessage()) . '</p>';
+                                                }
+                                            } else {
+                                                $url = url('/preuves/alertes/' . $record->id . '/' . $index);
+                                                $html .= '<a href="' . $url . '" target="_blank" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-lg">';
+                                                $html .= '📥 Télécharger le fichier';
+                                                $html .= '</a>';
+                                            }
+
+                                            $html .= '</div>';
+                                        }
+                                        $html .= '</div>';
+
+                                        return new \Illuminate\Support\HtmlString($html);
+                                    }),
                             ]),
 
                         Section::make('Conseils de sécurité')

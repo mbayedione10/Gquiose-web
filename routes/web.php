@@ -45,3 +45,37 @@ Route::get('remove-my-account', [DeleteAccountController::class, 'form'])->name(
 
 Route::post('remove-my-account', [DeleteAccountController::class, 'remove'])->name('remove.account');
 
+// Route pour visualiser/télécharger les preuves depuis Filament (admin)
+Route::get('preuves/alertes/{alerte}/{index}', function (App\Models\Alerte $alerte, int $index) {
+    // Vérifier que l'utilisateur est connecté
+    if (!auth()->check()) {
+        abort(401);
+    }
+
+    $preuves = $alerte->preuves ?? [];
+
+    if (!isset($preuves[$index])) {
+        abort(404, 'Preuve introuvable');
+    }
+
+    $preuve = $preuves[$index];
+    $evidenceService = app(App\Services\VBG\EvidenceSecurityService::class);
+    $decryptedContent = $evidenceService->retrieveEvidence($preuve['path']);
+
+    if (!$decryptedContent) {
+        abort(500, 'Erreur de déchiffrement');
+    }
+
+    // Log d'accès
+    \Log::info('Accès preuve Filament', [
+        'alerte_id' => $alerte->id,
+        'user_id' => auth()->id(),
+        'evidence_index' => $index,
+    ]);
+
+    // Afficher directement dans le navigateur (inline) au lieu de télécharger
+    return response($decryptedContent)
+        ->header('Content-Type', $preuve['type'])
+        ->header('Content-Disposition', 'inline; filename="' . $preuve['original_name'] . '"');
+})->middleware(['auth', 'web'])->name('admin.alertes.preuve.download');
+
