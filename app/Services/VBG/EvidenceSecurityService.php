@@ -5,7 +5,8 @@ namespace App\Services\VBG;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Str;
-use Intervention\Image\Facades\Image;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class EvidenceSecurityService
 {
@@ -112,14 +113,15 @@ class EvidenceSecurityService
     private function removeExifData(string $filePath, string $mimeType): string
     {
         try {
-            // Utiliser Intervention Image pour charger et nettoyer l'image
-            $image = Image::make($filePath);
-            
+            // Utiliser Intervention Image 3.x pour charger et nettoyer l'image
+            $manager = new ImageManager(new Driver());
+            $image = $manager->read($filePath);
+
             // Encoder l'image sans métadonnées
             // La méthode encode() crée une nouvelle image sans les métadonnées EXIF
             $extension = $this->getMimeExtension($mimeType);
-            $cleanedImage = $image->encode($extension, 90); // 90% qualité
-            
+            $cleanedImage = $image->encodeByExtension($extension, quality: 90);
+
             return (string) $cleanedImage;
         } catch (\Exception $e) {
             \Log::error('Erreur suppression EXIF: ' . $e->getMessage());

@@ -14,6 +14,7 @@
         "edamov/pushok": "^0.18.1",
         "filament/filament": "^3.2",
         "guzzlehttp/guzzle": "^7.2",
+        "intervention/image": "^3.11",
         "kreait/firebase-php": "^7.16",
         "laravel/framework": "^10.10",
         "laravel/pulse": "^1.4",
