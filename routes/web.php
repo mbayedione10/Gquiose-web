@@ -45,6 +45,11 @@ Route::get('remove-my-account', [DeleteAccountController::class, 'form'])->name(
 
 Route::post('remove-my-account', [DeleteAccountController::class, 'remove'])->name('remove.account');
 
+// Facebook Data Deletion Callback
+Route::post('facebook/data-deletion', [DeleteAccountController::class, 'facebookDataDeletion'])
+    ->name('facebook.data.deletion')
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
 // Route pour visualiser/télécharger les preuves depuis Filament (admin)
 Route::get('preuves/alertes/{alerte}/{index}', function (App\Models\Alerte $alerte, int $index) {
     // Vérifier que l'utilisateur est connecté

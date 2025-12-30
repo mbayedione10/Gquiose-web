@@ -73,7 +73,7 @@ class APIAuthController extends Controller
         return response::success([
             'utilisateur' => $client->only([
                 'id', 'nom', 'prenom', 'phone', 'email', 'dob',
-                'sexe', 'photo', 'ville_id', 'status'
+                'sexe', 'photo', 'ville_id', 'status', 'provider', 'platform'
             ]),
             'token' => $token,
             'token_type' => 'Bearer',
@@ -237,7 +237,7 @@ class APIAuthController extends Controller
             ]);
 
             return response::success([
-                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'sexe', 'dob']),
+                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'sexe', 'dob', 'provider', 'platform']),
                 'message' => 'Un code de vérification a été envoyé à votre numéro',
                 'verification_status' => 'pending_verification',
             ], 201);
@@ -336,7 +336,7 @@ class APIAuthController extends Controller
             ]);
 
             return response::success([
-                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'email', 'sexe', 'dob', 'ville_id']),
+                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'email', 'sexe', 'dob', 'ville_id', 'provider', 'platform']),
                 'message' => 'Un code de vérification a été envoyé à votre email',
                 'verification_status' => 'pending_verification',
             ], 201);
@@ -354,21 +354,9 @@ class APIAuthController extends Controller
         $validated = $request->validate([
             'provider'    => 'required|in:google,facebook,apple',
             'access_token'=> 'required|string', // Token à vérifier
-            'sexe'        => 'required|in:M,F,Autre',
-            'dob'         => 'required|date|before:today|after:' . now()->subYears(100)->format('Y-m-d'),
             'fcm_token'   => 'nullable|string',
-            'platform'    => 'required|in:android,ios',
-            'ville_id'    => 'nullable|exists:villes,id',
-        ], [
-            'dob.before' => 'La date de naissance doit être antérieure à aujourd\'hui',
-            'dob.after' => 'L\'âge ne peut pas dépasser 100 ans',
+            'platform'    => 'nullable|in:android,ios',
         ]);
-
-        // Vérifier que l'utilisateur a au moins 13 ans
-        $age = now()->diffInYears($validated['dob']);
-        if ($age < 13) {
-            return response::error('Vous devez avoir au moins 13 ans pour vous inscrire', 400);
-        }
 
         DB::beginTransaction();
         try {
@@ -405,7 +393,7 @@ class APIAuthController extends Controller
 
                 return response::success([
                     'utilisateur' => $existingUser->only([
-                        'id', 'nom', 'prenom', 'email', 'sexe', 'dob', 'photo', 'ville_id'
+                        'id', 'nom', 'prenom', 'email', 'photo', 'provider', 'platform'
                     ]),
                     'token' => $token,
                     'token_type' => 'Bearer',
@@ -414,9 +402,7 @@ class APIAuthController extends Controller
                 ]);
             }
 
-            // Créer un nouveau compte
-            $dob = $validated['dob'];
-
+            // Créer un nouveau compte avec les données du provider social
             $nom = $socialData['family_name'] ?? '';
             $prenom = $socialData['given_name'] ?? ($socialData['name'] ?? '');
 
@@ -424,15 +410,11 @@ class APIAuthController extends Controller
                 'nom'         => $nom,
                 'prenom'      => $prenom,
                 'email'       => $socialData['email'],
-                'phone'       => null,
-                'sexe'        => $validated['sexe'],
-                'dob'         => $dob,
                 'provider'    => $validated['provider'],
                 'provider_id' => $socialData['provider_id'],
                 'photo'       => $socialData['picture'] ?? null,
                 'fcm_token'   => $validated['fcm_token'] ?? null,
-                'platform'    => $validated['platform'],
-                'ville_id'    => $validated['ville_id'] ?? null,
+                'platform'    => $validated['platform'] ?? null,
                 'status'      => true, // Activé directement (email vérifié par le provider)
                 'email_verified_at' => $socialData['email_verified'] ?? false ? now() : null,
             ]);
@@ -449,7 +431,7 @@ class APIAuthController extends Controller
 
             return response::success([
                 'utilisateur' => $utilisateur->only([
-                    'id', 'nom', 'prenom', 'email', 'sexe', 'dob', 'photo', 'ville_id'
+                    'id', 'nom', 'prenom', 'email', 'photo', 'provider', 'platform'
                 ]),
                 'token' => $token,
                 'token_type' => 'Bearer',
@@ -541,7 +523,7 @@ class APIAuthController extends Controller
 
             return response::success([
                 'utilisateur' => $utilisateur->only([
-                    'id', 'nom', 'prenom', 'phone', 'email', 'dob', 'sexe', 'photo', 'ville_id'
+                    'id', 'nom', 'prenom', 'phone', 'email', 'dob', 'sexe', 'photo', 'ville_id', 'provider', 'platform'
                 ]),
                 'token' => $token,
                 'token_type' => 'Bearer',
@@ -858,7 +840,7 @@ class APIAuthController extends Controller
         Log::info('Profile updated', ['user_id' => $user->id]);
 
         return response::success([
-            'utilisateur' => $user->only(['id', 'nom', 'prenom', 'phone', 'email', 'dob', 'sexe', 'photo', 'ville_id']),
+            'utilisateur' => $user->only(['id', 'nom', 'prenom', 'phone', 'email', 'dob', 'sexe', 'photo', 'ville_id', 'provider', 'platform']),
             'message' => 'Profil mis à jour avec succès'
         ]);
     }

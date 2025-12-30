@@ -84,12 +84,12 @@ class UtilisateurResource extends Resource
                         ]),
 
                     TextInput::make('phone')
-                        ->rules(['max:255', 'string'])
-                        ->required()
+                        ->rules(['max:255', 'string', 'nullable'])
                         ->unique(
                             'utilisateurs',
                             'phone',
-                            fn(?Model $record) => $record
+                            fn(?Model $record) => $record,
+                            ignoreRecord: true
                         )
                         ->placeholder('Phone')
                         ->columnSpan([
