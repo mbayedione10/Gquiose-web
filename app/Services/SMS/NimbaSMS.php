@@ -35,7 +35,7 @@ class NimbaSMS implements SMSInterface
                 ->timeout(30)
                 ->post("{$this->baseUrl}/v1/messages", [
                     'sender_name' => $this->senderName,
-                    'to' => $this->formatPhoneNumber($to),
+                    'to' => [$this->formatPhoneNumber($to)],
                     'message' => $message,
                 ]);
 
