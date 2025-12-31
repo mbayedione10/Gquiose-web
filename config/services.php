@@ -32,7 +32,13 @@ return [
     ],
      // API SMS pour vérification
     'sms' => [
-        'provider' => env('SMS_PROVIDER', 'twilio'), // twilio, vonage, aws_sns, local
+        'provider' => env('SMS_PROVIDER', 'nimba'), // nimba, twilio, vonage
+        'nimba' => [
+            'base_url' => env('NIMBA_SMS_BASE_URL', 'https://api.nimbasms.com'),
+            'service_id' => env('NIMBA_SMS_SERVICE_ID'),
+            'secret' => env('NIMBA_SMS_SECRET'),
+            'sender_name' => env('NIMBA_SMS_SENDER_NAME', 'GQUIOSE'),
+        ],
         'twilio' => [
             'sid' => env('TWILIO_SID'),
             'token' => env('TWILIO_TOKEN'),
