@@ -31,11 +31,16 @@ class SocialVerifier
 
             $data = $response->json();
 
-            // Vérifier que le token est bien pour notre application
-            $clientId = config('services.google.client_id');
-            if ($clientId && isset($data['aud']) && $data['aud'] !== $clientId) {
+            // Vérifier que le token est bien pour notre application (Web, Android ou iOS)
+            $validClientIds = array_filter([
+                config('services.google.client_id'),
+                config('services.google.client_id_android'),
+                config('services.google.client_id_ios'),
+            ]);
+
+            if (!empty($validClientIds) && isset($data['aud']) && !in_array($data['aud'], $validClientIds)) {
                 Log::warning('Google token aud mismatch', [
-                    'expected' => $clientId,
+                    'expected' => $validClientIds,
                     'received' => $data['aud']
                 ]);
                 return null;
