@@ -68,8 +68,7 @@ class UtilisateurResource extends Resource
                         ]),
 
                     TextInput::make('email')
-                        ->rules(['email'])
-                        ->required()
+                        ->rules(['email', 'nullable'])
                         ->unique(
                             'utilisateurs',
                             'email',
@@ -77,6 +76,7 @@ class UtilisateurResource extends Resource
                         )
                         ->email()
                         ->placeholder('Email')
+                        ->helperText('Optionnel si le téléphone est renseigné')
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,
@@ -92,6 +92,7 @@ class UtilisateurResource extends Resource
                             ignoreRecord: true
                         )
                         ->placeholder('Phone')
+                        ->helperText('Optionnel si l\'email est renseigné')
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,
