@@ -410,6 +410,7 @@ class APIAuthController extends Controller
                 'nom'         => $nom,
                 'prenom'      => $prenom,
                 'email'       => $socialData['email'],
+                'phone'       => null,
                 'provider'    => $validated['provider'],
                 'provider_id' => $socialData['provider_id'],
                 'photo'       => $socialData['picture'] ?? null,
