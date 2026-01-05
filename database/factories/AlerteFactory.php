@@ -30,6 +30,7 @@ class AlerteFactory extends Factory
             'etat' => $this->faker->word(),
             'type_alerte_id' => \App\Models\TypeAlerte::factory(),
             'ville_id' => \App\Models\Ville::factory(),
+            'utilisateur_id' => \App\Models\Utilisateur::factory(),
         ];
     }
 }
