@@ -26,7 +26,7 @@ class SMSService
      */
     public function sendVerificationCode(string $phone, string $code): bool
     {
-        $message = "Votre code de vérification G Qui Ose est: {$code}. Valide pendant 10 minutes.";
+        $message = "Votre code de vérification GquiOse est: {$code}. Valide pendant 10 minutes.";
 
         $result = $this->provider->send($phone, $message);
 
@@ -51,7 +51,7 @@ class SMSService
      */
     public function sendPasswordResetCode(string $phone, string $code): bool
     {
-        $message = "Votre code de réinitialisation G Qui Ose est: {$code}. Valide pendant 10 minutes.";
+        $message = "Votre code de réinitialisation GquiOse est: {$code}. Valide pendant 10 minutes.";
 
         $result = $this->provider->send($phone, $message);
 
