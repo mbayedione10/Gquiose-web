@@ -847,6 +847,25 @@ class APIAuthController extends Controller
     }
 
     /**
+     * Récupérer le profil de l'utilisateur authentifié
+     */
+    public function getProfile(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response::error('Non authentifié', 401);
+        }
+
+        return response::success([
+            'utilisateur' => $user->only([
+                'id', 'nom', 'prenom', 'phone', 'email', 'dob',
+                'sexe', 'photo', 'ville_id', 'status', 'provider', 'platform'
+            ]),
+        ]);
+    }
+
+    /**
      * Changement de mot de passe (utilisateur authentifié)
      */
     public function changePassword(Request $request)

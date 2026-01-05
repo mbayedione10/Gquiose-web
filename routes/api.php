@@ -43,6 +43,7 @@ Route::prefix('v1')
         // Routes protégées par authentification
         Route::middleware('auth:sanctum')->group(function () {
             Route::post('logout', [APIAuthController::class, 'logout']);
+            Route::get('profile', [APIAuthController::class, 'getProfile']);
             Route::post('update-profile', [APIAuthController::class, 'updateProfile']);
             Route::post('change-password', [APIAuthController::class, 'changePassword']);
             Route::post('delete-account', [APIAuthController::class, 'deleteAccount']);
