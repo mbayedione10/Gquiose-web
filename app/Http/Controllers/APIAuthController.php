@@ -176,13 +176,17 @@ class APIAuthController extends Controller
             return response::error('Vous devez avoir au moins 13 ans pour vous inscrire', 400);
         }
 
-        // Vérifier unicité du phone
-        if (Utilisateur::where('phone', $validated['phone'])->exists()) {
+        // Normaliser le numéro de téléphone
+        $phone = $this->normalizePhoneNumber($validated['phone']);
+
+        // Vérifier unicité du phone (avec variantes)
+        $phoneVariants = $this->getPhoneVariants($phone);
+        if (Utilisateur::whereIn('phone', $phoneVariants)->exists()) {
             return response::error('Ce numéro est déjà utilisé', 409);
         }
 
         // Anti-spam : vérifier qu'on n'a pas envoyé de code récemment
-        $antiSpamKey = 'sms_sent_' . $validated['phone'];
+        $antiSpamKey = 'sms_sent_' . $phone;
         if (Cache::has($antiSpamKey)) {
             $remainingTime = Cache::get($antiSpamKey) - time();
             return response::error("Veuillez patienter {$remainingTime} secondes avant de renvoyer un code", 429);
@@ -195,7 +199,7 @@ class APIAuthController extends Controller
             $utilisateur = Utilisateur::create([
                 'nom'        => $validated['nom'] ?? '',
                 'prenom'     => $validated['prenom'] ?? '',
-                'phone'      => $validated['phone'],
+                'phone'      => $phone,
                 'sexe'       => $validated['sexe'],
                 'dob'        => $dob,
                 'password'   => bcrypt($validated['password']),
@@ -211,17 +215,17 @@ class APIAuthController extends Controller
             Code::create([
                 'code'           => $codeValue,
                 'utilisateur_id' => $utilisateur->id,
-                'phone'          => $validated['phone'],
+                'phone'          => $phone,
             ]);
 
             // Envoyer le SMS
             $smsService = new SMSService();
-            $smsSent = $smsService->sendVerificationCode($validated['phone'], $codeValue);
+            $smsSent = $smsService->sendVerificationCode($phone, $codeValue);
 
             if (!$smsSent) {
                 DB::rollBack();
                 Log::error('SMS sending failed during registration', [
-                    'phone' => substr($validated['phone'], 0, 4) . '****'
+                    'phone' => substr($phone, 0, 4) . '****'
                 ]);
                 return response::error('Impossible d\'envoyer le SMS. Veuillez réessayer.', 500);
             }
@@ -233,7 +237,7 @@ class APIAuthController extends Controller
 
             Log::info('Registration by phone successful', [
                 'user_id' => $utilisateur->id,
-                'phone' => substr($validated['phone'], 0, 4) . '****'
+                'phone' => substr($phone, 0, 4) . '****'
             ]);
 
             return response::success([
@@ -456,26 +460,34 @@ class APIAuthController extends Controller
         ]);
 
         $isEmail = filter_var($validated['identifier'], FILTER_VALIDATE_EMAIL);
+        $identifier = $validated['identifier'];
 
-        $cacheKey = 'code_attempts_' . $validated['identifier'];
+        // Normaliser le numéro de téléphone si ce n'est pas un email
+        if (!$isEmail) {
+            $identifier = $this->normalizePhoneNumber($identifier);
+        }
+
+        $cacheKey = 'code_attempts_' . $identifier;
         $attempts = Cache::get($cacheKey, 0);
 
         if ($attempts >= 3) {
             Log::warning('Code confirmation blocked - too many attempts', [
-                'identifier' => $isEmail ? $validated['identifier'] : substr($validated['identifier'], 0, 4) . '****'
+                'identifier' => $isEmail ? $identifier : substr($identifier, 0, 4) . '****'
             ]);
             return response::error('Trop de tentatives. Réessayez dans 24h.', 429);
         }
 
         // Recherche du code
         if ($isEmail) {
-            $codeRecord = Code::where('email', $validated['identifier'])
+            $codeRecord = Code::where('email', $identifier)
                 ->where('code', $validated['code'])
                 ->where('created_at', '>=', now()->subMinutes(10))
                 ->latest()
                 ->first();
         } else {
-            $codeRecord = Code::where('phone', $validated['identifier'])
+            // Rechercher avec le numéro normalisé et les variantes possibles
+            $phoneVariants = $this->getPhoneVariants($identifier);
+            $codeRecord = Code::whereIn('phone', $phoneVariants)
                 ->where('code', $validated['code'])
                 ->where('created_at', '>=', now()->subMinutes(10))
                 ->latest()
@@ -938,5 +950,47 @@ class APIAuthController extends Controller
             ]);
             return response::error('Une erreur est survenue', 500);
         }
+    }
+
+    /**
+     * Normalise un numéro de téléphone (supprime espaces, tirets, etc.)
+     */
+    private function normalizePhoneNumber(string $phone): string
+    {
+        // Supprime les espaces, tirets, points, parenthèses
+        $phone = preg_replace('/[\s\-\.\(\)]/', '', $phone);
+
+        // Si commence par 00, remplacer par +
+        if (str_starts_with($phone, '00')) {
+            $phone = '+' . substr($phone, 2);
+        }
+
+        return $phone;
+    }
+
+    /**
+     * Génère les variantes possibles d'un numéro de téléphone pour la recherche
+     */
+    private function getPhoneVariants(string $phone): array
+    {
+        $normalized = $this->normalizePhoneNumber($phone);
+        $variants = [$normalized];
+
+        // Avec + au début
+        if (!str_starts_with($normalized, '+')) {
+            $variants[] = '+' . $normalized;
+        }
+
+        // Sans + au début
+        if (str_starts_with($normalized, '+')) {
+            $variants[] = substr($normalized, 1);
+        }
+
+        // Avec 00 au début au lieu de +
+        if (str_starts_with($normalized, '+')) {
+            $variants[] = '00' . substr($normalized, 1);
+        }
+
+        return array_unique($variants);
     }
 }

@@ -9,7 +9,7 @@ class Code extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['code', 'email', 'utilisateur_id'];
+    protected $fillable = ['code', 'email', 'phone', 'utilisateur_id'];
 
     public function utilisateur()
     {
