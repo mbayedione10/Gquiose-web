@@ -109,14 +109,14 @@ class APIAuthController extends Controller
         $type = $request->input('type');
 
         if (!$type) {
-            // Auto-détection basée sur les champs présents
-            if ($request->has('access_token') && $request->has('provider')) {
+            // Auto-détection basée sur les champs présents (filled = non vide)
+            if ($request->filled('access_token') && $request->filled('provider')) {
                 $type = 'social';
-            } elseif ($request->has('email') && !$request->has('phone')) {
+            } elseif ($request->filled('email') && !$request->filled('phone')) {
                 $type = 'email';
-            } elseif ($request->has('phone') && !$request->has('email')) {
+            } elseif ($request->filled('phone') && !$request->filled('email')) {
                 $type = 'phone';
-            } elseif ($request->has('email') && $request->has('phone')) {
+            } elseif ($request->filled('email') && $request->filled('phone')) {
                 // Si les deux sont présents, privilégier email
                 $type = 'email';
             } else {
