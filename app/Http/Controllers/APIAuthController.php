@@ -468,14 +468,15 @@ class APIAuthController extends Controller
         }
 
         $cacheKey = 'code_attempts_' . $identifier;
-        $attempts = Cache::get($cacheKey, 0);
+        // $attempts = Cache::get($cacheKey, 0);
 
-        if ($attempts >= 3) {
-            Log::warning('Code confirmation blocked - too many attempts', [
-                'identifier' => $isEmail ? $identifier : substr($identifier, 0, 4) . '****'
-            ]);
-            return response::error('Trop de tentatives. Réessayez dans 24h.', 429);
-        }
+        // Limite de tentatives désactivée temporairement
+        // if ($attempts >= 3) {
+        //     Log::warning('Code confirmation blocked - too many attempts', [
+        //         'identifier' => $isEmail ? $identifier : substr($identifier, 0, 4) . '****'
+        //     ]);
+        //     return response::error('Trop de tentatives. Réessayez dans 24h.', 429);
+        // }
 
         // Recherche du code
         if ($isEmail) {
@@ -495,18 +496,11 @@ class APIAuthController extends Controller
         }
 
         if (!$codeRecord) {
-            Cache::put($cacheKey, $attempts + 1, now()->addDay());
-            $remaining = 3 - ($attempts + 1);
-
             Log::warning('Code confirmation failed - invalid code', [
-                'identifier' => $isEmail ? $validated['identifier'] : substr($validated['identifier'], 0, 4) . '****',
-                'attempt' => $attempts + 1
+                'identifier' => $isEmail ? $validated['identifier'] : substr($validated['identifier'], 0, 4) . '****'
             ]);
 
-            $msg = $remaining > 0
-                ? "Code incorrect. Il vous reste {$remaining} tentative(s)."
-                : "Trop de tentatives. Réessayez dans 24h.";
-            return response::error($msg, 400);
+            return response::error('Code incorrect ou expiré.', 400);
         }
 
         DB::beginTransaction();
