@@ -179,12 +179,43 @@ class UtilisateurResource extends Resource
                             'lg' => 6,
                         ]),
 
-                    TextInput::make('provider')
-                        ->label('Méthode de connexion')
-                        ->disabled()
-                        ->placeholder('Ex: google, facebook')
-                        ->helperText('Fournisseur d\'authentification sociale')
-                        ->visibleOn('edit')
+                    Forms\Components\Placeholder::make('provider_display')
+                        ->label('Méthode d\'inscription')
+                        ->content(function ($record) {
+                            if (!$record) return '-';
+
+                            if ($record->provider) {
+                                $providers = [
+                                    'google' => 'Google',
+                                    'facebook' => 'Facebook',
+                                    'apple' => 'Apple',
+                                ];
+                                return $providers[$record->provider] ?? ucfirst($record->provider);
+                            }
+
+                            // Inscription classique
+                            if ($record->email_verified_at) {
+                                return 'Email';
+                            }
+                            if ($record->phone_verified_at) {
+                                return 'SMS';
+                            }
+
+                            // Non vérifié, deviner selon les données
+                            return $record->email ? 'Email (non vérifié)' : 'SMS (non vérifié)';
+                        })
+                        ->visibleOn(['view', 'edit'])
+                        ->columnSpan([
+                            'default' => 12,
+                            'md' => 6,
+                            'lg' => 6,
+                        ]),
+
+                    Forms\Components\Placeholder::make('provider_id_display')
+                        ->label('ID du fournisseur')
+                        ->content(fn ($record) => $record?->provider_id ?? '-')
+                        ->visible(fn ($record) => $record?->provider !== null)
+                        ->visibleOn(['view', 'edit'])
                         ->columnSpan([
                             'default' => 12,
                             'md' => 6,
