@@ -131,9 +131,35 @@ class UtilisateurResource extends Resource
                             'lg' => 12,
                         ]),
 
+                    Forms\Components\Placeholder::make('photo_preview')
+                        ->label('Photo actuelle')
+                        ->content(function ($record) {
+                            if (!$record || !$record->photo) {
+                                return 'Aucune photo';
+                            }
+                            // Si c'est une URL externe
+                            if (str_starts_with($record->photo, 'http')) {
+                                return new \Illuminate\Support\HtmlString(
+                                    '<img src="' . $record->photo . '" alt="Photo" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">'
+                                );
+                            }
+                            // Si c'est un fichier local
+                            return new \Illuminate\Support\HtmlString(
+                                '<img src="' . asset('storage/' . $record->photo) . '" alt="Photo" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">'
+                            );
+                        })
+                        ->visibleOn(['view', 'edit'])
+                        ->columnSpan([
+                            'default' => 12,
+                            'md' => 12,
+                            'lg' => 12,
+                        ]),
+
                     Forms\Components\FileUpload::make('photo')
+                        ->label('Changer la photo')
                         ->image()
                         ->directory('photos-utilisateurs')
+                        ->helperText('Télécharger une nouvelle photo (remplacera l\'existante)')
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,
@@ -215,7 +241,18 @@ class UtilisateurResource extends Resource
                 Tables\Columns\ImageColumn::make('photo')
                     ->label("Photo")
                     ->circular()
-                    ->toggleable(),
+                    ->toggleable()
+                    ->getStateUsing(function ($record) {
+                        if (!$record->photo) {
+                            return null;
+                        }
+                        // Si c'est une URL externe (OAuth), l'utiliser directement
+                        if (str_starts_with($record->photo, 'http')) {
+                            return $record->photo;
+                        }
+                        // Sinon, construire l'URL locale
+                        return asset('storage/' . $record->photo);
+                    }),
 
                 Tables\Columns\IconColumn::make('status')
                     ->label("Statut")
