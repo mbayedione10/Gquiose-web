@@ -102,6 +102,7 @@ class UtilisateurResource extends Resource
                         ->options([
                             'M' => 'Masculin',
                             'F' => 'Féminin',
+                            'Autre' => 'Autre',
                         ])
                         ->placeholder('Sélectionner le sexe')
                         ->columnSpan([
