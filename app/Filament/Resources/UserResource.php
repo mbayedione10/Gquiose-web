@@ -16,9 +16,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\UserResource\Pages;
+use App\Filament\Traits\HasResourcePermissions;
 
 class UserResource extends Resource
 {
+    use HasResourcePermissions;
     protected static ?string $model = User::class;
 
 

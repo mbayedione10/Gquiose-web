@@ -13,9 +13,11 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\PermissionResource\Pages;
+use App\Filament\Traits\HasResourcePermissions;
 
 class PermissionResource extends Resource
 {
+    use HasResourcePermissions;
     protected static ?string $model = Permission::class;
 
 
@@ -24,7 +26,7 @@ class PermissionResource extends Resource
     protected static ?string $navigationLabel = "Permissions";
     protected static ?string $navigationGroup = "Gestion des utilisateurs";
     protected static ?string $navigationIcon = 'heroicon-o-adjustments-horizontal';
-    protected static ?int $navigationSort = 102;
+    protected static ?int $navigationSort = 103;
 
     public static function form(Form $form): Form
     {
