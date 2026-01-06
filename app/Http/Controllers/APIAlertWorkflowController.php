@@ -123,7 +123,15 @@ class APIAlertWorkflowController extends Controller
      */
     public function step3(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        // Convertir les chaînes vides en null pour les champs optionnels
+        $data = $request->all();
+        foreach (['relation_agresseur', 'frequence_incidents', 'date_incident', 'heure_incident'] as $field) {
+            if (isset($data[$field]) && $data[$field] === '') {
+                $data[$field] = null;
+            }
+        }
+
+        $validator = Validator::make($data, [
             'alerte_id' => 'required|exists:alertes,id',
             'description' => 'required|string|max:1000',
             'date_incident' => 'nullable|date|before_or_equal:today',
@@ -137,6 +145,9 @@ class APIAlertWorkflowController extends Controller
             'ville_id' => 'nullable|exists:villes,id',
             'preuves' => 'nullable|array|max:5',
             'preuves.*' => 'file|max:10240|mimes:jpeg,jpg,png,pdf,mp4,mov,avi',
+        ], [
+            'relation_agresseur.in' => 'La relation avec l\'agresseur doit être: conjoint, ex_partenaire, famille, collegue, ami, connaissance, inconnu ou autre',
+            'frequence_incidents.in' => 'La fréquence doit être: unique, quotidien, hebdomadaire, mensuel ou continu',
         ]);
 
         if ($validator->fails()) {

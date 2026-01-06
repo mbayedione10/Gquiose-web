@@ -25,4 +25,12 @@ class TypeAlerte extends Model
     {
         return $this->hasMany(Alerte::class);
     }
+
+    /**
+     * Relation avec la catégorie de conseils
+     */
+    public function categorieConseil()
+    {
+        return $this->hasOne(CategorieConseil::class, 'type_alerte_id');
+    }
 }

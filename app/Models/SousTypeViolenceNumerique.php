@@ -29,4 +29,12 @@ class SousTypeViolenceNumerique extends Model
     {
         return $this->hasMany(Alerte::class, 'sous_type_violence_numerique_id');
     }
+
+    /**
+     * Relation avec la catégorie de conseils
+     */
+    public function categorieConseil()
+    {
+        return $this->hasOne(CategorieConseil::class, 'sous_type_violence_numerique_id');
+    }
 }
