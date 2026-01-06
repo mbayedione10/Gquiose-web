@@ -8,9 +8,11 @@ use Illuminate\Support\Facades\DB;
 
 class QuizMauvaiseReponseChart extends DoughnutChartWidget
 {
-    protected static ?string $heading = 'Base de connaissances des mauvaises réponses par thématique';
+    protected static ?string $heading = 'Mauvaises réponses au Quiz - Par thématique';
 
-    protected static ?int $sort = 20;
+    protected static ?int $sort = 9;
+    
+    protected int | string | array $columnSpan = 'full';
 
 
 

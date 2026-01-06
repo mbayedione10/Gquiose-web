@@ -9,48 +9,65 @@ use Illuminate\Database\Eloquent\Builder;
 
 class RecentArticlesWidget extends BaseWidget
 {
-    protected static ?int $sort = 6;
+    protected static ?int $sort = 7;
 
     protected int | string | array $columnSpan = 'full';
 
     protected function getTableQuery(): Builder
     {
         return Article::query()
-            ->with(['rubrique'])
+            ->with(['rubrique', 'user'])
             ->latest()
-            ->limit(15);
+            ->limit(10);
     }
 
     protected function getTableColumns(): array
     {
         return [
+            Tables\Columns\ImageColumn::make('image')
+                ->label('Image')
+                ->circular()
+                ->defaultImageUrl(url('/images/default-article.png')),
+            
             Tables\Columns\TextColumn::make('title')
                 ->label('Titre')
                 ->searchable()
                 ->sortable()
-                ->limit(50),
+                ->weight('bold')
+                ->limit(60)
+                ->description(fn ($record) => str($record->description ?? '')->limit(100)),
+            
             Tables\Columns\TextColumn::make('rubrique.name')
                 ->label('Rubrique')
+                ->badge()
                 ->color('primary')
-                ->default('Non classé')
-                ->formatStateUsing(fn ($state) => $state ?? 'Non classé'),
+                ->default('Non classé'),
+            
             Tables\Columns\IconColumn::make('status')
-                ->label('Statut')
+                ->label('Publié')
                 ->boolean()
-                ->trueIcon('heroicon-o-check-circle')
-                ->falseIcon('heroicon-o-x-circle')
+                ->trueIcon('heroicon-m-check-circle')
+                ->falseIcon('heroicon-m-x-circle')
                 ->trueColor('success')
-                ->falseColor('danger'),
+                ->falseColor('gray'),
+            
+            Tables\Columns\TextColumn::make('user.name')
+                ->label('Auteur')
+                ->icon('heroicon-m-user')
+                ->default('Admin'),
+            
             Tables\Columns\TextColumn::make('created_at')
                 ->label('Publié le')
-                ->dateTime('d/m/Y H:i')
-                ->sortable(),
+                ->dateTime('d/m/Y')
+                ->sortable()
+                ->since()
+                ->description(fn ($record) => $record->created_at->diffForHumans()),
         ];
     }
 
     protected function getTableHeading(): string
     {
-        return '15 derniers articles';
+        return 'Articles récents';
     }
 
     protected function getTableRecordUrlUsing(): ?\Closure

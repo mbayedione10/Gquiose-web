@@ -5,19 +5,23 @@ namespace App\Filament\Widgets;
 use App\Models\Utilisateur;
 use App\Models\Alerte;
 use App\Models\Evaluation;
+use App\Models\Response;
+use App\Models\Article;
 use Filament\Widgets\LineChartWidget;
 use Illuminate\Support\Carbon;
 
 class ActivityChartWidget extends LineChartWidget
 {
-    protected static ?string $heading = 'Activité des 7 derniers jours';
-    protected static ?int $sort = 1;
+    protected static ?string $heading = 'Tendances d\'activité - 7 derniers jours';
+    protected static ?int $sort = 2;
     protected int | string | array $columnSpan = 'full';
+
+    protected static ?string $maxHeight = '300px';
 
     protected function getData(): array
     {
         $days = collect(range(6, 0))->map(function ($day) {
-            return Carbon::now()->subDays($day)->format('d/m');
+            return Carbon::now()->subDays($day)->format('D d/m');
         });
 
         $utilisateurs = collect(range(6, 0))->map(function ($day) {
@@ -32,28 +36,70 @@ class ActivityChartWidget extends LineChartWidget
             return Evaluation::whereDate('created_at', Carbon::now()->subDays($day))->count();
         });
 
+        $quiz = collect(range(6, 0))->map(function ($day) {
+            return Response::whereDate('created_at', Carbon::now()->subDays($day))->count();
+        });
+
+        $articles = collect(range(6, 0))->map(function ($day) {
+            return Article::whereDate('created_at', Carbon::now()->subDays($day))->count();
+        });
+
         return [
             'datasets' => [
                 [
                     'label' => 'Nouveaux utilisateurs',
                     'data' => $utilisateurs->toArray(),
-                    'borderColor' => '#10b981',
-                    'backgroundColor' => 'rgba(16, 185, 129, 0.1)',
+                    'borderColor' => 'rgb(34, 197, 94)',
+                    'backgroundColor' => 'rgba(34, 197, 94, 0.1)',
+                    'tension' => 0.3,
                 ],
                 [
-                    'label' => 'Alertes',
+                    'label' => 'Alertes VBG signalées',
                     'data' => $alertes->toArray(),
-                    'borderColor' => '#ef4444',
+                    'borderColor' => 'rgb(239, 68, 68)',
                     'backgroundColor' => 'rgba(239, 68, 68, 0.1)',
+                    'tension' => 0.3,
                 ],
                 [
-                    'label' => 'Évaluations',
+                    'label' => 'Réponses au Quiz',
+                    'data' => $quiz->toArray(),
+                    'borderColor' => 'rgb(251, 146, 60)',
+                    'backgroundColor' => 'rgba(251, 146, 60, 0.1)',
+                    'tension' => 0.3,
+                ],
+                [
+                    'label' => 'Évaluations app',
                     'data' => $evaluations->toArray(),
-                    'borderColor' => '#3b82f6',
+                    'borderColor' => 'rgb(59, 130, 246)',
                     'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
+                    'tension' => 0.3,
+                ],
+                [
+                    'label' => 'Articles publiés',
+                    'data' => $articles->toArray(),
+                    'borderColor' => 'rgb(168, 85, 247)',
+                    'backgroundColor' => 'rgba(168, 85, 247, 0.1)',
+                    'tension' => 0.3,
                 ],
             ],
             'labels' => $days->toArray(),
+        ];
+    }
+
+    protected function getOptions(): array
+    {
+        return [
+            'plugins' => [
+                'legend' => [
+                    'display' => true,
+                    'position' => 'bottom',
+                ],
+            ],
+            'scales' => [
+                'y' => [
+                    'beginAtZero' => true,
+                ],
+            ],
         ];
     }
 }

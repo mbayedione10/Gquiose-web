@@ -10,18 +10,18 @@ use Illuminate\Database\Eloquent\Builder;
 
 class LastAlert extends BaseWidget
 {
-
-    protected static ?string $heading = '15 dernières alertes';
+    protected static ?string $heading = 'Alertes VBG récentes';
 
     protected int | string | array $columnSpan = "full";
 
-    protected static ?int $sort = 15;
+    protected static ?int $sort = 6;
+    
     protected function getTableQuery(): Builder
     {
-        return  Alerte::query()
-            ->with(['utilisateur'])
+        return Alerte::query()
+            ->with(['utilisateur', 'ville', 'typeAlerte'])
             ->latest()
-            ->limit(15);
+            ->limit(10);
     }
 
     protected function isTablePaginationEnabled(): bool
@@ -33,38 +33,56 @@ class LastAlert extends BaseWidget
     {
         return [
             Tables\Columns\TextColumn::make('ref')
+                ->label('Référence')
                 ->searchable()
-                ->limit(50),
+                ->copyable()
+                ->weight('bold')
+                ->limit(20),
 
-
-            Tables\Columns\TextColumn::make("utilisateur.name")
-                ->label("Signalée par")
-                ->sortable(),
-
-            Tables\Columns\TextColumn::make("type")
-                ->label("Type")
-                ->searchable()
-                ->sortable(),
+            Tables\Columns\TextColumn::make('typeAlerte.name')
+                ->label('Type de violence')
+                ->badge()
+                ->color('warning')
+                ->default('Non classifié'),
 
             Tables\Columns\TextColumn::make('etat')
-                ->label("État")
+                ->label('Statut')
+                ->badge()
                 ->colors([
-                    'warning' => static fn ($state): bool => $state === 'Non approuvée',
-                    'success' => static fn ($state): bool => $state === 'Confirmée',
-                    'danger' => static fn ($state): bool => $state === 'Rejetée',
+                    'warning' => 'Non approuvée',
+                    'success' => 'Confirmée',
+                    'danger' => 'Rejetée',
                 ])
-                ->searchable()
-                ->limit(50),
+                ->icons([
+                    'heroicon-m-clock' => 'Non approuvée',
+                    'heroicon-m-check-circle' => 'Confirmée',
+                    'heroicon-m-x-circle' => 'Rejetée',
+                ]),
 
-            Tables\Columns\TextColumn::make('description')
-                ->label("Information")
-                ->searchable(),
+            Tables\Columns\TextColumn::make('ville.name')
+                ->label('Ville')
+                ->icon('heroicon-m-map-pin')
+                ->default('Non spécifiée'),
+
+            Tables\Columns\TextColumn::make('utilisateur.name')
+                ->label('Signalée par')
+                ->icon('heroicon-m-user')
+                ->default('Anonyme'),
+
+            Tables\Columns\IconColumn::make('anonymat_souhaite')
+                ->label('Anonymat')
+                ->boolean()
+                ->trueIcon('heroicon-o-eye-slash')
+                ->falseIcon('heroicon-o-eye')
+                ->trueColor('warning')
+                ->falseColor('success'),
 
             Tables\Columns\TextColumn::make('created_at')
-                ->label("Signalée ")
-                ->searchable()
-                ->date("d F Y H:i")
-                ->limit(50),
+                ->label('Date du signalement')
+                ->dateTime('d/m/Y à H:i')
+                ->sortable()
+                ->since()
+                ->description(fn ($record) => $record->created_at->diffForHumans()),
         ];
     }
 

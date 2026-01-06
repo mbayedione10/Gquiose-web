@@ -44,27 +44,6 @@ class DashboardStatsExport implements FromCollection, WithHeadings, WithStyles, 
         $data->push(['Total Structures', $totalStructures, '', '']);
         $data->push(['', '', '', '']);
 
-        // Alertes récentes (7 dernières)
-        $data->push(['ALERTES RÉCENTES (7 dernières)', '', '', '']);
-        $data->push(['Type', 'État', 'Utilisateur', 'Ville', 'Date']);
-
-        $alertesRecentes = Alerte::with(['utilisateur', 'ville'])
-            ->latest()
-            ->take(7)
-            ->get();
-
-        foreach ($alertesRecentes as $alerte) {
-            $data->push([
-                $alerte->type ?? 'N/A',
-                $alerte->etat ?? 'En attente',
-                $alerte->utilisateur?->name ?? 'Inconnu',
-                $alerte->ville?->nom ?? 'Inconnue',
-                $alerte->created_at->format('d/m/Y H:i'),
-            ]);
-        }
-
-        $data->push(['', '', '', '']);
-
         // Distribution des alertes par type
         $data->push(['DISTRIBUTION DES ALERTES PAR TYPE', '', '', '']);
         $data->push(['Type de Violence', 'Nombre', 'Pourcentage', '']);
