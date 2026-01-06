@@ -27,6 +27,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->passwordReset()
+            ->emailVerification()
             ->brandName(config('app.name'))
             ->brandLogo(asset('images/logo_gquiose.svg'))
             ->brandLogoHeight('3rem')

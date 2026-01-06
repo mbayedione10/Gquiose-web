@@ -9,16 +9,19 @@ use Illuminate\Notifications\Notifiable;
 use Filament\Panel;
 use Filament\Models\Contracts\FilamentUser;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, CanResetPasswordContract
 {
     use Notifiable;
     use HasFactory;
     use Searchable;
     use FilamentTrait;
     use HasPermissions;
+    use CanResetPassword;
 
     protected $fillable = ['name', 'phone', 'email', 'password', 'role_id'];
 

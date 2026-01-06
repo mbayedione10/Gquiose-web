@@ -137,6 +137,62 @@ class UserResource extends Resource
                     ->indicator('Role')
                     ->multiple()
                     ->label('Role'),
+            ])
+            ->actions([
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make('changePassword')
+                        ->label('Modifier le mot de passe')
+                        ->icon('heroicon-o-key')
+                        ->form([
+                            TextInput::make('new_password')
+                                ->label('Nouveau mot de passe')
+                                ->password()
+                                ->required()
+                                ->minLength(6)
+                                ->maxLength(255),
+                            TextInput::make('new_password_confirmation')
+                                ->label('Confirmer le mot de passe')
+                                ->password()
+                                ->required()
+                                ->same('new_password')
+                                ->minLength(6)
+                                ->maxLength(255),
+                        ])
+                        ->action(function (User $record, array $data): void {
+                            $record->update([
+                                'password' => \Hash::make($data['new_password'])
+                            ]);
+                            
+                            \Filament\Notifications\Notification::make()
+                                ->success()
+                                ->title('Mot de passe modifié')
+                                ->body('Le mot de passe a été mis à jour avec succès.')
+                                ->send();
+                        })
+                        ->requiresConfirmation()
+                        ->modalHeading('Modifier le mot de passe')
+                        ->modalDescription('Veuillez saisir le nouveau mot de passe pour cet administrateur.')
+                        ->modalSubmitActionLabel('Modifier'),
+                    Tables\Actions\DeleteAction::make()
+                        ->label('Supprimer')
+                        ->requiresConfirmation()
+                        ->modalHeading('Supprimer l\'administrateur')
+                        ->modalDescription('Êtes-vous sûr de vouloir supprimer cet administrateur ? Cette action est irréversible.')
+                        ->modalSubmitActionLabel('Oui, supprimer')
+                        ->successNotificationTitle('Administrateur supprimé avec succès'),
+                ]),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->requiresConfirmation()
+                        ->modalHeading('Supprimer les administrateurs sélectionnés')
+                        ->modalDescription('Êtes-vous sûr de vouloir supprimer ces administrateurs ? Cette action est irréversible.')
+                        ->modalSubmitActionLabel('Oui, supprimer')
+                        ->successNotificationTitle('Administrateurs supprimés avec succès'),
+                ]),
             ]);
     }
 
