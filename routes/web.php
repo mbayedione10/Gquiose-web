@@ -84,3 +84,8 @@ Route::get('preuves/alertes/{alerte}/{index}', function (App\Models\Alerte $aler
         ->header('Content-Disposition', 'inline; filename="' . $preuve['original_name'] . '"');
 })->middleware(['auth', 'web'])->name('admin.alertes.preuve.download');
 
+// Routes pour l'invitation admin
+Route::get('admin/invitation/accept/{token}', [App\Http\Controllers\AdminInvitationController::class, 'showAcceptForm'])
+    ->name('admin.invitation.accept');
+Route::post('admin/invitation/accept/{token}', [App\Http\Controllers\AdminInvitationController::class, 'accept'])
+    ->name('admin.invitation.accept.submit');
