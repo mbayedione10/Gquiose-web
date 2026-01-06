@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Scopes\Searchable;
 use App\Models\Traits\FilamentTrait;
+use App\Models\Traits\HasPermissions;
 use Illuminate\Notifications\Notifiable;
 use Filament\Panel;
 use Filament\Models\Contracts\FilamentUser;
@@ -17,6 +18,7 @@ class User extends Authenticatable implements FilamentUser
     use HasFactory;
     use Searchable;
     use FilamentTrait;
+    use HasPermissions;
 
     protected $fillable = ['name', 'phone', 'email', 'password', 'role_id'];
 
