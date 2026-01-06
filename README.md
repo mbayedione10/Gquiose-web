@@ -1,66 +1,216 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Gquiose - Génération Qui Ose
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Application backend pour la lutte contre les violences basées sur le genre (VBG) en Afrique.
 
-## About Laravel
+[![Laravel](https://img.shields.io/badge/Laravel-10.x-red.svg)](https://laravel.com)
+[![PHP](https://img.shields.io/badge/PHP-8.3-blue.svg)](https://php.net)
+[![Filament](https://img.shields.io/badge/Filament-3.x-orange.svg)](https://filamentphp.com)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## À propos
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**Gquiose** (Génération Qui Ose) est une plateforme complète de signalement et de support pour les victimes de violences basées sur le genre. L'application fournit une API REST sécurisée pour les applications mobiles iOS et Android, ainsi qu'un panel d'administration Filament pour la gestion des signalements et du contenu éducatif.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Fonctionnalités principales
 
-## Learning Laravel
+- **🚨 Signalement de VBG** - Formulaire multi-étapes pour documenter les incidents avec preuves
+- **📱 Support multi-plateforme** - API pour iOS et Android avec notifications push (FCM/APNs)
+- **📚 Contenu éducatif** - Articles, vidéos, FAQs sur la prévention des violences
+- **💬 Forum communautaire** - Espace d'échange sécurisé et modéré
+- **📊 Évaluations** - Questionnaires d'évaluation des connaissances
+- **🩸 Suivi menstruel** - Calendrier de cycle avec symptômes et rappels
+- **🏥 Annuaire de structures** - Localisation des centres d'aide et de santé
+- **🔐 Authentification flexible** - Email, téléphone, OAuth (Google, Facebook, Apple)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Technologies
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+- **Backend**: Laravel 10 + PHP 8.3
+- **Base de données**: MySQL
+- **Admin**: Filament 3
+- **API**: RESTful JSON avec Laravel Sanctum
+- **Frontend**: Vite + Bootstrap 4 + SCSS
+- **SMS**: Multi-provider (NimbaSMS, Twilio, Vonage)
+- **Push**: Firebase Cloud Messaging + Apple Push Notification Service
+- **Tests**: Pest PHP
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Prérequis
 
-## Laravel Sponsors
+- PHP 8.3 ou supérieur
+- Composer 2.x
+- Node.js 20.x et npm
+- MySQL 8.0+
+- Extensions PHP: `curl`, `gd`, `mbstring`, `xml`, `zip`, `bcmath`, `intl`
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+## Installation
 
-### Premium Partners
+### 1. Cloner le repository
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+```bash
+git clone https://github.com/mbayedione10/Gquiose-web.git
+cd Gquiose-web
+```
 
-## Contributing
+### 2. Installer les dépendances
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+composer install
+npm install
+```
 
-## Code of Conduct
+### 3. Configuration de l'environnement
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-## Security Vulnerabilities
+Éditer le fichier `.env` avec vos configurations:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```env
+# Base de données
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=gquiose_db
+DB_USERNAME=votre_utilisateur
+DB_PASSWORD=votre_mot_de_passe
 
-## License
+# Provider SMS (nimba, twilio, vonage)
+SMS_PROVIDER=nimba
+NIMBA_SMS_SERVICE_ID=votre_service_id
+NIMBA_SMS_SECRET=votre_secret
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Push Notifications
+FCM_SERVER_KEY=votre_fcm_key
+APNS_KEY_ID=votre_apns_key_id
+APNS_TEAM_ID=votre_team_id
+```
+
+Voir [CONFIGURATION_ENVIRONNEMENT.md](CONFIGURATION_ENVIRONNEMENT.md) pour la documentation complète.
+
+### 4. Base de données
+
+```bash
+php artisan migrate
+php artisan db:seed
+```
+
+### 5. Compiler les assets
+
+```bash
+# Développement
+npm run dev
+
+# Production
+npm run build
+```
+
+### 6. Lancer l'application
+
+```bash
+php artisan serve
+```
+
+L'application sera accessible à `http://localhost:8000`
+
+## Documentation
+
+- **[DOCUMENTATION_API_COMPLETE.md](DOCUMENTATION_API_COMPLETE.md)** - Documentation complète de l'API avec tous les endpoints
+- **[CONFIGURATION_ENVIRONNEMENT.md](CONFIGURATION_ENVIRONNEMENT.md)** - Guide de configuration des variables d'environnement
+- **[DEPLOY-CHECKLIST.md](DEPLOY-CHECKLIST.md)** - Guide de déploiement en production
+- **[.github/copilot-instructions.md](.github/copilot-instructions.md)** - Instructions pour les agents IA
+
+## Structure du projet
+
+```
+app/
+├── Http/Controllers/
+│   ├── API*Controller.php      # Endpoints API mobile
+│   └── *Controller.php         # Contrôleurs web/Filament
+├── Services/                   # Logique métier
+│   ├── SMS/                    # Services SMS multi-provider
+│   ├── Push/                   # Notifications push FCM/APNs
+│   └── SocialAuth/             # Vérification OAuth
+├── Models/                     # Modèles Eloquent
+├── Filament/Resources/         # Ressources admin Filament
+└── Helpers.php                 # Fonctions helper globales
+```
+
+## Tests
+
+```bash
+# Exécuter tous les tests
+./vendor/bin/pest
+
+# Tests avec couverture
+./vendor/bin/pest --coverage
+
+# Format du code
+./vendor/bin/pint
+```
+
+## Déploiement
+
+Pour déployer en production, suivre le guide [DEPLOY-CHECKLIST.md](DEPLOY-CHECKLIST.md):
+
+1. Configuration serveur (Nginx + PHP 8.3-FPM)
+2. Variables d'environnement de production
+3. Compilation des assets: `npm run build && php artisan optimize`
+4. Configuration des workers pour les queues
+5. Configuration SSL avec Let's Encrypt
+
+## Panel d'administration
+
+Accès: `https://votre-domaine.com/admin`
+
+Le panel Filament permet de:
+- Gérer les signalements de VBG
+- Modérer le forum et les contenus
+- Créer et publier des articles, vidéos, FAQs
+- Consulter les statistiques et évaluations
+- Gérer les utilisateurs et permissions
+
+## API Mobile
+
+**Base URL**: `https://test.gquiose.africa/api/v1`
+
+Endpoints principaux:
+- `POST /login` - Authentification
+- `POST /register` - Inscription
+- `POST /alertes/step1-6` - Workflow de signalement VBG
+- `GET /articles` - Contenu éducatif
+- `POST /forum/message/sync` - Forum
+
+Voir [DOCUMENTATION_API_COMPLETE.md](DOCUMENTATION_API_COMPLETE.md) pour tous les endpoints.
+
+## Sécurité
+
+Pour signaler une vulnérabilité de sécurité, veuillez contacter [mbayedione10@gmail.com](mailto:mbayedione10@gmail.com).
+
+- Authentification Sanctum avec tokens à expiration
+- Validation stricte des entrées utilisateur
+- Protection CSRF sur les formulaires web
+- Chiffrement des données sensibles
+- Logs de sécurité pour les événements critiques
+
+## Contribution
+
+Les contributions sont les bienvenues! Pour contribuer:
+
+1. Fork le projet
+2. Créer une branche (`git checkout -b feature/amelioration`)
+3. Commit vos changements (`git commit -m 'Ajout nouvelle fonctionnalité'`)
+4. Push vers la branche (`git push origin feature/amelioration`)
+5. Ouvrir une Pull Request
+
+## Licence
+
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+## Contact
+
+**Email**: mbayedione10@gmail.com  
+**URL Production**: https://test.gquiose.africa
+
+---
+
+Développé avec ❤️ pour soutenir la lutte contre les violences basées sur le genre en Afrique.
