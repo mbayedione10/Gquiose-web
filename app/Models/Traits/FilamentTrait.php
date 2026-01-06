@@ -11,6 +11,11 @@ trait FilamentTrait
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->isSuperAdmin() || in_array($this->role?->name, ['admin', 'super-admin', 'Admin', 'Super Admin']);
+        return $this->isSuperAdmin() || in_array($this->role?->name, [
+            'Admin',
+            'Super Admin',
+            'Éditeur',
+            'Modérateur'
+        ]);
     }
 }

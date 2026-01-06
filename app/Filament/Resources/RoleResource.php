@@ -34,19 +34,32 @@ class RoleResource extends Resource
             Section::make()->schema([
                 Grid::make(['default' => 0])->schema([
                     TextInput::make('name')
+                        ->label('Nom du rôle')
                         ->rules(['max:255', 'string'])
                         ->required()
                         ->unique('roles', 'name', fn(?Model $record) => $record)
-                        ->placeholder('Name')
+                        ->placeholder('Ex: Super Admin')
                         ->columnSpan([
                             'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
+                            'md' => 6,
+                            'lg' => 6,
                         ]),
 
                     Toggle::make('status')
+                        ->label('Actif')
                         ->rules(['boolean'])
                         ->required()
+                        ->default(true)
+                        ->columnSpan([
+                            'default' => 12,
+                            'md' => 6,
+                            'lg' => 6,
+                        ]),
+
+                    Forms\Components\Textarea::make('description')
+                        ->label('Description')
+                        ->rows(3)
+                        ->placeholder('Décrivez les responsabilités et permissions de ce rôle')
                         ->columnSpan([
                             'default' => 12,
                             'md' => 12,
@@ -63,10 +76,34 @@ class RoleResource extends Resource
             ->poll('60s')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nom')
                     ->toggleable()
                     ->searchable(true, null, true)
+                    ->sortable()
+                    ->weight('bold')
                     ->limit(50),
+                Tables\Columns\TextColumn::make('description')
+                    ->label('Description')
+                    ->toggleable()
+                    ->searchable()
+                    ->limit(80)
+                    ->wrap(),
+                Tables\Columns\TextColumn::make('users_count')
+                    ->label('Utilisateurs')
+                    ->counts('users')
+                    ->toggleable()
+                    ->alignCenter()
+                    ->badge()
+                    ->color('info'),
+                Tables\Columns\TextColumn::make('permissions_count')
+                    ->label('Permissions')
+                    ->counts('permissions')
+                    ->toggleable()
+                    ->alignCenter()
+                    ->badge()
+                    ->color('success'),
                 Tables\Columns\IconColumn::make('status')
+                    ->label('Statut')
                     ->toggleable()
                     ->boolean(),
             ])
