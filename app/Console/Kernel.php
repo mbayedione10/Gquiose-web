@@ -12,7 +12,11 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Process queue jobs every minute
+        $schedule->command('queue:work --stop-when-empty --max-time=60')
+            ->everyMinute()
+            ->withoutOverlapping();
+
         $schedule->command('notifications:send-scheduled')->everyMinute();
         $schedule->command('cycle:send-reminders')->daily();
         $schedule->command('health:send-weekly-tips')->weekly();
