@@ -32,7 +32,7 @@ class UtilisateurFactory extends Factory
             'phone' => '+224' . $this->faker->unique->numerify('6########'),
             'sexe' => 'F',
             'status' => true,
-            'dob' => $this->faker->dateTimeBetween('-40 years', '-15 years')->format('Y-m-d'),
+            'anneedenaissance' => $this->faker->numberBetween(now()->year - 40, now()->year - 15),
             'password' => bcrypt('password'),
         ];
     }

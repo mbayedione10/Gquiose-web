@@ -112,14 +112,50 @@ class UtilisateurResource extends Resource
                             'lg' => 12,
                         ]),
 
-                    Forms\Components\DatePicker::make('dob')
-                        ->label('Date de naissance')
-                        ->placeholder('Date de naissance')
-                        ->displayFormat('d/m/Y')
+                    TextInput::make('anneedenaissance')
+                        ->label('Année de naissance')
+                        ->placeholder('Ex: 1990')
+                        ->numeric()
+                        ->minValue(now()->year - 100)
+                        ->maxValue(now()->year)
+                        ->reactive()
+                        ->afterStateUpdated(function ($state, callable $set) {
+                            if ($state) {
+                                $age = now()->year - $state;
+                                $tranche = match(true) {
+                                    $age < 15 => '-15 ans',
+                                    $age >= 15 && $age <= 17 => '15-17 ans',
+                                    $age >= 18 && $age <= 24 => '18-24 ans',
+                                    $age >= 25 && $age <= 29 => '25-29 ans',
+                                    $age >= 30 && $age <= 35 => '30-35 ans',
+                                    $age > 35 => '+35 ans',
+                                    default => null,
+                                };
+                                $set('dob', $tranche);
+                            }
+                        })
                         ->columnSpan([
                             'default' => 12,
-                            'md' => 12,
-                            'lg' => 12,
+                            'md' => 6,
+                            'lg' => 6,
+                        ]),
+
+                    Forms\Components\Select::make('dob')
+                        ->label("Tranche d'âge")
+                        ->options([
+                            '-15 ans' => '-15 ans',
+                            '15-17 ans' => '15-17 ans',
+                            '18-24 ans' => '18-24 ans',
+                            '25-29 ans' => '25-29 ans',
+                            '30-35 ans' => '30-35 ans',
+                            '+35 ans' => '+35 ans',
+                        ])
+                        ->placeholder("Sélectionner une tranche d'âge")
+                        ->helperText("Se remplit automatiquement selon l'année de naissance")
+                        ->columnSpan([
+                            'default' => 12,
+                            'md' => 6,
+                            'lg' => 6,
                         ]),
 
                     Forms\Components\Select::make('ville_id')
@@ -265,11 +301,16 @@ class UtilisateurResource extends Resource
                     ->sortable()
                     ->toggleable(),
 
-                Tables\Columns\TextColumn::make('dob')
-                    ->label("Date de naissance")
-                    ->date('d/m/Y')
+                Tables\Columns\TextColumn::make('anneedenaissance')
+                    ->label("Année de naissance")
                     ->sortable()
                     ->toggleable(),
+
+                Tables\Columns\TextColumn::make('dob')
+                    ->label("Tranche d'âge")
+                    ->sortable()
+                    ->toggleable()
+                    ->placeholder('-'),
 
                 Tables\Columns\ImageColumn::make('photo')
                     ->label("Photo")

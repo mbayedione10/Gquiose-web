@@ -83,15 +83,15 @@ class PushNotificationService
         if ($notification->target_audience === 'filtered' && $notification->filters) {
             $filters = is_array($notification->filters) ? $notification->filters : json_decode($notification->filters, true);
 
-            // Filtres démographiques
+            // Filtres démographiques (basés sur l'année de naissance)
             if (isset($filters['age_min'])) {
-                $maxDate = now()->subYears($filters['age_min'])->format('Y-m-d');
-                $query->where('dob', '<=', $maxDate);
+                $maxYear = now()->year - $filters['age_min'];
+                $query->where('anneedenaissance', '<=', $maxYear);
             }
 
             if (isset($filters['age_max'])) {
-                $minDate = now()->subYears($filters['age_max'] + 1)->addDay()->format('Y-m-d');
-                $query->where('dob', '>=', $minDate);
+                $minYear = now()->year - $filters['age_max'];
+                $query->where('anneedenaissance', '>=', $minYear);
             }
 
             if (isset($filters['sexe'])) {

@@ -72,7 +72,7 @@ class APIAuthController extends Controller
 
         return response::success([
             'utilisateur' => $client->only([
-                'id', 'nom', 'prenom', 'phone', 'email', 'dob',
+                'id', 'nom', 'prenom', 'phone', 'email', 'anneedenaissance',
                 'sexe', 'photo', 'ville_id', 'status', 'provider', 'platform'
             ]),
             'token' => $token,
@@ -156,7 +156,7 @@ class APIAuthController extends Controller
         $validated = $request->validate([
             'phone'                => 'required|string|regex:/^\+?[0-9]{8,15}$/',
             'sexe'                 => 'required|in:M,F,Autre',
-            'dob'                  => 'required|date|before:today|after:' . now()->subYears(100)->format('Y-m-d'),
+            'anneedenaissance'     => 'required|integer|min:' . (now()->year - 100) . '|max:' . now()->year,
             'password'             => 'required|string|min:8|confirmed',
             'password_confirmation'=> 'required',
             'nom'                  => 'nullable|string|max:255',
@@ -166,12 +166,12 @@ class APIAuthController extends Controller
             'ville_id'             => 'nullable|exists:villes,id',
         ], [
             'phone.regex' => 'Le numéro doit contenir entre 8 et 15 chiffres',
-            'dob.before' => 'La date de naissance doit être antérieure à aujourd\'hui',
-            'dob.after' => 'L\'âge ne peut pas dépasser 100 ans',
+            'dob.min' => 'L\'âge ne peut pas dépasser 100 ans',
+            'dob.max' => 'L\'année de naissance ne peut pas être dans le futur',
         ]);
 
         // Vérifier que l'utilisateur a au moins 13 ans
-        $age = now()->diffInYears($validated['dob']);
+        $age = now()->year - $validated['anneedenaissance'];
         if ($age < 13) {
             return response::error('Vous devez avoir au moins 13 ans pour vous inscrire', 400);
         }
@@ -194,19 +194,17 @@ class APIAuthController extends Controller
 
         DB::beginTransaction();
         try {
-            $dob = $validated['dob'];
-
             $utilisateur = Utilisateur::create([
-                'nom'        => $validated['nom'] ?? '',
-                'prenom'     => $validated['prenom'] ?? '',
-                'phone'      => $phone,
-                'sexe'       => $validated['sexe'],
-                'dob'        => $dob,
-                'password'   => bcrypt($validated['password']),
-                'status'     => false,
-                'fcm_token'  => $validated['fcm_token'] ?? null,
-                'platform'   => $validated['platform'],
-                'ville_id'   => $validated['ville_id'] ?? null,
+                'nom'              => $validated['nom'] ?? '',
+                'prenom'           => $validated['prenom'] ?? '',
+                'phone'            => $phone,
+                'sexe'             => $validated['sexe'],
+                'anneedenaissance' => $validated['anneedenaissance'],
+                'password'         => bcrypt($validated['password']),
+                'status'           => false,
+                'fcm_token'        => $validated['fcm_token'] ?? null,
+                'platform'         => $validated['platform'],
+                'ville_id'         => $validated['ville_id'] ?? null,
             ]);
 
             // Générer code 4 chiffres
@@ -241,7 +239,7 @@ class APIAuthController extends Controller
             ]);
 
             return response::success([
-                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'sexe', 'dob', 'provider', 'platform']),
+                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'sexe', 'anneedenaissance', 'provider', 'platform']),
                 'message' => 'Un code de vérification a été envoyé à votre numéro',
                 'verification_status' => 'pending_verification',
             ], 201);
@@ -260,7 +258,7 @@ class APIAuthController extends Controller
             'email'                => 'required|email|unique:utilisateurs,email',
             'phone'                => 'nullable|string|regex:/^\+?[0-9]{8,15}$/',
             'sexe'                 => 'required|in:M,F,Autre',
-            'dob'                  => 'required|date|before:today|after:' . now()->subYears(100)->format('Y-m-d'),
+            'anneedenaissance'     => 'required|integer|min:' . (now()->year - 100) . '|max:' . now()->year,
             'password'             => 'required|string|min:8|confirmed',
             'password_confirmation'=> 'required',
             'nom'                  => 'nullable|string|max:255',
@@ -269,15 +267,15 @@ class APIAuthController extends Controller
             'platform'             => 'required|in:android,ios',
             'ville_id'             => 'nullable|exists:villes,id',
         ], [
-            'dob.before' => 'La date de naissance doit être antérieure à aujourd\'hui',
-            'dob.after' => 'L\'âge ne peut pas dépasser 100 ans',
+            'dob.min' => 'L\'âge ne peut pas dépasser 100 ans',
+            'dob.max' => 'L\'année de naissance ne peut pas être dans le futur',
             'phone.regex' => 'Le numéro doit contenir entre 8 et 15 chiffres',
             'platform.required' => 'La plateforme est requise',
             'platform.in' => 'La plateforme doit être android ou ios',
         ]);
 
         // Vérifier que l'utilisateur a au moins 13 ans
-        $age = now()->diffInYears($validated['dob']);
+        $age = now()->year - $validated['anneedenaissance'];
         if ($age < 13) {
             return response::error('Vous devez avoir au moins 13 ans pour vous inscrire', 400);
         }
@@ -298,20 +296,18 @@ class APIAuthController extends Controller
 
         DB::beginTransaction();
         try {
-            $dob = $validated['dob'];
-
             $utilisateur = Utilisateur::create([
-                'nom'        => $validated['nom'] ?? '',
-                'prenom'     => $validated['prenom'] ?? '',
-                'email'      => $validated['email'],
-                'phone'      => $validated['phone'] ?? null,
-                'sexe'       => $validated['sexe'],
-                'dob'        => $dob,
-                'password'   => bcrypt($validated['password']),
-                'status'     => false,
-                'fcm_token'  => $validated['fcm_token'] ?? null,
-                'platform'   => $validated['platform'],
-                'ville_id'   => $validated['ville_id'] ?? null,
+                'nom'              => $validated['nom'] ?? '',
+                'prenom'           => $validated['prenom'] ?? '',
+                'email'            => $validated['email'],
+                'phone'            => $validated['phone'] ?? null,
+                'sexe'             => $validated['sexe'],
+                'anneedenaissance' => $validated['anneedenaissance'],
+                'password'         => bcrypt($validated['password']),
+                'status'           => false,
+                'fcm_token'        => $validated['fcm_token'] ?? null,
+                'platform'         => $validated['platform'],
+                'ville_id'         => $validated['ville_id'] ?? null,
             ]);
 
             // Générer code 4 chiffres (unifié avec phone)
@@ -340,7 +336,7 @@ class APIAuthController extends Controller
             ]);
 
             return response::success([
-                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'email', 'sexe', 'dob', 'ville_id', 'provider', 'platform']),
+                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'email', 'sexe', 'anneedenaissance', 'ville_id', 'provider', 'platform']),
                 'message' => 'Un code de vérification a été envoyé à votre email',
                 'verification_status' => 'pending_verification',
             ], 201);
@@ -530,7 +526,7 @@ class APIAuthController extends Controller
 
             return response::success([
                 'utilisateur' => $utilisateur->only([
-                    'id', 'nom', 'prenom', 'phone', 'email', 'dob', 'sexe', 'photo', 'ville_id', 'provider', 'platform'
+                    'id', 'nom', 'prenom', 'phone', 'email', 'anneedenaissance', 'sexe', 'photo', 'ville_id', 'provider', 'platform'
                 ]),
                 'token' => $token,
                 'token_type' => 'Bearer',
@@ -827,12 +823,12 @@ class APIAuthController extends Controller
         }
 
         $validated = $request->validate([
-            'nom'      => 'nullable|string|max:255',
-            'prenom'   => 'nullable|string|max:255',
-            'sexe'     => 'nullable|in:M,F,Autre',
-            'dob'      => 'nullable|date',
-            'ville_id' => 'nullable|exists:villes,id',
-            'photo'    => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+            'nom'              => 'nullable|string|max:255',
+            'prenom'           => 'nullable|string|max:255',
+            'sexe'             => 'nullable|in:M,F,Autre',
+            'anneedenaissance' => 'nullable|integer|min:' . (now()->year - 100) . '|max:' . now()->year,
+            'ville_id'         => 'nullable|exists:villes,id',
+            'photo'            => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
         $user->fill(collect($validated)->except(['photo'])->toArray());
@@ -847,7 +843,7 @@ class APIAuthController extends Controller
         Log::info('Profile updated', ['user_id' => $user->id]);
 
         return response::success([
-            'utilisateur' => $user->only(['id', 'nom', 'prenom', 'phone', 'email', 'dob', 'sexe', 'photo', 'ville_id', 'provider', 'platform']),
+            'utilisateur' => $user->only(['id', 'nom', 'prenom', 'phone', 'email', 'anneedenaissance', 'sexe', 'photo', 'ville_id', 'provider', 'platform']),
             'message' => 'Profil mis à jour avec succès'
         ]);
     }
@@ -865,7 +861,7 @@ class APIAuthController extends Controller
 
         return response::success([
             'utilisateur' => $user->only([
-                'id', 'nom', 'prenom', 'phone', 'email', 'dob',
+                'id', 'nom', 'prenom', 'phone', 'email', 'anneedenaissance',
                 'sexe', 'photo', 'ville_id', 'status', 'provider', 'platform'
             ]),
         ]);

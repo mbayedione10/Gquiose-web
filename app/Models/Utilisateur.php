@@ -21,6 +21,7 @@ class Utilisateur extends Model
         'sexe',
         'status',
         'dob',
+        'anneedenaissance',
         'password',
         'provider',
         'provider_id',
@@ -43,7 +44,7 @@ class Utilisateur extends Model
     protected $casts = [
         'status' => 'boolean',
         'email_verified_at' => 'datetime',
-        'dob' => 'date',
+        'anneedenaissance' => 'integer',
     ];
 
     protected $hidden = [
