@@ -49,16 +49,12 @@ return new class extends Migration
                     }
                 }
 
-                // Mettre à jour si on a une tranche valide et différente
+                // Mettre à jour seulement si on a une tranche valide et différente
+                // Ne jamais effacer les données existantes qu'on ne peut pas parser
                 if ($tranche && $user->dob !== $tranche) {
                     DB::table('utilisateurs')
                         ->where('id', $user->id)
                         ->update(['dob' => $tranche]);
-                } elseif (!$tranche && $user->dob !== null) {
-                    // Si on ne peut pas déterminer, mettre null
-                    DB::table('utilisateurs')
-                        ->where('id', $user->id)
-                        ->update(['dob' => null]);
                 }
             }
         });

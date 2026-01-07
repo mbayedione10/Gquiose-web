@@ -9,23 +9,15 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     * Nettoie les valeurs texte invalides dans le champ dob
+     * MIGRATION OBSOLÈTE - Désactivée car incompatible avec le nouveau système de tranches d'âge
+     * Le champ dob stocke maintenant des tranches d'âge (ex: "18-24 ans") et non des dates
      */
     public function up(): void
     {
-        // Supprimer les valeurs qui ne sont pas des dates valides
-        $users = DB::table('utilisateurs')
-            ->whereNotNull('dob')
-            ->get(['id', 'dob']);
-
-        foreach ($users as $user) {
-            // Vérifier si c'est une date valide (format YYYY-MM-DD)
-            if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $user->dob)) {
-                DB::table('utilisateurs')
-                    ->where('id', $user->id)
-                    ->update(['dob' => null]);
-            }
-        }
+        // Migration désactivée - le nettoyage est géré par la migration
+        // 2026_01_07_150000_update_dob_to_standard_age_ranges_in_utilisateurs_table.php
+        
+        // Ne rien faire pour préserver les données existantes
     }
 
     /**
