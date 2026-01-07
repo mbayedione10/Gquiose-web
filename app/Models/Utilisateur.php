@@ -94,4 +94,32 @@ class Utilisateur extends Model
     {
         return $this->hasMany(NotificationLog::class, 'utilisateur_id');
     }
+
+    /**
+     * Mutator pour anneedenaissance: remplit automatiquement dob avec la tranche d'âge
+     */
+    protected function setAnneedenaissanceAttribute($value): void
+    {
+        $this->attributes['anneedenaissance'] = $value;
+
+        if ($value) {
+            $age = now()->year - (int) $value;
+            $this->attributes['dob'] = $this->getAgeRange($age);
+        }
+    }
+
+    /**
+     * Détermine la tranche d'âge selon l'âge calculé
+     */
+    private function getAgeRange(int $age): string
+    {
+        return match(true) {
+            $age < 15 => '-15 ans',
+            $age >= 15 && $age <= 17 => '15-17 ans',
+            $age >= 18 && $age <= 24 => '18-24 ans',
+            $age >= 25 && $age <= 29 => '25-29 ans',
+            $age >= 30 && $age <= 35 => '30-35 ans',
+            default => '+35 ans',
+        };
+    }
 }
