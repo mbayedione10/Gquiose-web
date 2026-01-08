@@ -174,6 +174,36 @@
         </table>
     </div>
 
+    @if(isset($ageRangeStats) && count($ageRangeStats['tranches']) > 0)
+    <div class="section">
+        <h2>👥 Répartition par Tranche d'Âge</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tranche d'âge</th>
+                    <th>Nombre</th>
+                    <th>Pourcentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($ageRangeStats['tranches'] as $tranche)
+                    @php
+                        $percentage = $ageRangeStats['total'] > 0 ? round(($tranche['count'] / $ageRangeStats['total']) * 100, 1) : 0;
+                    @endphp
+                    <tr>
+                        <td><span class="badge badge-purple">{{ $tranche['label'] }}</span></td>
+                        <td><strong>{{ number_format($tranche['count']) }}</strong></td>
+                        <td>{{ $percentage }}%</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+        <p style="text-align: right; color: #6b7280; margin-top: 10px; font-size: 10px;">
+            Total: {{ number_format($ageRangeStats['total']) }} utilisateurs
+        </p>
+    </div>
+    @endif
+
     @if(isset($evolution) && $evolution->count() > 0)
     <div class="section">
         <h2>📊 Évolution Temporelle</h2>

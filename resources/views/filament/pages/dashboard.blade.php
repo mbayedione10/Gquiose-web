@@ -112,12 +112,19 @@
         </div>
     </div>
 
-    <!-- 3. Actions Rapides -->
+
+
+    <!-- 4. Actions Rapides -->
     <div class="mb-6">
         @livewire(\App\Filament\Widgets\QuickActionsWidget::class)
     </div>
 
-    <!-- 4. Activité des 7 derniers jours (statistiques) -->
+    <!-- 5. Répartition par tranche d'âge -->
+    <div class="mb-6">
+        @livewire(\App\Filament\Widgets\AgeRangeStatsWidget::class)
+    </div>
+
+    <!-- 6. Activité des 7 derniers jours (statistiques) -->
     <div class="mb-6">
         <div class="grid grid-cols-1 gap-6">
             @livewire(\App\Filament\Widgets\StatsOverviewWidget::class)
@@ -125,17 +132,17 @@
         </div>
     </div>
 
-    <!-- 5. Alertes Récentes -->
+    <!-- 6. Alertes Récentes -->
     <div class="mb-6">
         @livewire(\App\Filament\Widgets\LastAlert::class)
     </div>
 
-    <!-- 6. 15 derniers articles -->
+    <!-- 7. 15 derniers articles -->
     <div class="mb-6">
         @livewire(\App\Filament\Widgets\RecentArticlesWidget::class)
     </div>
 
-    <!-- 7. Notifications récentes -->
+    <!-- 8. Notifications récentes -->
     <div class="mb-6">
         @livewire(\App\Filament\Widgets\RecentNotificationsWidget::class)
     </div>

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Response;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\EvaluationStatsExport;
+use App\Filament\Widgets\AgeRangeStatsWidget;
 
 class ViewEvaluationStats extends Page
 {
@@ -40,7 +41,7 @@ class ViewEvaluationStats extends Page
     protected function getFooterWidgets(): array
     {
         return [
-            EvaluationStatsResource\Widgets\QuestionChartWidget::class,
+            AgeRangeStatsWidget::class,
         ];
     }
 
@@ -120,6 +121,7 @@ class ViewEvaluationStats extends Page
         $dateFin = $this->dateFin;
         $contexte = $this->contexte;
         $evolution = $this->getEvolution();
+        $ageRangeStats = $this->getAgeRangeStats();
 
         $pdf = Pdf::loadView('exports.evaluation-stats-pdf', compact(
             'evaluations',
@@ -127,7 +129,8 @@ class ViewEvaluationStats extends Page
             'dateDebut',
             'dateFin',
             'contexte',
-            'evolution'
+            'evolution',
+            'ageRangeStats'
         ));
 
         return response()->streamDownload(
@@ -144,7 +147,8 @@ class ViewEvaluationStats extends Page
                 $this->getStats(),
                 $this->dateDebut,
                 $this->dateFin,
-                $this->contexte
+                $this->contexte,
+                $this->getAgeRangeStats()
             ),
             'statistiques-evaluations-' . now()->format('Y-m-d') . '.xlsx'
         );
@@ -187,5 +191,60 @@ class ViewEvaluationStats extends Page
             ->groupBy('date')
             ->orderBy('date')
             ->get();
+    }
+
+    public function getAgeRangeStats(): array
+    {
+        $currentYear = now()->year;
+
+        $tranches = [
+            'moins_15' => ['label' => 'Moins de 15 ans', 'min_age' => 0, 'max_age' => 14, 'dob_value' => '-15 ans'],
+            '15_17' => ['label' => '15-17 ans', 'min_age' => 15, 'max_age' => 17, 'dob_value' => '15-17 ans'],
+            '18_24' => ['label' => '18-24 ans', 'min_age' => 18, 'max_age' => 24, 'dob_value' => '18-24 ans'],
+            '25_29' => ['label' => '25-29 ans', 'min_age' => 25, 'max_age' => 29, 'dob_value' => '25-29 ans'],
+            '30_35' => ['label' => '30-35 ans', 'min_age' => 30, 'max_age' => 35, 'dob_value' => '30-35 ans'],
+            'plus_35' => ['label' => 'Plus de 35 ans', 'min_age' => 36, 'max_age' => 200, 'dob_value' => '+35 ans'],
+        ];
+
+        $results = [];
+        $total = 0;
+
+        foreach ($tranches as $key => $config) {
+            $minYear = $currentYear - $config['max_age'];
+            $maxYear = $currentYear - $config['min_age'];
+
+            $countDynamic = \App\Models\Utilisateur::whereNotNull('anneedenaissance')
+                ->where('anneedenaissance', '>', 0)
+                ->whereBetween('anneedenaissance', [$minYear, $maxYear])
+                ->count();
+
+            $countFallback = \App\Models\Utilisateur::where(function ($query) {
+                    $query->whereNull('anneedenaissance')
+                        ->orWhere('anneedenaissance', 0);
+                })
+                ->where('dob', $config['dob_value'])
+                ->count();
+
+            $count = $countDynamic + $countFallback;
+            $total += $count;
+            $results[] = ['label' => $config['label'], 'count' => $count];
+        }
+
+        $sansAge = \App\Models\Utilisateur::where(function ($query) {
+                $query->whereNull('anneedenaissance')
+                    ->orWhere('anneedenaissance', 0);
+            })
+            ->where(function ($query) {
+                $query->whereNull('dob')
+                    ->orWhere('dob', '');
+            })
+            ->count();
+
+        if ($sansAge > 0) {
+            $results[] = ['label' => 'Non renseigné', 'count' => $sansAge];
+            $total += $sansAge;
+        }
+
+        return ['tranches' => $results, 'total' => $total];
     }
 }

@@ -18,22 +18,30 @@ class EvaluationStatsExport implements WithMultipleSheets
     protected $dateDebut;
     protected $dateFin;
     protected $contexte;
+    protected $ageRangeStats;
 
-    public function __construct($evaluations, $stats, $dateDebut, $dateFin, $contexte)
+    public function __construct($evaluations, $stats, $dateDebut, $dateFin, $contexte, $ageRangeStats = null)
     {
         $this->evaluations = $evaluations;
         $this->stats = $stats;
         $this->dateDebut = $dateDebut;
         $this->dateFin = $dateFin;
         $this->contexte = $contexte;
+        $this->ageRangeStats = $ageRangeStats;
     }
 
     public function sheets(): array
     {
-        return [
+        $sheets = [
             new EvaluationStatsSheet($this->evaluations, $this->stats, $this->dateDebut, $this->dateFin, $this->contexte),
             new EvaluationDetailsSheet($this->evaluations),
         ];
+
+        if ($this->ageRangeStats) {
+            $sheets[] = new AgeRangeStatsSheet($this->ageRangeStats);
+        }
+
+        return $sheets;
     }
 }
 
@@ -156,5 +164,57 @@ class EvaluationDetailsSheet implements FromCollection, WithHeadings, WithStyles
     public function title(): string
     {
         return 'Détails Évaluations';
+    }
+}
+
+class AgeRangeStatsSheet implements FromCollection, WithHeadings, WithStyles, WithTitle
+{
+    protected $ageRangeStats;
+
+    public function __construct($ageRangeStats)
+    {
+        $this->ageRangeStats = $ageRangeStats;
+    }
+
+    public function collection()
+    {
+        $data = new Collection();
+
+        $data->push(['RÉPARTITION PAR TRANCHE D\'ÂGE', '', '']);
+        $data->push(['Généré le', now()->format('d/m/Y à H:i'), '']);
+        $data->push(['Total Utilisateurs', $this->ageRangeStats['total'], '']);
+        $data->push(['', '', '']);
+
+        foreach ($this->ageRangeStats['tranches'] as $tranche) {
+            $percentage = $this->ageRangeStats['total'] > 0
+                ? round(($tranche['count'] / $this->ageRangeStats['total']) * 100, 1)
+                : 0;
+
+            $data->push([
+                $tranche['label'],
+                $tranche['count'],
+                $percentage . '%',
+            ]);
+        }
+
+        return $data;
+    }
+
+    public function headings(): array
+    {
+        return [];
+    }
+
+    public function styles(Worksheet $sheet)
+    {
+        return [
+            1 => ['font' => ['bold' => true, 'size' => 14]],
+            5 => ['font' => ['bold' => true]],
+        ];
+    }
+
+    public function title(): string
+    {
+        return 'Tranches d\'âge';
     }
 }
