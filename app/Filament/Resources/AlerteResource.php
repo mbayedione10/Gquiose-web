@@ -474,6 +474,7 @@ class AlerteResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(fn (Alerte $record): string => static::getUrl('view', ['record' => $record]))
             ->poll('60s')
             ->columns([
                 Tables\Columns\TextColumn::make('numero_suivi')
