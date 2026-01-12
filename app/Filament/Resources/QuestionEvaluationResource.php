@@ -13,6 +13,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Repeater;
+use Filament\Tables\Actions\DeleteBulkAction;
 use App\Filament\Resources\QuestionEvaluationResource\Pages;
 
 class QuestionEvaluationResource extends Resource
@@ -28,13 +29,26 @@ class QuestionEvaluationResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Section::make()->schema([
+            Section::make('Informations de la question')->schema([
                 TextInput::make('question')
                     ->label("Question")
                     ->rules(['required', 'max:500', 'string'])
                     ->required()
                     ->placeholder('Ex: Comment évaluez-vous cette fonctionnalité ?')
                     ->columnSpan(12),
+
+                Select::make('formulaire_type')
+                    ->label("Type de formulaire")
+                    ->options([
+                        'generale' => 'Évaluation générale',
+                        'satisfaction_quiz' => 'Satisfaction Quiz',
+                        'satisfaction_article' => 'Satisfaction Article',
+                        'satisfaction_structure' => 'Satisfaction Structure',
+                        'satisfaction_alerte' => 'Satisfaction Alerte',
+                    ])
+                    ->required()
+                    ->default('generale')
+                    ->columnSpan(6),
 
                 Select::make('type')
                     ->label("Type de question")
@@ -46,18 +60,23 @@ class QuestionEvaluationResource extends Resource
                         'scale' => 'Échelle (1-5)',
                     ])
                     ->required()
-                    ->reactive()
+                    ->live()
                     ->columnSpan(6),
 
                 TextInput::make('ordre')
                     ->label("Ordre d'affichage")
                     ->numeric()
                     ->default(0)
-                    ->columnSpan(3),
+                    ->columnSpan(6),
 
                 Toggle::make('obligatoire')
                     ->label("Question obligatoire")
                     ->default(false)
+                    ->columnSpan(3),
+
+                Toggle::make('status')
+                    ->label("Active")
+                    ->default(true)
                     ->columnSpan(3),
 
                 Repeater::make('options')
@@ -69,11 +88,7 @@ class QuestionEvaluationResource extends Resource
                     ])
                     ->visible(fn ($get) => in_array($get('type'), ['multiple_choice']))
                     ->default([])
-                    ->columnSpan(12),
-
-                Toggle::make('status')
-                    ->label("Active")
-                    ->default(true)
+                    ->addActionLabel('Ajouter une option')
                     ->columnSpan(12),
             ])->columns(12),
         ]);
@@ -87,6 +102,26 @@ class QuestionEvaluationResource extends Resource
                     ->label('Question')
                     ->searchable()
                     ->limit(50),
+
+                Tables\Columns\TextColumn::make('formulaire_type')
+                    ->label('Formulaire')
+                    ->badge()
+                    ->color(fn ($state) => match($state) {
+                        'generale' => 'gray',
+                        'satisfaction_quiz' => 'success',
+                        'satisfaction_article' => 'info',
+                        'satisfaction_structure' => 'warning',
+                        'satisfaction_alerte' => 'danger',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn ($state) => match($state) {
+                        'generale' => 'Générale',
+                        'satisfaction_quiz' => 'Quiz',
+                        'satisfaction_article' => 'Article',
+                        'satisfaction_structure' => 'Structure',
+                        'satisfaction_alerte' => 'Alerte',
+                        default => $state,
+                    }),
 
                 Tables\Columns\TextColumn::make('type')
                     ->label('Type')
@@ -108,18 +143,28 @@ class QuestionEvaluationResource extends Resource
                     ->label('Obligatoire')
                     ->boolean(),
 
-                Tables\Columns\IconColumn::make('status')
-                    ->label('Active')
-                    ->boolean(),
+                Tables\Columns\ToggleColumn::make('status')
+                    ->label('Active'),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Créée le')
                     ->date('d/m/Y')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('ordre')
             ->filters([
+                Tables\Filters\SelectFilter::make('formulaire_type')
+                    ->label('Type de formulaire')
+                    ->options([
+                        'generale' => 'Évaluation générale',
+                        'satisfaction_quiz' => 'Satisfaction Quiz',
+                        'satisfaction_article' => 'Satisfaction Article',
+                        'satisfaction_structure' => 'Satisfaction Structure',
+                        'satisfaction_alerte' => 'Satisfaction Alerte',
+                    ]),
                 Tables\Filters\SelectFilter::make('type')
+                    ->label('Type de question')
                     ->options([
                         'text' => 'Texte libre',
                         'rating' => 'Note',
@@ -129,6 +174,15 @@ class QuestionEvaluationResource extends Resource
                     ]),
                 Tables\Filters\TernaryFilter::make('status')
                     ->label('Active'),
+            ])
+            ->actions([
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 
