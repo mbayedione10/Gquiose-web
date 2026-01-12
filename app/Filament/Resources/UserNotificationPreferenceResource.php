@@ -30,9 +30,10 @@ class UserNotificationPreferenceResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('utilisateur_id')
                             ->label('Utilisateur')
-                            ->relationship('utilisateur', 'email')
+                            ->relationship('utilisateur', 'name')
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->name ?: $record->phone ?: $record->email ?: "Utilisateur #{$record->id}")
                             ->required()
-                            ->searchable(),
+                            ->searchable(['name', 'phone', 'email']),
                     ]),
 
                 Forms\Components\Section::make()
@@ -111,9 +112,10 @@ class UserNotificationPreferenceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('utilisateur.email')
+                Tables\Columns\TextColumn::make('utilisateur.name')
                     ->label('Utilisateur')
-                    ->searchable()
+                    ->formatStateUsing(fn ($record) => $record->utilisateur?->name ?: $record->utilisateur?->phone ?: $record->utilisateur?->email ?: "Utilisateur #{$record->utilisateur_id}")
+                    ->searchable(['utilisateur.name', 'utilisateur.phone', 'utilisateur.email'])
                     ->sortable(),
                 
                 Tables\Columns\IconColumn::make('notifications_enabled')
