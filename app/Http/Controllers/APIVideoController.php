@@ -20,4 +20,15 @@ class APIVideoController extends Controller
 
         return ApiResponse::success($data);
     }
+
+    public function show($id)
+    {
+        $video = Video::find($id);
+
+        if (!$video) {
+            return ApiResponse::error('Vidéo non trouvée', 404);
+        }
+
+        return ApiResponse::success(['video' => $video]);
+    }
 }

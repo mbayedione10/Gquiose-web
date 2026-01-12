@@ -134,6 +134,7 @@ Route::prefix('v1')
 
         /*************************  VIDEO    ***************************/
         Route::get('videos', [APIVideoController::class, 'videos']);
+        Route::get('videos/{id}', [APIVideoController::class, 'show']);
 
         // Routes pour les évaluations
         Route::prefix('evaluations')
