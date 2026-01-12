@@ -59,7 +59,7 @@ class APIEvaluationController extends Controller
             'article' => 'satisfaction_article',
             'structure' => 'satisfaction_structure',
             'generale' => 'generale',
-            'alerte' => 'generale',
+            'alerte' => 'satisfaction_alerte',
         ];
 
         return $mapping[$contexte] ?? 'generale';
@@ -70,8 +70,16 @@ class APIEvaluationController extends Controller
      */
     public function submit(Request $request)
     {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Utilisateur non authentifié',
+            ], 401);
+        }
+
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:utilisateurs,id',
             'contexte' => 'nullable|string|in:quiz,article,structure,generale,alerte',
             'contexte_id' => 'nullable|integer',
             'reponses' => 'required|array',
@@ -80,8 +88,6 @@ class APIEvaluationController extends Controller
             'reponses.*.valeur_numerique' => 'nullable|integer|min:1|max:5',
             'commentaire' => 'nullable|string|max:1000',
         ], [
-            'user_id.required' => 'L\'utilisateur est requis',
-            'user_id.exists' => 'L\'utilisateur n\'existe pas',
             'reponses.required' => 'Les réponses sont requises',
             'reponses.array' => 'Le format des réponses est invalide',
         ]);
@@ -94,13 +100,15 @@ class APIEvaluationController extends Controller
             ], 422);
         }
 
-        // Verify all required questions are answered
+        // Verify all required questions are answered for this formulaire_type
         $questionIds = array_column($request->reponses, 'question_id');
+        $formulaireType = $this->mapContexteToFormulaireType($request->contexte ?? 'generale');
         $requiredQuestions = QuestionEvaluation::where('status', true)
             ->where('obligatoire', true)
+            ->where('formulaire_type', $formulaireType)
             ->pluck('id')
             ->toArray();
-        
+
         $missingRequired = array_diff($requiredQuestions, $questionIds);
         if (!empty($missingRequired)) {
             return response()->json([
@@ -119,7 +127,7 @@ class APIEvaluationController extends Controller
 
             // Créer l'évaluation
             $evaluation = Evaluation::create([
-                'utilisateur_id' => $request->user_id,
+                'utilisateur_id' => $user->id,
                 'contexte' => $request->contexte ?? 'generale',
                 'contexte_id' => $request->contexte_id,
                 'reponses' => $request->reponses,
