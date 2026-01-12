@@ -59,7 +59,7 @@ Route::prefix('v1')
             Route::prefix('notifications')->group(function () {
                 Route::post('/register-token', [App\Http\Controllers\APIPushNotificationController::class, 'registerToken']);
                 Route::post('/preferences', [App\Http\Controllers\APIPushNotificationController::class, 'updatePreferences']);
-                Route::get('/preferences/{userId}', [App\Http\Controllers\APIPushNotificationController::class, 'getPreferences']);
+                Route::get('/preferences', [App\Http\Controllers\APIPushNotificationController::class, 'getPreferences']);
                 Route::post('/{notificationId}/opened', [App\Http\Controllers\APIPushNotificationController::class, 'trackOpened']);
                 Route::post('/{notificationId}/clicked', [App\Http\Controllers\APIPushNotificationController::class, 'trackClicked']);
             });

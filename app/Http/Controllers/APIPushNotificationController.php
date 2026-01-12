@@ -52,8 +52,16 @@ class APIPushNotificationController extends Controller
      */
     public function updatePreferences(Request $request)
     {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non authentifié'
+            ], 401);
+        }
+
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:utilisateurs,id',
             'notifications_enabled' => 'boolean',
             'cycle_notifications' => 'boolean',
             'content_notifications' => 'boolean',
@@ -72,34 +80,58 @@ class APIPushNotificationController extends Controller
             ], 422);
         }
 
-        $user = Utilisateur::find($request->user_id);
-        
         $preferences = $user->notificationPreferences()->updateOrCreate(
             ['utilisateur_id' => $user->id],
-            $request->except('user_id')
+            $request->only([
+                'notifications_enabled',
+                'cycle_notifications',
+                'content_notifications',
+                'forum_notifications',
+                'health_tips_notifications',
+                'admin_notifications',
+                'quiet_start',
+                'quiet_end',
+                'do_not_disturb',
+            ])
         );
 
         return response()->json([
             'success' => true,
-            'preferences' => $preferences
+            'preferences' => $preferences,
+            'message' => 'Préférences mises à jour avec succès'
         ]);
     }
 
     /**
      * Récupérer les préférences de notification
      */
-    public function getPreferences($userId)
+    public function getPreferences(Request $request)
     {
-        $user = Utilisateur::find($userId);
-        
+        $user = $request->user();
+
         if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Utilisateur non trouvé'
-            ], 404);
+                'message' => 'Non authentifié'
+            ], 401);
         }
 
         $preferences = $user->notificationPreferences;
+
+        // Si pas de préférences, retourner les valeurs par défaut
+        if (!$preferences) {
+            $preferences = [
+                'notifications_enabled' => true,
+                'cycle_notifications' => true,
+                'content_notifications' => true,
+                'forum_notifications' => true,
+                'health_tips_notifications' => true,
+                'admin_notifications' => true,
+                'quiet_start' => null,
+                'quiet_end' => null,
+                'do_not_disturb' => false,
+            ];
+        }
 
         return response()->json([
             'success' => true,

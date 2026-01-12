@@ -511,6 +511,20 @@ class APIAuthController extends Controller
             }
             $utilisateur->save();
 
+            // Créer les préférences de notifications par défaut
+            if (!$utilisateur->notificationPreferences) {
+                \App\Models\UserNotificationPreference::create([
+                    'utilisateur_id' => $utilisateur->id,
+                    'notifications_enabled' => true,
+                    'cycle_notifications' => true,
+                    'content_notifications' => true,
+                    'forum_notifications' => true,
+                    'health_tips_notifications' => true,
+                    'admin_notifications' => true,
+                    'do_not_disturb' => false,
+                ]);
+            }
+
             // Générer un token Sanctum pour connexion automatique
             $token = $utilisateur->createToken('auth_token', ['*'], now()->addDays(30))->plainTextToken;
 
