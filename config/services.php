@@ -83,4 +83,9 @@ return [
         'key_path' => storage_path('app/apple/AuthKey_*.p8'),
     ],
 
+    // YouTube API pour récupérer les infos des vidéos
+    'youtube' => [
+        'api_key' => env('YOUTUBE_API_KEY'),
+    ],
+
 ];

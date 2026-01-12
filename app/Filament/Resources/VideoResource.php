@@ -77,11 +77,17 @@ class VideoResource extends Resource
                             ->acceptedFileTypes(['video/mp4', 'video/quicktime', 'video/x-msvideo'])
                             ->maxSize(512000)
                             ->required(fn ($get) => $get('type') === 'file'),
+                    ])
+                    ->visible(fn ($get) => $get('type') === 'file'),
 
+                Forms\Components\Section::make('Métadonnées')
+                    ->schema([
                         Forms\Components\Grid::make(3)->schema([
                             Forms\Components\TextInput::make("duration")
                                 ->label("Durée")
-                                ->placeholder("Ex: 10:30"),
+                                ->placeholder("Ex: 10:30")
+                                ->disabled(fn ($get) => $get('type') === 'youtube')
+                                ->helperText(fn ($get) => $get('type') === 'youtube' ? 'Récupérée automatiquement depuis YouTube' : null),
 
                             Forms\Components\Select::make("resolution")
                                 ->label("Résolution")
@@ -90,15 +96,16 @@ class VideoResource extends Resource
                                     '1080p' => '1080p (Full HD)',
                                     '1440p' => '1440p (2K)',
                                     '2160p' => '2160p (4K)',
-                                ]),
+                                ])
+                                ->visible(fn ($get) => $get('type') === 'file'),
 
                             Forms\Components\TextInput::make("file_size")
                                 ->label("Taille (octets)")
                                 ->numeric()
-                                ->disabled(),
+                                ->disabled()
+                                ->visible(fn ($get) => $get('type') === 'file'),
                         ]),
-                    ])
-                    ->visible(fn ($get) => $get('type') === 'file'),
+                    ]),
 
                 Forms\Components\Section::make('Miniature')
                     ->schema([

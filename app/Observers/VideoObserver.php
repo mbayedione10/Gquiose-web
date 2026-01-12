@@ -3,16 +3,22 @@
 namespace App\Observers;
 
 use App\Models\Video;
+use App\Services\YouTubeService;
 use Illuminate\Support\Facades\Storage;
 
 class VideoObserver
 {
+    public function __construct(
+        private YouTubeService $youtubeService
+    ) {}
+
     /**
      * Handle the Video "creating" event.
      */
     public function creating(Video $video): void
     {
         $this->updateFileSize($video);
+        $this->updateYouTubeInfo($video);
     }
 
     /**
@@ -21,6 +27,7 @@ class VideoObserver
     public function updating(Video $video): void
     {
         $this->updateFileSize($video);
+        $this->updateYouTubeInfo($video);
         $this->cleanupOldFiles($video);
     }
 
@@ -29,7 +36,6 @@ class VideoObserver
      */
     public function deleted(Video $video): void
     {
-        // Supprimer tous les fichiers associés
         $this->deleteFile($video->video_file);
         $this->deleteFile($video->thumbnail);
         $this->deleteFile($video->subtitle_file);
@@ -51,28 +57,51 @@ class VideoObserver
     }
 
     /**
+     * Récupère automatiquement les infos YouTube (durée)
+     */
+    private function updateYouTubeInfo(Video $video): void
+    {
+        if ($video->type !== 'youtube' || !$video->url) {
+            return;
+        }
+
+        // Ne récupérer que si l'URL a changé ou si la durée n'est pas définie
+        $original = $video->getOriginal();
+        $urlChanged = !isset($original['url']) || $original['url'] !== $video->url;
+
+        if (!$urlChanged && $video->duration) {
+            return;
+        }
+
+        $info = $this->youtubeService->getVideoInfo($video->url);
+
+        if ($info) {
+            // Mettre à jour la durée si disponible
+            if ($info['duration'] && !$video->duration) {
+                $video->duration = $info['duration'];
+            }
+        }
+    }
+
+    /**
      * Supprime les anciens fichiers lors d'une mise à jour
      */
     private function cleanupOldFiles(Video $video): void
     {
         $original = $video->getOriginal();
 
-        // Supprimer l'ancien fichier vidéo si changé
         if (isset($original['video_file']) && $original['video_file'] !== $video->video_file) {
             $this->deleteFile($original['video_file']);
         }
 
-        // Supprimer l'ancienne miniature si changée
         if (isset($original['thumbnail']) && $original['thumbnail'] !== $video->thumbnail) {
             $this->deleteFile($original['thumbnail']);
         }
 
-        // Supprimer l'ancien fichier sous-titres si changé
         if (isset($original['subtitle_file']) && $original['subtitle_file'] !== $video->subtitle_file) {
             $this->deleteFile($original['subtitle_file']);
         }
 
-        // Supprimer l'ancien fichier audiodescription si changé
         if (isset($original['audiodescription_file']) && $original['audiodescription_file'] !== $video->audiodescription_file) {
             $this->deleteFile($original['audiodescription_file']);
         }
