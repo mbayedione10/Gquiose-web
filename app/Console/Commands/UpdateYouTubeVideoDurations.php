@@ -8,11 +8,12 @@ use Illuminate\Console\Command;
 
 class UpdateYouTubeVideoDurations extends Command
 {
-    protected $signature = 'videos:update-durations
-                            {--force : Mettre à jour même si la durée existe déjà}
-                            {--id= : Mettre à jour une vidéo spécifique par ID}';
+    protected $signature = 'videos:update-youtube-info
+                            {--force : Mettre à jour même si les infos existent déjà}
+                            {--id= : Mettre à jour une vidéo spécifique par ID}
+                            {--duration-only : Ne mettre à jour que la durée}';
 
-    protected $description = 'Récupère et met à jour les durées des vidéos YouTube via l\'API YouTube';
+    protected $description = 'Récupère et met à jour les infos YouTube (titre, durée, miniature) via l\'API YouTube';
 
     public function __construct(
         private YouTubeService $youtubeService
@@ -36,7 +37,10 @@ class UpdateYouTubeVideoDurations extends Command
         }
 
         if (!$this->option('force')) {
-            $query->whereNull('duration');
+            $query->where(function ($q) {
+                $q->whereNull('duration')
+                  ->orWhereNull('youtube_thumbnail');
+            });
         }
 
         $videos = $query->get();
@@ -46,6 +50,7 @@ class UpdateYouTubeVideoDurations extends Command
             return self::SUCCESS;
         }
 
+        $durationOnly = $this->option('duration-only');
         $this->info("Mise à jour de {$videos->count()} vidéo(s)...");
         $this->newLine();
 
@@ -59,11 +64,32 @@ class UpdateYouTubeVideoDurations extends Command
         foreach ($videos as $video) {
             $info = $this->youtubeService->getVideoInfo($video->url);
 
-            if ($info && $info['duration']) {
-                $video->update(['duration' => $info['duration']]);
-                $updated++;
-            } elseif ($info && !$info['duration']) {
-                $skipped++;
+            if ($info) {
+                $updateData = [];
+
+                // Mettre à jour la durée si disponible
+                if ($info['duration'] && (!$video->duration || $this->option('force'))) {
+                    $updateData['duration'] = $info['duration'];
+                }
+
+                if (!$durationOnly) {
+                    // Mettre à jour le titre si disponible et vide
+                    if ($info['title'] && (!$video->name || $this->option('force'))) {
+                        $updateData['name'] = $info['title'];
+                    }
+
+                    // Mettre à jour la miniature YouTube si disponible
+                    if ($info['thumbnail'] && (!$video->youtube_thumbnail || $this->option('force'))) {
+                        $updateData['youtube_thumbnail'] = $info['thumbnail'];
+                    }
+                }
+
+                if (!empty($updateData)) {
+                    $video->update($updateData);
+                    $updated++;
+                } else {
+                    $skipped++;
+                }
             } else {
                 $failed++;
             }
@@ -78,12 +104,12 @@ class UpdateYouTubeVideoDurations extends Command
             ['Statut', 'Nombre'],
             [
                 ['Mises à jour', $updated],
-                ['URL invalide', $skipped],
+                ['Déjà à jour', $skipped],
                 ['Erreurs', $failed],
             ]
         );
 
-        if ($skipped > 0) {
+        if ($failed > 0) {
             $this->warn('Certaines URLs YouTube sont invalides ou les vidéos n\'existent pas.');
         }
 

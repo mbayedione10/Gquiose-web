@@ -31,6 +31,7 @@ class VideoResource extends Resource
                             ->placeholder("Titre de la vidéo")
                             ->rules(['max:255', 'string'])
                             ->required()
+                            ->helperText(fn ($get) => $get('type') === 'youtube' ? 'Récupéré automatiquement depuis YouTube (modifiable)' : null)
                             ->columnSpan(2),
 
                         Forms\Components\Textarea::make("description")
@@ -109,14 +110,23 @@ class VideoResource extends Resource
 
                 Forms\Components\Section::make('Miniature')
                     ->schema([
+                        Forms\Components\Placeholder::make('youtube_thumbnail_preview')
+                            ->label('Miniature YouTube')
+                            ->content(fn ($record) => $record?->youtube_thumbnail
+                                ? new \Illuminate\Support\HtmlString("<img src=\"{$record->youtube_thumbnail}\" style=\"max-width: 320px; border-radius: 8px;\" />")
+                                : 'Sera récupérée automatiquement après enregistrement')
+                            ->visible(fn ($get) => $get('type') === 'youtube'),
+
                         Forms\Components\FileUpload::make("thumbnail")
-                            ->label("Image miniature")
+                            ->label("Miniature personnalisée (optionnel)")
                             ->disk('public')
                             ->directory('videos/thumbnails')
                             ->image()
                             ->imageResizeMode('cover')
                             ->imageCropAspectRatio('16:9')
-                            ->helperText("Ratio 16:9 recommandé. Générée automatiquement pour YouTube si non fournie."),
+                            ->helperText(fn ($get) => $get('type') === 'youtube'
+                                ? "Uploadez une image pour remplacer la miniature YouTube"
+                                : "Ratio 16:9 recommandé"),
                     ]),
 
                 Forms\Components\Section::make('Accessibilité')
@@ -143,7 +153,7 @@ class VideoResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('thumbnail')
+                Tables\Columns\ImageColumn::make('thumbnail_url')
                     ->label("Miniature")
                     ->circular(false)
                     ->width(80)

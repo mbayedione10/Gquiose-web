@@ -80,7 +80,7 @@ class VideoObserver
     }
 
     /**
-     * Récupère automatiquement les infos YouTube (durée)
+     * Récupère automatiquement les infos YouTube (titre, durée, miniature)
      */
     private function updateYouTubeInfo(Video $video): void
     {
@@ -88,20 +88,32 @@ class VideoObserver
             return;
         }
 
-        // Ne récupérer que si l'URL a changé ou si la durée n'est pas définie
         $original = $video->getOriginal();
         $urlChanged = !isset($original['url']) || $original['url'] !== $video->url;
 
-        if (!$urlChanged && $video->duration) {
+        // Vérifier si on doit récupérer les infos
+        $needsUpdate = $urlChanged || !$video->duration || !$video->youtube_thumbnail;
+
+        if (!$needsUpdate) {
             return;
         }
 
         $info = $this->youtubeService->getVideoInfo($video->url);
 
         if ($info) {
-            // Mettre à jour la durée si disponible
+            // Mettre à jour le titre si vide ou si URL a changé
+            if ($info['title'] && (!$video->name || $urlChanged)) {
+                $video->name = $info['title'];
+            }
+
+            // Mettre à jour la durée si vide
             if ($info['duration'] && !$video->duration) {
                 $video->duration = $info['duration'];
+            }
+
+            // Mettre à jour la miniature YouTube si vide ou si URL a changé
+            if ($info['thumbnail'] && (!$video->youtube_thumbnail || $urlChanged)) {
+                $video->youtube_thumbnail = $info['thumbnail'];
             }
         }
     }

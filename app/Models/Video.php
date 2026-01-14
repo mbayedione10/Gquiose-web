@@ -20,6 +20,7 @@ class Video extends Model
         'type',
         'video_file',
         'thumbnail',
+        'youtube_thumbnail',
         'subtitle_file',
         'audiodescription_file',
         'duration',
@@ -50,8 +51,13 @@ class Video extends Model
      */
     public function getThumbnailUrlAttribute()
     {
+        // Priorité: miniature uploadée > miniature YouTube stockée > génération automatique
         if ($this->thumbnail) {
             return Storage::url($this->thumbnail);
+        }
+
+        if ($this->youtube_thumbnail) {
+            return $this->youtube_thumbnail;
         }
 
         if ($this->type === 'youtube' && $this->url) {
