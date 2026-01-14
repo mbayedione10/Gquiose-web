@@ -17,8 +17,16 @@ class VideoObserver
      */
     public function creating(Video $video): void
     {
-        $this->updateFileSize($video);
         $this->updateYouTubeInfo($video);
+    }
+
+    /**
+     * Handle the Video "created" event.
+     * File size is updated here because the file is fully uploaded after creation.
+     */
+    public function created(Video $video): void
+    {
+        $this->updateFileSizeAfterSave($video);
     }
 
     /**
@@ -26,9 +34,17 @@ class VideoObserver
      */
     public function updating(Video $video): void
     {
-        $this->updateFileSize($video);
         $this->updateYouTubeInfo($video);
         $this->cleanupOldFiles($video);
+    }
+
+    /**
+     * Handle the Video "updated" event.
+     * File size is updated here because the file is fully uploaded after update.
+     */
+    public function updated(Video $video): void
+    {
+        $this->updateFileSizeAfterSave($video);
     }
 
     /**
@@ -43,15 +59,22 @@ class VideoObserver
     }
 
     /**
-     * Met à jour automatiquement la taille du fichier vidéo
+     * Met à jour automatiquement la taille du fichier vidéo après sauvegarde
      */
-    private function updateFileSize(Video $video): void
+    private function updateFileSizeAfterSave(Video $video): void
     {
         if ($video->type === 'file' && $video->video_file) {
             $path = $video->video_file;
 
-            if (Storage::disk('public')->exists($path)) {
-                $video->file_size = Storage::disk('public')->size($path);
+            try {
+                if (Storage::disk('public')->exists($path)) {
+                    $fileSize = Storage::disk('public')->size($path);
+                    if ($video->file_size !== $fileSize) {
+                        $video->updateQuietly(['file_size' => $fileSize]);
+                    }
+                }
+            } catch (\League\Flysystem\UnableToRetrieveMetadata $e) {
+                // File might still be in Livewire's temp directory during upload
             }
         }
     }
