@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\ResponseResource\Pages;
 
-use Filament\Resources\Pages\ListRecords;
-use App\Filament\Traits\HasDescendingOrder;
 use App\Filament\Resources\ResponseResource;
+use App\Filament\Traits\HasDescendingOrder;
+use Filament\Resources\Pages\ListRecords;
 
 class ListResponses extends ListRecords
 {

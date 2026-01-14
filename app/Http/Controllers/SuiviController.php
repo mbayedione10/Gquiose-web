@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Suivi;
-use App\Models\Alerte;
-use Illuminate\View\View;
-use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\SuiviStoreRequest;
 use App\Http\Requests\SuiviUpdateRequest;
+use App\Models\Alerte;
+use App\Models\Suivi;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class SuiviController extends Controller
 {

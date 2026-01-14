@@ -2,23 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Responses\ApiResponse;
 use App\Models\Question;
 use App\Models\Response;
 use App\Models\Utilisateur;
 use Illuminate\Http\Request;
-use App\Http\Responses\ApiResponse;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class APIQuizController extends Controller
 {
     /**
      * Trouve un utilisateur par user_id, email ou phone
-     *
-     * @param Request $request
-     * @return Utilisateur|null
      */
     private function findUser(Request $request): ?Utilisateur
     {
@@ -49,7 +46,6 @@ class APIQuizController extends Controller
      *   ]
      * }
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function sync(Request $request)
@@ -64,14 +60,14 @@ class APIQuizController extends Controller
         }
 
         // Vérifier qu'au moins un identifiant est fourni
-        if (!$request->filled('user_id') && !$request->filled('email') && !$request->filled('phone')) {
+        if (! $request->filled('user_id') && ! $request->filled('email') && ! $request->filled('phone')) {
             return ApiResponse::error('Au moins un identifiant est requis: user_id, email ou phone', 422);
         }
 
         // Trouver l'utilisateur
         $user = $this->findUser($request);
 
-        if (!$user) {
+        if (! $user) {
             return ApiResponse::error('Utilisateur non trouvé', 404);
         }
 
@@ -83,7 +79,7 @@ class APIQuizController extends Controller
             $data = $responsesData;
         }
 
-        if (!is_array($data)) {
+        if (! is_array($data)) {
             return ApiResponse::error('Format de réponses invalide', 422);
         }
 
@@ -110,26 +106,29 @@ class APIQuizController extends Controller
                 if ($questionId === null) {
                     $errors[] = [
                         'index' => $index,
-                        'error' => 'questionId manquant'
+                        'error' => 'questionId manquant',
                     ];
+
                     continue;
                 }
 
                 if ($rawUserResponse === null) {
                     $errors[] = [
                         'questionId' => $questionId,
-                        'error' => 'reponse manquante'
+                        'error' => 'reponse manquante',
                     ];
+
                     continue;
                 }
 
-                $question = $questions->get((int)$questionId);
+                $question = $questions->get((int) $questionId);
 
-                if (!$question) {
+                if (! $question) {
                     $errors[] = [
                         'questionId' => $questionId,
-                        'error' => 'Question introuvable'
+                        'error' => 'Question introuvable',
                     ];
+
                     continue;
                 }
 
@@ -144,7 +143,7 @@ class APIQuizController extends Controller
                     $attrs = $question->getAttributes();
 
                     Log::info("Checking option: {$userResponse} for question {$question->id}");
-                    Log::debug('Question attributes keys: ' . implode(', ', array_keys($attrs)));
+                    Log::debug('Question attributes keys: '.implode(', ', array_keys($attrs)));
 
                     if (array_key_exists($userResponse, $attrs) && $attrs[$userResponse] !== null && $attrs[$userResponse] !== '') {
                         $actualResponseValue = $attrs[$userResponse];
@@ -152,15 +151,17 @@ class APIQuizController extends Controller
                     } else {
                         $errors[] = [
                             'questionId' => $questionId,
-                            'error' => "Option invalide: {$userResponse} n'existe pas ou est vide pour cette question"
+                            'error' => "Option invalide: {$userResponse} n'existe pas ou est vide pour cette question",
                         ];
+
                         continue;
                     }
                 } else {
                     $errors[] = [
                         'questionId' => $questionId,
-                        'error' => "Format de réponse invalide: {$rawUserResponse}. Utilisez 'option1', 'option2', etc., ou 'reponse'"
+                        'error' => "Format de réponse invalide: {$rawUserResponse}. Utilisez 'option1', 'option2', etc., ou 'reponse'",
                     ];
+
                     continue;
                 }
 
@@ -175,7 +176,7 @@ class APIQuizController extends Controller
                         [
                             'reponse' => $actualResponseValue,
                             // comparaison permissive (==) pour tolérer types différents
-                            'isValid' => ($actualResponseValue == $question->reponse)
+                            'isValid' => ($actualResponseValue == $question->reponse),
                         ]
                     );
 
@@ -184,15 +185,16 @@ class APIQuizController extends Controller
                         $savedCount++;
                     }
                 } catch (\Exception $e) {
-                    Log::error('Erreur lors de la sauvegarde de la réponse: ' . $e->getMessage(), [
+                    Log::error('Erreur lors de la sauvegarde de la réponse: '.$e->getMessage(), [
                         'questionId' => $questionId,
                         'userId' => $user->id,
-                        'payload' => $item
+                        'payload' => $item,
                     ]);
                     $errors[] = [
                         'questionId' => $questionId,
-                        'error' => 'Erreur serveur lors de la sauvegarde'
+                        'error' => 'Erreur serveur lors de la sauvegarde',
                     ];
+
                     continue;
                 }
             }
@@ -200,18 +202,19 @@ class APIQuizController extends Controller
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Erreur globale lors de la synchronisation des réponses: ' . $e->getMessage(), [
-                'exception' => $e
+            Log::error('Erreur globale lors de la synchronisation des réponses: '.$e->getMessage(), [
+                'exception' => $e,
             ]);
+
             return ApiResponse::error('Erreur serveur lors de la synchronisation', 500);
         }
 
         $response = [
             'message' => 'Réponses synchronisées avec succès',
-            'saved_count' => $savedCount
+            'saved_count' => $savedCount,
         ];
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $response['errors'] = $errors;
         }
 

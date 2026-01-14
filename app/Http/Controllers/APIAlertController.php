@@ -30,7 +30,7 @@ class APIAlertController extends Controller
         if ($userId) {
             $user = Utilisateur::find($userId);
 
-            if (!$user) {
+            if (! $user) {
                 return ApiResponse::error("Cet utilisateur n'existe pas", Response::HTTP_NOT_FOUND);
             }
 
@@ -102,62 +102,60 @@ class APIAlertController extends Controller
 
         return ApiResponse::success([
             'alertes' => $alertes,
-            'total' => $alertes->count()
+            'total' => $alertes->count(),
         ]);
     }
 
-    public function  sync(Request $request)
+    public function sync(Request $request)
     {
-        if (!isset($request['user_id']) &&  !isset($request['type']))
-        {
-            return ApiResponse::error("les champs sont obligatoires", Response::HTTP_BAD_REQUEST);
+        if (! isset($request['user_id']) && ! isset($request['type'])) {
+            return ApiResponse::error('les champs sont obligatoires', Response::HTTP_BAD_REQUEST);
         }
 
         $user = Utilisateur::whereId($request['user_id'])->first();
 
-        if ($user == null)
+        if ($user == null) {
             return ApiResponse::error("Cet utilisateur n'existe pas");
+        }
 
+        $types = ['Mutilation génitale', 'Viol', 'Mariage précoce', 'Autres'];
 
-        $types = [ "Mutilation génitale", "Viol", "Mariage précoce", "Autres"];
-
-        if (!in_array($request['type'], $types))
+        if (! in_array($request['type'], $types)) {
             return ApiResponse::error("Le type n'est pas correct", Response::HTTP_BAD_REQUEST);
-
+        }
 
         $alerte = new Alerte();
         $alerte->ref = uniqid();
         $alerte->utilisateur_id = $user->id;
         $alerte->type = $request['type'];
         $alerte->description = $request['description'];
-        $alerte->etat = "Non approuvée";
+        $alerte->etat = 'Non approuvée';
         $alerte->save();
 
         $info = Information::first();
 
-        if ($info != null && $info->email_alerte != null)
-        {
-            $objet = "🚨 Nouvelle alerte signalée - Réf: " . $alerte->ref;
-            $greeting = "Bonjour,";
+        if ($info != null && $info->email_alerte != null) {
+            $objet = '🚨 Nouvelle alerte signalée - Réf: '.$alerte->ref;
+            $greeting = 'Bonjour,';
             $content = "Une nouvelle alerte vient d'être signalée sur la plateforme Génération Qui Ose.\n\n";
             $content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
             $content .= "📋 DÉTAILS DE L'ALERTE\n";
             $content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
-            $content .= "🔖 Référence: " . $alerte->ref . "\n\n";
-            $content .= "📌 Type: " . $alerte->type . "\n\n";
+            $content .= '🔖 Référence: '.$alerte->ref."\n\n";
+            $content .= '📌 Type: '.$alerte->type."\n\n";
 
             if ($alerte->description != null) {
-                $content .= "📝 Description: " . $alerte->description . "\n\n";
+                $content .= '📝 Description: '.$alerte->description."\n\n";
             }
 
             $content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
             $content .= "👤 INFORMATIONS DE L'UTILISATEUR\n";
             $content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
-            $content .= "👤 Nom: " . $user->name . "\n\n";
-            $content .= "📞 Téléphone: " . $user->phone . "\n\n";
-            $content .= "📧 Email: " . ($user->email ?? 'Non renseigné') . "\n\n";
+            $content .= '👤 Nom: '.$user->name."\n\n";
+            $content .= '📞 Téléphone: '.$user->phone."\n\n";
+            $content .= '📧 Email: '.($user->email ?? 'Non renseigné')."\n\n";
             $content .= "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
-            $content .= "⚠️ Merci de traiter cette alerte dans les plus brefs délais.";
+            $content .= '⚠️ Merci de traiter cette alerte dans les plus brefs délais.';
 
             $emails = $info->email_alerte;
             $first = $emails[0];
@@ -169,12 +167,10 @@ class APIAlertController extends Controller
                 ->send(new NotificationEmail($greeting, $objet, $content));
         }
 
-
-
         $data = [
-            "ref" => $alerte->ref,
-            "type" => $alerte->type,
-            "etat" => $alerte->etat,
+            'ref' => $alerte->ref,
+            'type' => $alerte->type,
+            'etat' => $alerte->etat,
         ];
 
         return ApiResponse::success($data);

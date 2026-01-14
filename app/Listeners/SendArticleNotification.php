@@ -14,6 +14,7 @@ class SendArticleNotification implements ShouldQueue
     use InteractsWithQueue;
 
     protected $notificationService;
+
     protected $evaluationTriggerService;
 
     /**
@@ -39,9 +40,9 @@ class SendArticleNotification implements ShouldQueue
         // Créer la notification push
         $notification = PushNotification::create([
             'title' => '📚 Nouvel article disponible !',
-            'message' => substr($article->titre, 0, 100) . '...',
+            'message' => substr($article->titre, 0, 100).'...',
             'icon' => '📚',
-            'action' => 'article/' . $article->slug,
+            'action' => 'article/'.$article->slug,
             'image' => $article->image,
             'type' => 'automatic',
             'target_audience' => 'all',
@@ -61,11 +62,11 @@ class SendArticleNotification implements ShouldQueue
             ->pluck('id')
             ->toArray();
 
-        if (!empty($activeUserIds)) {
+        if (! empty($activeUserIds)) {
             $this->evaluationTriggerService->triggerAutoEvaluation('article', $article->id, [
                 'delay_days' => 1,
                 'target_users' => $activeUserIds,
-                'evaluation_type' => 'satisfaction_article'
+                'evaluation_type' => 'satisfaction_article',
             ]);
         }
     }

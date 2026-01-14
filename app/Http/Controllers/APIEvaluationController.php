@@ -19,7 +19,7 @@ class APIEvaluationController extends Controller
         $contexte = $request->input('contexte', 'generale');
         $formulaireType = $this->mapContexteToFormulaireType($contexte);
         $previousAnswers = $request->input('previous_answers', []);
-        
+
         $questions = QuestionEvaluation::where('status', true)
             ->where('formulaire_type', $formulaireType)
             ->orderBy('ordre')
@@ -36,7 +36,7 @@ class APIEvaluationController extends Controller
                     'formulaire_type' => $question->formulaire_type,
                     'options' => $question->options,
                     'obligatoire' => $question->obligatoire,
-                    'has_condition' => !is_null($question->condition_question_id),
+                    'has_condition' => ! is_null($question->condition_question_id),
                     'condition' => $question->condition_question_id ? [
                         'question_id' => $question->condition_question_id,
                         'operator' => $question->condition_operator,
@@ -72,7 +72,7 @@ class APIEvaluationController extends Controller
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
                 'message' => 'Utilisateur non authentifié',
@@ -110,7 +110,7 @@ class APIEvaluationController extends Controller
             ->toArray();
 
         $missingRequired = array_diff($requiredQuestions, $questionIds);
-        if (!empty($missingRequired)) {
+        if (! empty($missingRequired)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Toutes les questions obligatoires doivent être répondues.',
@@ -123,7 +123,7 @@ class APIEvaluationController extends Controller
 
             // Calculer le score global si applicable
             $scores = array_filter(array_column($request->reponses, 'valeur_numerique'));
-            $scoreGlobal = !empty($scores) ? round(array_sum($scores) / count($scores), 2) : null;
+            $scoreGlobal = ! empty($scores) ? round(array_sum($scores) / count($scores), 2) : null;
 
             // Créer l'évaluation
             $evaluation = Evaluation::create([
@@ -161,7 +161,7 @@ class APIEvaluationController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'enregistrement de l\'évaluation',

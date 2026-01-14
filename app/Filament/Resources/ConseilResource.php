@@ -3,24 +3,23 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ConseilResource\Pages;
-use App\Filament\Resources\ConseilResource\RelationManagers;
 use App\Models\Conseil;
-use App\Models\Rubrique;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Table;
 
 class ConseilResource extends Resource
 {
     protected static ?string $model = Conseil::class;
 
-    protected static ?string $navigationLabel = "Conseils";
-    protected static ?string $navigationGroup = "Contenu Educatif";
+    protected static ?string $navigationLabel = 'Conseils';
+
+    protected static ?string $navigationGroup = 'Contenu Educatif';
+
     protected static ?string $navigationIcon = 'heroicon-o-light-bulb';
+
     protected static ?int $navigationSort = 5;
 
     public static function form(Form $form): Form
@@ -40,13 +39,13 @@ class ConseilResource extends Resource
                             ->required()
                             ->default('Général'),
 
-                        Forms\Components\Textarea::make("message")
-                            ->label("Conseil")
-                            ->placeholder("Entrez votre conseil ici...")
+                        Forms\Components\Textarea::make('message')
+                            ->label('Conseil')
+                            ->placeholder('Entrez votre conseil ici...')
                             ->rows(4)
                             ->required()
-                            ->maxLength(500)
-                    ])
+                            ->maxLength(500),
+                    ]),
             ]);
     }
 
@@ -54,8 +53,8 @@ class ConseilResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make("message")
-                    ->label("Conseil")
+                Tables\Columns\TextColumn::make('message')
+                    ->label('Conseil'),
             ])
             ->filters([
                 //

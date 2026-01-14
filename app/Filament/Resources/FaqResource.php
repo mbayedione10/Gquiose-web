@@ -3,15 +3,12 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FaqResource\Pages;
-use App\Filament\Resources\FaqResource\RelationManagers;
 use App\Models\Faq;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Table;
 
 class FaqResource extends Resource
 {
@@ -29,18 +26,18 @@ class FaqResource extends Resource
                     ->schema([
 
                         Forms\Components\TextInput::make('question')
-                            ->label("Question")
+                            ->label('Question')
                             ->required()
                             ->maxLength(255),
 
                         Forms\Components\Textarea::make('reponse')
-                            ->label("Réponse")
+                            ->label('Réponse')
                             ->required()
                             ->maxLength(65535),
 
                         Forms\Components\Toggle::make('status')
                             ->required(),
-                    ])
+                    ]),
             ]);
     }
 
@@ -49,13 +46,13 @@ class FaqResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('question')
-                    ->label("Question"),
+                    ->label('Question'),
 
                 Tables\Columns\TextColumn::make('reponse')
-                    ->label("Réponse"),
+                    ->label('Réponse'),
 
                 Tables\Columns\ToggleColumn::make('status')
-                    ->label("Statut"),
+                    ->label('Statut'),
 
             ])
             ->filters([

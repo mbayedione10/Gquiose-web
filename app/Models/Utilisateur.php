@@ -3,15 +3,15 @@
 namespace App\Models;
 
 use App\Models\Scopes\Searchable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
 
 class Utilisateur extends Model
 {
+    use HasApiTokens;
     use HasFactory;
     use Searchable;
-    use HasApiTokens;
 
     protected $fillable = [
         'nom',
@@ -30,16 +30,15 @@ class Utilisateur extends Model
         'phone_verified_at',
         'fcm_token',
         'platform',
-        'ville_id'
+        'ville_id',
     ];
 
-   protected $searchableFields = [
-    'nom',
-    'prenom',
-    'email',
-    'phone',
-];
-
+    protected $searchableFields = [
+        'nom',
+        'prenom',
+        'email',
+        'phone',
+    ];
 
     protected $casts = [
         'status' => 'boolean',
@@ -60,15 +59,14 @@ class Utilisateur extends Model
     }
 
     public function getFullNameAttribute()
-{
-    return $this->prenom . " " . $this->nom;
-}
+    {
+        return $this->prenom.' '.$this->nom;
+    }
 
     public function getNameAttribute()
     {
         return $this->getFullNameAttribute();
     }
-
 
     public function alertes()
     {
@@ -113,7 +111,7 @@ class Utilisateur extends Model
      */
     private function getAgeRange(int $age): string
     {
-        return match(true) {
+        return match (true) {
             $age < 15 => '-15 ans',
             $age >= 15 && $age <= 17 => '15-17 ans',
             $age >= 18 && $age <= 24 => '18-24 ans',

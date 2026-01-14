@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\ArticleStoreRequest;
+use App\Http\Requests\ArticleUpdateRequest;
+use App\Http\Resources\ArticleCollection;
+use App\Http\Resources\ArticleResource;
 use App\Models\Article;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\ArticleResource;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Resources\ArticleCollection;
-use App\Http\Requests\ArticleStoreRequest;
-use App\Http\Requests\ArticleUpdateRequest;
 
 class ArticleController extends Controller
 {

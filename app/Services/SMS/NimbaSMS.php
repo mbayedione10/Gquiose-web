@@ -2,15 +2,18 @@
 
 namespace App\Services\SMS;
 
+use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Exception;
 
 class NimbaSMS implements SMSInterface
 {
     protected string $baseUrl;
+
     protected string $serviceId;
+
     protected string $secret;
+
     protected string $senderName;
 
     public function __construct()
@@ -20,7 +23,7 @@ class NimbaSMS implements SMSInterface
         $this->secret = config('services.sms.nimba.secret');
         $this->senderName = config('services.sms.nimba.sender_name', 'GQUIOSE');
 
-        if (!$this->serviceId || !$this->secret) {
+        if (! $this->serviceId || ! $this->secret) {
             throw new Exception('NimbaSMS credentials not configured');
         }
     }
@@ -45,13 +48,13 @@ class NimbaSMS implements SMSInterface
                 Log::info('SMS sent via NimbaSMS', [
                     'to' => $this->maskPhone($to),
                     'message_id' => $data['id'] ?? null,
-                    'status' => $data['status'] ?? 'sent'
+                    'status' => $data['status'] ?? 'sent',
                 ]);
 
                 return [
                     'success' => true,
                     'message_id' => $data['id'] ?? null,
-                    'error' => null
+                    'error' => null,
                 ];
             }
 
@@ -60,24 +63,24 @@ class NimbaSMS implements SMSInterface
             Log::error('NimbaSMS API error', [
                 'to' => $this->maskPhone($to),
                 'status_code' => $response->status(),
-                'error' => $errorMessage
+                'error' => $errorMessage,
             ]);
 
             return [
                 'success' => false,
                 'message_id' => null,
-                'error' => $errorMessage
+                'error' => $errorMessage,
             ];
         } catch (Exception $e) {
             Log::error('NimbaSMS request failed', [
                 'to' => $this->maskPhone($to),
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return [
                 'success' => false,
                 'message_id' => null,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
     }
@@ -98,28 +101,28 @@ class NimbaSMS implements SMSInterface
 
                 return [
                     'status' => $status,
-                    'delivered' => in_array($status, ['delivered', 'sent'])
+                    'delivered' => in_array($status, ['delivered', 'sent']),
                 ];
             }
 
             Log::error('NimbaSMS status check failed', [
                 'message_id' => $messageId,
-                'status_code' => $response->status()
+                'status_code' => $response->status(),
             ]);
 
             return [
                 'status' => 'unknown',
-                'delivered' => false
+                'delivered' => false,
             ];
         } catch (Exception $e) {
             Log::error('NimbaSMS status check error', [
                 'message_id' => $messageId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return [
                 'status' => 'unknown',
-                'delivered' => false
+                'delivered' => false,
             ];
         }
     }
@@ -135,7 +138,7 @@ class NimbaSMS implements SMSInterface
 
         // Si le numéro commence par 00, remplacer par +
         if (str_starts_with($phone, '00')) {
-            $phone = '+' . substr($phone, 2);
+            $phone = '+'.substr($phone, 2);
         }
 
         return $phone;
@@ -150,6 +153,6 @@ class NimbaSMS implements SMSInterface
             return '****';
         }
 
-        return substr($phone, 0, 4) . str_repeat('*', strlen($phone) - 4);
+        return substr($phone, 0, 4).str_repeat('*', strlen($phone) - 4);
     }
 }

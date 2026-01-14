@@ -14,12 +14,12 @@ return new class extends Migration
     {
         Schema::table('utilisateurs', function (Blueprint $table) {
             // Vérifier si dob existe déjà (pour MySQL/PostgreSQL)
-            if (!Schema::hasColumn('utilisateurs', 'dob')) {
+            if (! Schema::hasColumn('utilisateurs', 'dob')) {
                 $table->string('dob')->nullable()->after('status');
             }
-            
+
             // Ajouter anneedenaissance si manquant
-            if (!Schema::hasColumn('utilisateurs', 'anneedenaissance')) {
+            if (! Schema::hasColumn('utilisateurs', 'anneedenaissance')) {
                 $table->integer('anneedenaissance')->nullable()->after('status');
             }
         });

@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Utilisateur;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class UtilisateurFactory extends Factory
@@ -29,7 +28,7 @@ class UtilisateurFactory extends Factory
             'nom' => $this->faker->randomElement($nomsGuineens),
             'prenom' => $this->faker->randomElement($prenomsGuineensFeminins),
             'email' => $this->faker->unique->email(),
-            'phone' => '+224' . $this->faker->unique->numerify('6########'),
+            'phone' => '+224'.$this->faker->unique->numerify('6########'),
             'sexe' => 'F',
             'status' => true,
             'anneedenaissance' => $this->faker->numberBetween(now()->year - 40, now()->year - 15),

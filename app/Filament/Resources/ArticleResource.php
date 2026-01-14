@@ -2,43 +2,41 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\ArticleResource\Pages;
 use App\Models\Article;
 use App\Models\Rubrique;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
 use Filament\Tables\Filters\SelectFilter;
-use App\Filament\Filters\DateRangeFilter;
-use App\Filament\Resources\ArticleResource\Pages;
+use Filament\Tables\Table;
 
 class ArticleResource extends Resource
 {
     protected static ?string $model = Article::class;
 
-
     protected static ?string $recordTitleAttribute = 'title';
 
-    protected static ?string $navigationLabel = "Articles";
-    protected static ?string $navigationGroup = "Blog";
-    protected static ?string $navigationIcon = 'heroicon-o-newspaper';
-    protected static ?int $navigationSort = 30;
+    protected static ?string $navigationLabel = 'Articles';
 
+    protected static ?string $navigationGroup = 'Blog';
+
+    protected static ?string $navigationIcon = 'heroicon-o-newspaper';
+
+    protected static ?int $navigationSort = 30;
 
     public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make()->schema([
                 TextInput::make('title')
-                    ->label("Titre")
+                    ->label('Titre')
                     ->rules(['max:255', 'string'])
                     ->required()
                     ->placeholder("Titre de l'article")
@@ -49,7 +47,7 @@ class ArticleResource extends Resource
                     ]),
 
                 RichEditor::make('description')
-                    ->label("Description")
+                    ->label('Description')
                     ->required()
                     ->placeholder('Description')
                     ->columnSpan([
@@ -59,19 +57,19 @@ class ArticleResource extends Resource
                     ]),
 
                 Select::make('rubrique_id')
-                    ->label("Rubrique")
+                    ->label('Rubrique')
                     ->rules(['exists:rubriques,id'])
                     ->required()
                     ->relationship('rubrique', 'name')
                     ->createOptionForm([
                         TextInput::make('name')
-                            ->label("Rubrique")
+                            ->label('Rubrique')
                             ->rules(['max:255', 'string'])
                             ->required()
                             ->unique(
                                 'rubriques',
                                 'name',
-                                fn(?Rubrique $record) => $record
+                                fn (?Rubrique $record) => $record
                             )
                             ->placeholder('Nom de la rubrique')
                             ->columnSpan([
@@ -101,7 +99,6 @@ class ArticleResource extends Resource
                         'lg' => 12,
                     ]),
 
-
                 FileUpload::make('image')
                     ->rules(['image', 'max:1024'])
                     ->nullable()
@@ -114,7 +111,7 @@ class ArticleResource extends Resource
                     ]),
 
                 TextInput::make('video_url')
-                    ->label("Vidéo")
+                    ->label('Vidéo')
                     ->rules(['max:255', 'string'])
                     ->nullable()
                     ->placeholder("L'URL de la vidéo YouTube")
@@ -126,7 +123,7 @@ class ArticleResource extends Resource
 
                 Toggle::make('status')
                     ->rules(['boolean'])
-                    ->label("Publier")
+                    ->label('Publier')
                     ->required()
                     ->columnSpan([
                         'default' => 12,
@@ -147,42 +144,41 @@ class ArticleResource extends Resource
                     ->circular(),
 
                 Tables\Columns\TextColumn::make('title')
-                    ->label("Titre")
+                    ->label('Titre')
                     ->searchable()
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('rubrique.name')
-                    ->label("Rubrique")
+                    ->label('Rubrique')
                     ->sortable()
                     ->limit(50),
 
-
                 Tables\Columns\ToggleColumn::make('vedette')
-                    ->label("Vedette"),
+                    ->label('Vedette'),
 
-               Tables\Columns\ToggleColumn::make('status')
-                    ->label("Publié"),
+                Tables\Columns\ToggleColumn::make('status')
+                    ->label('Publié'),
 
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label("Publié par")
+                    ->label('Publié par')
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label("Date de création")
-                    ->date('d F Y H:i')
+                    ->label('Date de création')
+                    ->date('d F Y H:i'),
 
             ])
             ->filters([
 
                 SelectFilter::make('rubrique_id')
-                    ->label("Rubrique")
+                    ->label('Rubrique')
                     ->relationship('rubrique', 'name')
                     ->indicator('Rubrique')
                     ->multiple()
                     ->label('Rubrique'),
 
                 SelectFilter::make('user_id')
-                    ->label("Auteur")
+                    ->label('Auteur')
                     ->relationship('user', 'name')
                     ->indicator('User')
                     ->multiple()

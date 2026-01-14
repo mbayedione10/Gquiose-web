@@ -10,11 +10,8 @@ use App\Models\Utilisateur;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use function Symfony\Component\Translation\t;
+use Filament\Tables\Table;
 
 class MessageResource extends Resource
 {
@@ -22,8 +19,10 @@ class MessageResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $navigationLabel = "Sujets";
-    protected static ?string $navigationGroup = "Forum";
+    protected static ?string $navigationLabel = 'Sujets';
+
+    protected static ?string $navigationGroup = 'Forum';
+
     protected static ?int $navigationSort = 74;
 
     public static function form(Form $form): Form
@@ -33,8 +32,8 @@ class MessageResource extends Resource
                 Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Select::make('theme_id')
-                            ->label("Thème")
-                            ->placeholder("Selectionnez un thème")
+                            ->label('Thème')
+                            ->placeholder('Selectionnez un thème')
                             ->relationship('theme', 'name')
                             ->searchable()
                             ->options(
@@ -48,8 +47,8 @@ class MessageResource extends Resource
                             ]),
 
                         Forms\Components\Select::make('utilisateur_id')
-                            ->label("Utilisateur")
-                            ->placeholder("Selectionnez un utilisateur")
+                            ->label('Utilisateur')
+                            ->placeholder('Selectionnez un utilisateur')
                             ->relationship('utilisateur', 'email')
                             ->searchable()
                             ->required()
@@ -64,8 +63,8 @@ class MessageResource extends Resource
                             ]),
 
                         Forms\Components\Textarea::make('question')
-                            ->label("Question")
-                            ->placeholder("Le message")
+                            ->label('Question')
+                            ->placeholder('Le message')
                             ->required()
                             ->columnSpan([
                                 'default' => 12,
@@ -76,15 +75,15 @@ class MessageResource extends Resource
                     ]),
 
                 Forms\Components\Repeater::make('chats')
-                    ->label("Chats")
+                    ->label('Chats')
                     ->relationship('chats')
                     ->columnSpan('full')
-                    ->createItemButtonLabel("Ajout un message")
+                    ->createItemButtonLabel('Ajout un message')
                     ->schema([
 
                         Forms\Components\Select::make('utilisateur_id')
-                            ->label("Utilisateur")
-                            ->placeholder("Selectionnez un utilisateur")
+                            ->label('Utilisateur')
+                            ->placeholder('Selectionnez un utilisateur')
                             ->relationship('utilisateur', 'email')
                             ->searchable()
                             ->required()
@@ -99,8 +98,8 @@ class MessageResource extends Resource
                             ]),
 
                         Forms\Components\Textarea::make('message')
-                            ->label("Message")
-                            ->placeholder("Le message")
+                            ->label('Message')
+                            ->placeholder('Le message')
                             ->required()
                             ->columnSpan([
                                 'default' => 12,
@@ -109,13 +108,13 @@ class MessageResource extends Resource
                             ]),
 
                         Forms\Components\Toggle::make('status')
-                            ->label("Statut")
+                            ->label('Statut')
                             ->default(true),
 
                         Forms\Components\Toggle::make('anonyme')
-                            ->label("Anonyme")
-                            ->default(false)
-                    ])
+                            ->label('Anonyme')
+                            ->default(false),
+                    ]),
             ]);
     }
 
@@ -124,28 +123,28 @@ class MessageResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('theme.name')
-                    ->label("Thème")
+                    ->label('Thème')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('utilisateur.name')
-                    ->label("Utilisateur")
+                    ->label('Utilisateur')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('question')
-                    ->label("Question")
+                    ->label('Question')
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('chats_count')
-                    ->label("Messages")
+                    ->label('Messages')
                     ->sortable()
                     ->counts('chats'),
 
                 Tables\Columns\ToggleColumn::make('status')
-                    ->label("Statut"),
+                    ->label('Statut'),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label("Date de création")
-                    ->date('d F Y H:i')
+                    ->label('Date de création')
+                    ->date('d F Y H:i'),
             ])
             ->filters([
                 //

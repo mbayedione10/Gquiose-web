@@ -33,14 +33,15 @@ class SMSService
         if ($result['success']) {
             Log::info('Verification code sent', [
                 'phone' => $this->maskPhone($phone),
-                'message_id' => $result['message_id']
+                'message_id' => $result['message_id'],
             ]);
+
             return true;
         }
 
         Log::error('Verification code failed', [
             'phone' => $this->maskPhone($phone),
-            'error' => $result['error']
+            'error' => $result['error'],
         ]);
 
         return false;
@@ -58,14 +59,15 @@ class SMSService
         if ($result['success']) {
             Log::info('Password reset code sent', [
                 'phone' => $this->maskPhone($phone),
-                'message_id' => $result['message_id']
+                'message_id' => $result['message_id'],
             ]);
+
             return true;
         }
 
         Log::error('Password reset code failed', [
             'phone' => $this->maskPhone($phone),
-            'error' => $result['error']
+            'error' => $result['error'],
         ]);
 
         return false;
@@ -80,7 +82,7 @@ class SMSService
             return '****';
         }
 
-        return substr($phone, 0, 4) . str_repeat('*', strlen($phone) - 4);
+        return substr($phone, 0, 4).str_repeat('*', strlen($phone) - 4);
     }
 
     /**

@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use App\Models\TypeStructure;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\TypeStructureResource;
-use App\Http\Resources\TypeStructureCollection;
 use App\Http\Requests\TypeStructureStoreRequest;
 use App\Http\Requests\TypeStructureUpdateRequest;
+use App\Http\Resources\TypeStructureCollection;
+use App\Http\Resources\TypeStructureResource;
+use App\Models\TypeStructure;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class TypeStructureController extends Controller
 {

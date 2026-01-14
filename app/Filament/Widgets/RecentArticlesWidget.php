@@ -11,7 +11,7 @@ class RecentArticlesWidget extends BaseWidget
 {
     protected static ?int $sort = 7;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected function getTableQuery(): Builder
     {
@@ -28,7 +28,7 @@ class RecentArticlesWidget extends BaseWidget
                 ->label('Image')
                 ->circular()
                 ->defaultImageUrl(url('/images/default-article.png')),
-            
+
             Tables\Columns\TextColumn::make('title')
                 ->label('Titre')
                 ->searchable()
@@ -36,13 +36,13 @@ class RecentArticlesWidget extends BaseWidget
                 ->weight('bold')
                 ->limit(60)
                 ->description(fn ($record) => str($record->description ?? '')->limit(100)),
-            
+
             Tables\Columns\TextColumn::make('rubrique.name')
                 ->label('Rubrique')
                 ->badge()
                 ->color('primary')
                 ->default('Non classé'),
-            
+
             Tables\Columns\IconColumn::make('status')
                 ->label('Publié')
                 ->boolean()
@@ -50,12 +50,12 @@ class RecentArticlesWidget extends BaseWidget
                 ->falseIcon('heroicon-m-x-circle')
                 ->trueColor('success')
                 ->falseColor('gray'),
-            
+
             Tables\Columns\TextColumn::make('user.name')
                 ->label('Auteur')
                 ->icon('heroicon-m-user')
                 ->default('Admin'),
-            
+
             Tables\Columns\TextColumn::make('created_at')
                 ->label('Publié le')
                 ->dateTime('d/m/Y')

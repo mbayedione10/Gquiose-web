@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\ThematiqueStoreRequest;
+use App\Http\Requests\ThematiqueUpdateRequest;
+use App\Http\Resources\ThematiqueCollection;
+use App\Http\Resources\ThematiqueResource;
 use App\Models\Thematique;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\ThematiqueResource;
-use App\Http\Resources\ThematiqueCollection;
-use App\Http\Requests\ThematiqueStoreRequest;
-use App\Http\Requests\ThematiqueUpdateRequest;
 
 class ThematiqueController extends Controller
 {

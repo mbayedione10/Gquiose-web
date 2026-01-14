@@ -3,11 +3,11 @@
 
 namespace App\Exports;
 
-use App\Models\Utilisateur;
 use App\Models\Alerte;
 use App\Models\Article;
-use App\Models\Video;
 use App\Models\Structure;
+use App\Models\Utilisateur;
+use App\Models\Video;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -53,6 +53,7 @@ class DashboardStatsExport implements FromCollection, WithHeadings, WithStyles, 
             ->groupBy('type_alerte_id')
             ->map(function ($alertes) {
                 $typeAlerte = $alertes->first()->typeAlerte;
+
                 return (object) [
                     'type_name' => $typeAlerte?->name ?? 'Non classifié',
                     'total' => $alertes->count(),
@@ -68,7 +69,7 @@ class DashboardStatsExport implements FromCollection, WithHeadings, WithStyles, 
             $data->push([
                 $type->type_name,
                 $type->total,
-                $percentage . '%',
+                $percentage.'%',
                 '',
             ]);
         }

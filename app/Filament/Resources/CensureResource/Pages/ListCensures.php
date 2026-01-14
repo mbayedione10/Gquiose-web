@@ -10,14 +10,14 @@ class ListCensures extends ListRecords
 {
     protected static string $resource = CensureResource::class;
 
-    protected static ?string $title = "Liste des mot censurés";
+    protected static ?string $title = 'Liste des mot censurés';
 
     protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()
-                ->label("Nouveau mot à censurer")
-                ->icon('heroicon-o-plus-circle')
+                ->label('Nouveau mot à censurer')
+                ->icon('heroicon-o-plus-circle'),
         ];
     }
 }

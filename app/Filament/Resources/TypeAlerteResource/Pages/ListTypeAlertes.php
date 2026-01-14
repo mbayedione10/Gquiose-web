@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\TypeAlerteResource\Pages;
 
-use Filament\Resources\Pages\ListRecords;
-use App\Filament\Traits\HasDescendingOrder;
 use App\Filament\Resources\TypeAlerteResource;
+use App\Filament\Traits\HasDescendingOrder;
+use Filament\Resources\Pages\ListRecords;
 
 class ListTypeAlertes extends ListRecords
 {

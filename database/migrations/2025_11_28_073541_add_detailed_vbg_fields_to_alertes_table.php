@@ -32,7 +32,7 @@ return new class extends Migration
                 'quotidien',
                 'hebdomadaire',
                 'mensuel',
-                'continu'
+                'continu',
             ])->nullable()->comment('Fréquence des incidents de violence');
 
             // === Informations générales sur l\'incident ===

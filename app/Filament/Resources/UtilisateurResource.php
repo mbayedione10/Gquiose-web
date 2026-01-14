@@ -2,32 +2,32 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Filters\DateRangeFilter;
+use App\Filament\Resources\UtilisateurResource\Pages;
 use App\Filament\Resources\UtilisateurResource\Widgets\UtilisateurBonneReponseChart;
 use App\Filament\Resources\UtilisateurResource\Widgets\UtilisateurMauvaiseReponseChart;
 use App\Filament\Resources\UtilisateurResource\Widgets\UtilisateurOverview;
 use App\Filament\Resources\UtilisateurResource\Widgets\ViewUtilisateurOverview;
+use App\Mail\SendCodeEmail;
+use App\Models\Code;
 use App\Models\Utilisateur;
-use Faker\Provider\Text;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
+use App\Services\SMS\SMSService;
+use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Toggle;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
-use App\Filament\Filters\DateRangeFilter;
-use App\Filament\Resources\UtilisateurResource\Pages;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
-use App\Models\Code;
-use App\Mail\SendCodeEmail;
-use App\Services\SMS\SMSService;
-use Illuminate\Support\Facades\Mail;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Mail;
 
 class UtilisateurResource extends Resource
 {
@@ -72,7 +72,7 @@ class UtilisateurResource extends Resource
                         ->unique(
                             'utilisateurs',
                             'email',
-                            fn(?Model $record) => $record
+                            fn (?Model $record) => $record
                         )
                         ->email()
                         ->placeholder('Email')
@@ -88,7 +88,7 @@ class UtilisateurResource extends Resource
                         ->unique(
                             'utilisateurs',
                             'phone',
-                            fn(?Model $record) => $record,
+                            fn (?Model $record) => $record,
                             ignoreRecord: true
                         )
                         ->placeholder('Phone')
@@ -122,7 +122,7 @@ class UtilisateurResource extends Resource
                         ->afterStateUpdated(function ($state, callable $set) {
                             if ($state) {
                                 $age = now()->year - $state;
-                                $tranche = match(true) {
+                                $tranche = match (true) {
                                     $age < 15 => '-15 ans',
                                     $age >= 15 && $age <= 17 => '15-17 ans',
                                     $age >= 18 && $age <= 24 => '18-24 ans',
@@ -172,18 +172,19 @@ class UtilisateurResource extends Resource
                     Forms\Components\Placeholder::make('photo_preview')
                         ->label('Photo actuelle')
                         ->content(function ($record) {
-                            if (!$record || !$record->photo) {
+                            if (! $record || ! $record->photo) {
                                 return 'Aucune photo';
                             }
                             // Si c'est une URL externe
                             if (str_starts_with($record->photo, 'http')) {
                                 return new \Illuminate\Support\HtmlString(
-                                    '<img src="' . $record->photo . '" alt="Photo" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">'
+                                    '<img src="'.$record->photo.'" alt="Photo" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">'
                                 );
                             }
+
                             // Si c'est un fichier local
                             return new \Illuminate\Support\HtmlString(
-                                '<img src="' . asset('storage/' . $record->photo) . '" alt="Photo" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">'
+                                '<img src="'.asset('storage/'.$record->photo).'" alt="Photo" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">'
                             );
                         })
                         ->visibleOn(['view', 'edit'])
@@ -219,7 +220,9 @@ class UtilisateurResource extends Resource
                     Forms\Components\Placeholder::make('provider_display')
                         ->label('Méthode d\'inscription')
                         ->content(function ($record) {
-                            if (!$record) return '-';
+                            if (! $record) {
+                                return '-';
+                            }
 
                             if ($record->provider) {
                                 $providers = [
@@ -227,6 +230,7 @@ class UtilisateurResource extends Resource
                                     'facebook' => 'Facebook',
                                     'apple' => 'Apple',
                                 ];
+
                                 return $providers[$record->provider] ?? ucfirst($record->provider);
                             }
 
@@ -279,30 +283,30 @@ class UtilisateurResource extends Resource
             ->poll('60s')
             ->columns([
                 Tables\Columns\TextColumn::make('nom')
-                    ->label("Nom")
+                    ->label('Nom')
                     ->searchable()
                     ->limit(50),
                 Tables\Columns\TextColumn::make('prenom')
-                    ->label("Prénom")
+                    ->label('Prénom')
                     ->searchable()
                     ->limit(50),
                 Tables\Columns\TextColumn::make('email')
-                    ->label("Email")
+                    ->label('Email')
                     ->searchable()
                     ->limit(50),
                 Tables\Columns\TextColumn::make('phone')
-                    ->label("Téléphone")
+                    ->label('Téléphone')
                     ->searchable()
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('ville.name')
-                    ->label("Ville")
+                    ->label('Ville')
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('anneedenaissance')
-                    ->label("Année de naissance")
+                    ->label('Année de naissance')
                     ->sortable()
                     ->toggleable(),
 
@@ -313,27 +317,28 @@ class UtilisateurResource extends Resource
                     ->placeholder('-'),
 
                 Tables\Columns\ImageColumn::make('photo')
-                    ->label("Photo")
+                    ->label('Photo')
                     ->circular()
                     ->toggleable()
                     ->getStateUsing(function ($record) {
-                        if (!$record->photo) {
+                        if (! $record->photo) {
                             return null;
                         }
                         // Si c'est une URL externe (OAuth), l'utiliser directement
                         if (str_starts_with($record->photo, 'http')) {
                             return $record->photo;
                         }
+
                         // Sinon, construire l'URL locale
-                        return asset('storage/' . $record->photo);
+                        return asset('storage/'.$record->photo);
                     }),
 
                 Tables\Columns\IconColumn::make('status')
-                    ->label("Statut")
+                    ->label('Statut')
                     ->boolean(),
 
                 Tables\Columns\TextColumn::make('platform')
-                    ->label("Plateforme")
+                    ->label('Plateforme')
                     ->colors([
                         'success' => 'android',
                         'info' => 'ios',
@@ -342,7 +347,7 @@ class UtilisateurResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('provider')
-                    ->label("Méthode")
+                    ->label('Méthode')
                     ->colors([
                         'warning' => fn ($state) => $state !== null,
                     ])
@@ -351,9 +356,9 @@ class UtilisateurResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label("Inscription")
+                    ->label('Inscription')
                     ->date('d F Y H:i')
-                    ->sortable()
+                    ->sortable(),
             ])
             ->filters([
                 DateRangeFilter::make('created_at'),
@@ -370,27 +375,27 @@ class UtilisateurResource extends Resource
                     ->label('Renvoyer le code')
                     ->icon('heroicon-o-envelope')
                     ->color('warning')
-                    ->visible(fn (Utilisateur $record): bool => !$record->status)
+                    ->visible(fn (Utilisateur $record): bool => ! $record->status)
                     ->requiresConfirmation()
                     ->modalHeading('Renvoyer le code de vérification')
-                    ->modalSubheading(fn (Utilisateur $record): string => 
-                        "Voulez-vous renvoyer le code de vérification à " . 
-                        ($record->email ?: 'ce numéro de téléphone') . " ?"
+                    ->modalSubheading(fn (Utilisateur $record): string => 'Voulez-vous renvoyer le code de vérification à '.
+                        ($record->email ?: 'ce numéro de téléphone').' ?'
                     )
                     ->modalButton('Envoyer')
                     ->action(function (Utilisateur $record) {
                         try {
-                            $isEmail = !empty($record->email);
+                            $isEmail = ! empty($record->email);
                             $identifier = $isEmail ? $record->email : Crypt::decryptString($record->phone);
 
                             // Anti-spam
-                            $antiSpamKey = 'admin_resend_code_' . $record->id;
+                            $antiSpamKey = 'admin_resend_code_'.$record->id;
                             if (Cache::has($antiSpamKey)) {
                                 Notification::make()
                                     ->title('Trop de tentatives')
                                     ->body('Veuillez patienter avant de renvoyer un code.')
                                     ->warning()
                                     ->send();
+
                                 return;
                             }
 
@@ -405,15 +410,15 @@ class UtilisateurResource extends Resource
                             $codeValue = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
 
                             Code::create([
-                                'code'           => $codeValue,
+                                'code' => $codeValue,
                                 'utilisateur_id' => $record->id,
-                                'email'          => $isEmail ? $identifier : null,
-                                'phone'          => !$isEmail ? Crypt::encryptString($identifier) : null,
+                                'email' => $isEmail ? $identifier : null,
+                                'phone' => ! $isEmail ? Crypt::encryptString($identifier) : null,
                             ]);
 
                             // Envoyer par email ou SMS
                             if ($isEmail) {
-                                $fullname = trim($record->prenom . ' ' . $record->nom) ?: 'Utilisateur';
+                                $fullname = trim($record->prenom.' '.$record->nom) ?: 'Utilisateur';
                                 $title = 'Code de vérification Gquiose';
                                 $content = "Bonjour {$fullname}, voici votre code de vérification pour activer votre compte Gquiose.";
 
@@ -422,13 +427,14 @@ class UtilisateurResource extends Resource
                                 $smsService = new SMSService();
                                 $smsSent = $smsService->sendVerificationCode($identifier, $codeValue);
 
-                                if (!$smsSent) {
+                                if (! $smsSent) {
                                     DB::rollBack();
                                     Notification::make()
                                         ->title('Erreur d\'envoi')
                                         ->body('Impossible d\'envoyer le SMS.')
                                         ->danger()
                                         ->send();
+
                                     return;
                                 }
                             }
@@ -441,12 +447,12 @@ class UtilisateurResource extends Resource
                             Log::info('Admin resent verification code', [
                                 'user_id' => $record->id,
                                 'type' => $isEmail ? 'email' : 'sms',
-                                'admin_id' => auth()->id()
+                                'admin_id' => auth()->id(),
                             ]);
 
                             Notification::make()
                                 ->title('Code envoyé avec succès')
-                                ->body('Le code de vérification a été renvoyé à ' . ($isEmail ? 'l\'email' : 'le numéro de téléphone'))
+                                ->body('Le code de vérification a été renvoyé à '.($isEmail ? 'l\'email' : 'le numéro de téléphone'))
                                 ->success()
                                 ->send();
 
@@ -454,7 +460,7 @@ class UtilisateurResource extends Resource
                             DB::rollBack();
                             Log::error('Admin error resending verification code', [
                                 'error' => $e->getMessage(),
-                                'user_id' => $record->id
+                                'user_id' => $record->id,
                             ]);
 
                             Notification::make()
@@ -485,7 +491,7 @@ class UtilisateurResource extends Resource
             UtilisateurOverview::class,
             ViewUtilisateurOverview::class,
             UtilisateurBonneReponseChart::class,
-            UtilisateurMauvaiseReponseChart::class
+            UtilisateurMauvaiseReponseChart::class,
         ];
     }
 

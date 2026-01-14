@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Response;
-use App\Models\Question;
-use Illuminate\View\View;
-use App\Models\Utilisateur;
-use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\ResponseStoreRequest;
 use App\Http\Requests\ResponseUpdateRequest;
+use App\Models\Question;
+use App\Models\Response;
+use App\Models\Utilisateur;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ResponseController extends Controller
 {

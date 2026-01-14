@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Rubrique;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class RubriqueFactory extends Factory

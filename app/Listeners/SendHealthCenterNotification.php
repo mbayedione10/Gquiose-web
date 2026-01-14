@@ -14,6 +14,7 @@ class SendHealthCenterNotification implements ShouldQueue
     use InteractsWithQueue;
 
     protected $notificationService;
+
     protected $evaluationTriggerService;
 
     /**
@@ -39,9 +40,9 @@ class SendHealthCenterNotification implements ShouldQueue
         // Créer la notification push ciblée par ville
         $notification = PushNotification::create([
             'title' => '🏥 Nouveau centre de santé !',
-            'message' => $structure->name . ' - ' . $structure->ville->name,
+            'message' => $structure->name.' - '.$structure->ville->name,
             'icon' => '🏥',
-            'action' => 'health_center/' . $structure->id,
+            'action' => 'health_center/'.$structure->id,
             'type' => 'automatic',
             'target_audience' => 'filtered',
             'filters' => [
@@ -62,11 +63,11 @@ class SendHealthCenterNotification implements ShouldQueue
             ->pluck('id')
             ->toArray();
 
-        if (!empty($villeUserIds)) {
+        if (! empty($villeUserIds)) {
             $this->evaluationTriggerService->triggerAutoEvaluation('structure', $structure->id, [
                 'delay_days' => 3,
                 'target_users' => $villeUserIds,
-                'evaluation_type' => 'satisfaction_structure'
+                'evaluation_type' => 'satisfaction_structure',
             ]);
         }
     }

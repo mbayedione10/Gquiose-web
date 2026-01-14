@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\UtilisateurStoreRequest;
+use App\Http\Requests\UtilisateurUpdateRequest;
+use App\Http\Resources\UtilisateurCollection;
+use App\Http\Resources\UtilisateurResource;
 use App\Models\Utilisateur;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\UtilisateurResource;
-use App\Http\Resources\UtilisateurCollection;
-use App\Http\Requests\UtilisateurStoreRequest;
-use App\Http\Requests\UtilisateurUpdateRequest;
 
 class UtilisateurController extends Controller
 {

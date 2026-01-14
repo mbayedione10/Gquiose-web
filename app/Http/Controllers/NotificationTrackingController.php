@@ -16,7 +16,6 @@ class NotificationTrackingController extends Controller
      * POST /api/notifications/opened
      * Body: { "notification_id": 123, "log_id": 456 }
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function markAsOpened(Request $request)
@@ -36,7 +35,7 @@ class NotificationTrackingController extends Controller
         try {
             $user = auth()->user();
 
-            if (!$user) {
+            if (! $user) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized',
@@ -56,7 +55,7 @@ class NotificationTrackingController extends Controller
                     ->first();
             }
 
-            if (!$log) {
+            if (! $log) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Notification log not found',
@@ -84,7 +83,7 @@ class NotificationTrackingController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error("Error marking notification as opened: " . $e->getMessage());
+            Log::error('Error marking notification as opened: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -99,7 +98,6 @@ class NotificationTrackingController extends Controller
      * POST /api/notifications/clicked
      * Body: { "notification_id": 123, "log_id": 456 }
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function markAsClicked(Request $request)
@@ -119,7 +117,7 @@ class NotificationTrackingController extends Controller
         try {
             $user = auth()->user();
 
-            if (!$user) {
+            if (! $user) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized',
@@ -139,7 +137,7 @@ class NotificationTrackingController extends Controller
                     ->first();
             }
 
-            if (!$log) {
+            if (! $log) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Notification log not found',
@@ -155,7 +153,7 @@ class NotificationTrackingController extends Controller
                 $notification->increment('clicked_count');
 
                 // Incrémenter opened_count si pas déjà fait
-                if (!$log->opened_at) {
+                if (! $log->opened_at) {
                     $notification->increment('opened_count');
                 }
             }
@@ -173,7 +171,7 @@ class NotificationTrackingController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error("Error marking notification as clicked: " . $e->getMessage());
+            Log::error('Error marking notification as clicked: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -187,7 +185,6 @@ class NotificationTrackingController extends Controller
      *
      * GET /api/notifications/history
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function getHistory(Request $request)
@@ -195,7 +192,7 @@ class NotificationTrackingController extends Controller
         try {
             $user = auth()->user();
 
-            if (!$user) {
+            if (! $user) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthorized',
@@ -226,7 +223,7 @@ class NotificationTrackingController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            Log::error("Error fetching notification history: " . $e->getMessage());
+            Log::error('Error fetching notification history: '.$e->getMessage());
 
             return response()->json([
                 'success' => false,

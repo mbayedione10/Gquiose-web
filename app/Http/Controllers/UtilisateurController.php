@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\View\View;
-use App\Models\Utilisateur;
-use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\UtilisateurStoreRequest;
 use App\Http\Requests\UtilisateurUpdateRequest;
+use App\Models\Utilisateur;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class UtilisateurController extends Controller
 {

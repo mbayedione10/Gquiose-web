@@ -29,6 +29,7 @@ class GenerateAlertTrackingNumbers extends Command
 
         if ($count === 0) {
             $this->info('✅ Toutes les alertes ont déjà un numéro de suivi.');
+
             return 0;
         }
 
@@ -57,7 +58,7 @@ class GenerateAlertTrackingNumbers extends Command
             }
 
             // Format sur 5 chiffres : 00001, 00002, etc.
-            $numeroSuivi = $prefix . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+            $numeroSuivi = $prefix.str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
             // Mettre à jour l'alerte (sans déclencher les observers)
             $alerte->numero_suivi = $numeroSuivi;

@@ -9,9 +9,9 @@ class Faq extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["question", 'reponse', 'status'];
+    protected $fillable = ['question', 'reponse', 'status'];
 
     protected $casts = [
-        'status' => 'boolean'
+        'status' => 'boolean',
     ];
 }

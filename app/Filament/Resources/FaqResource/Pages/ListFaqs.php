@@ -14,7 +14,7 @@ class ListFaqs extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label("Nouvelle Faq"),
+                ->label('Nouvelle Faq'),
         ];
     }
 }

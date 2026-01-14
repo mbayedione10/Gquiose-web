@@ -2,27 +2,30 @@
 
 namespace App\Filament\Resources\EvaluationStatsResource\Pages;
 
+use App\Exports\EvaluationStatsExport;
 use App\Filament\Resources\EvaluationStatsResource;
+use App\Filament\Widgets\AgeRangeStatsWidget;
 use App\Models\Evaluation;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Filament\Actions\Action;
-use Filament\Resources\Pages\Page;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
-use Illuminate\Support\Facades\Response;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Filament\Resources\Pages\Page;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\EvaluationStatsExport;
-use App\Filament\Widgets\AgeRangeStatsWidget;
 
 class ViewEvaluationStats extends Page
 {
     protected static string $resource = EvaluationStatsResource::class;
+
     protected static string $view = 'filament.resources.evaluation-stats.dashboard';
 
     public $dateDebut;
+
     public $dateFin;
+
     public $contexte = 'all';
+
     public $periode = '30';
 
     public function mount(): void
@@ -107,7 +110,7 @@ class ViewEvaluationStats extends Page
                         $this->dateFin = $data['dateFin'];
                     } else {
                         $this->dateFin = now()->format('Y-m-d');
-                        $this->dateDebut = now()->subDays((int)$data['periode'])->format('Y-m-d');
+                        $this->dateDebut = now()->subDays((int) $data['periode'])->format('Y-m-d');
                     }
                 }),
         ];
@@ -134,8 +137,8 @@ class ViewEvaluationStats extends Page
         ));
 
         return response()->streamDownload(
-            fn () => print($pdf->output()),
-            'statistiques-evaluations-' . now()->format('Y-m-d') . '.pdf'
+            fn () => print ($pdf->output()),
+            'statistiques-evaluations-'.now()->format('Y-m-d').'.pdf'
         );
     }
 
@@ -150,7 +153,7 @@ class ViewEvaluationStats extends Page
                 $this->contexte,
                 $this->getAgeRangeStats()
             ),
-            'statistiques-evaluations-' . now()->format('Y-m-d') . '.xlsx'
+            'statistiques-evaluations-'.now()->format('Y-m-d').'.xlsx'
         );
     }
 
@@ -187,7 +190,7 @@ class ViewEvaluationStats extends Page
                 Carbon::parse($this->dateDebut)->startOfDay(),
                 Carbon::parse($this->dateFin)->endOfDay(),
             ])
-            ->when($this->contexte !== 'all', fn($q) => $q->where('contexte', $this->contexte))
+            ->when($this->contexte !== 'all', fn ($q) => $q->where('contexte', $this->contexte))
             ->groupBy('date')
             ->orderBy('date')
             ->get();
@@ -219,9 +222,9 @@ class ViewEvaluationStats extends Page
                 ->count();
 
             $countFallback = \App\Models\Utilisateur::where(function ($query) {
-                    $query->whereNull('anneedenaissance')
-                        ->orWhere('anneedenaissance', 0);
-                })
+                $query->whereNull('anneedenaissance')
+                    ->orWhere('anneedenaissance', 0);
+            })
                 ->where('dob', $config['dob_value'])
                 ->count();
 
@@ -231,9 +234,9 @@ class ViewEvaluationStats extends Page
         }
 
         $sansAge = \App\Models\Utilisateur::where(function ($query) {
-                $query->whereNull('anneedenaissance')
-                    ->orWhere('anneedenaissance', 0);
-            })
+            $query->whereNull('anneedenaissance')
+                ->orWhere('anneedenaissance', 0);
+        })
             ->where(function ($query) {
                 $query->whereNull('dob')
                     ->orWhere('dob', '');

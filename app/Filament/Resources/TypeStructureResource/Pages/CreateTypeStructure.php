@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\TypeStructureResource\Pages;
 
-use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\TypeStructureResource;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateTypeStructure extends CreateRecord
 {

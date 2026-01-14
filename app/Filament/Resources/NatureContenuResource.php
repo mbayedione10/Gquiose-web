@@ -2,25 +2,28 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\NatureContenuResource\Pages;
 use App\Models\NatureContenu;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
-use App\Filament\Resources\NatureContenuResource\Pages;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 class NatureContenuResource extends Resource
 {
     protected static ?string $model = NatureContenu::class;
 
-    protected static ?string $navigationLabel = "Nature du contenu";
-    protected static ?string $navigationGroup = "VBG";
+    protected static ?string $navigationLabel = 'Nature du contenu';
+
+    protected static ?string $navigationGroup = 'VBG';
+
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
+
     protected static ?int $navigationSort = 14;
 
     public static function form(Form $form): Form

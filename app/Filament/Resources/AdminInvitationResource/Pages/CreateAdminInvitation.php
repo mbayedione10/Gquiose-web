@@ -3,12 +3,12 @@
 namespace App\Filament\Resources\AdminInvitationResource\Pages;
 
 use App\Filament\Resources\AdminInvitationResource;
-use App\Models\AdminInvitation;
 use App\Mail\AdminInvitationMail;
-use Filament\Resources\Pages\CreateRecord;
+use App\Models\AdminInvitation;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Mail;
+use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class CreateAdminInvitation extends CreateRecord
 {
@@ -29,7 +29,7 @@ class CreateAdminInvitation extends CreateRecord
 
         Notification::make()
             ->title('Invitation envoyée')
-            ->body('Un email d\'invitation a été envoyé à ' . $this->record->email)
+            ->body('Un email d\'invitation a été envoyé à '.$this->record->email)
             ->success()
             ->send();
     }

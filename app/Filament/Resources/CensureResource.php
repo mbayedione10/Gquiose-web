@@ -3,16 +3,12 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CensureResource\Pages;
-use App\Filament\Resources\CensureResource\RelationManagers;
 use App\Models\Censure;
-use App\Models\Conseil;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Table;
 
 class CensureResource extends Resource
 {
@@ -20,7 +16,7 @@ class CensureResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-no-symbol';
 
-    protected static ?string $navigationGroup = "Forum";
+    protected static ?string $navigationGroup = 'Forum';
 
     //protected static ?int $navigationSort = 14;
 
@@ -30,17 +26,17 @@ class CensureResource extends Resource
             ->schema([
                 Forms\Components\Section::make()
                     ->schema([
-                        Forms\Components\TextInput::make("name")
-                            ->label("Censure")
-                            ->placeholder("Mot censuré")
+                        Forms\Components\TextInput::make('name')
+                            ->label('Censure')
+                            ->placeholder('Mot censuré')
                             ->unique(
                                 'censures',
                                 'name',
-                                fn(?Censure $record) => $record
+                                fn (?Censure $record) => $record
                             )
                             ->rules(['max:255', 'string'])
-                            ->required()
-                    ])
+                            ->required(),
+                    ]),
             ]);
     }
 
@@ -49,9 +45,9 @@ class CensureResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label("Mot censuré")
+                    ->label('Mot censuré')
                     ->searchable()
-                    ->sortable()
+                    ->sortable(),
             ])
             ->filters([
                 //

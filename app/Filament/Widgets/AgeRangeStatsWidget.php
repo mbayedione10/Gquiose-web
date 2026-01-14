@@ -8,8 +8,11 @@ use Filament\Widgets\DoughnutChartWidget;
 class AgeRangeStatsWidget extends DoughnutChartWidget
 {
     protected static ?string $heading = 'Répartition par tranche d\'âge';
+
     protected static ?int $sort = 5;
-    protected int | string | array $columnSpan = 'full';
+
+    protected int|string|array $columnSpan = 'full';
+
     protected static ?string $maxHeight = '300px';
 
     protected function getData(): array
@@ -77,23 +80,23 @@ class AgeRangeStatsWidget extends DoughnutChartWidget
 
             // Fallback sur dob pour ceux sans anneedenaissance
             $countFallback = Utilisateur::where(function ($query) {
-                    $query->whereNull('anneedenaissance')
-                        ->orWhere('anneedenaissance', 0);
-                })
+                $query->whereNull('anneedenaissance')
+                    ->orWhere('anneedenaissance', 0);
+            })
                 ->where('dob', $config['dob_value'])
                 ->count();
 
             $count = $countDynamic + $countFallback;
             $data[] = $count;
-            $labels[] = $config['label'] . ' (' . $count . ')';
+            $labels[] = $config['label'].' ('.$count.')';
             $colors[] = $config['color'];
         }
 
         // Utilisateurs sans aucune info d'âge
         $sansAge = Utilisateur::where(function ($query) {
-                $query->whereNull('anneedenaissance')
-                    ->orWhere('anneedenaissance', 0);
-            })
+            $query->whereNull('anneedenaissance')
+                ->orWhere('anneedenaissance', 0);
+        })
             ->where(function ($query) {
                 $query->whereNull('dob')
                     ->orWhere('dob', '');
@@ -102,7 +105,7 @@ class AgeRangeStatsWidget extends DoughnutChartWidget
 
         if ($sansAge > 0) {
             $data[] = $sansAge;
-            $labels[] = 'Non renseigné (' . $sansAge . ')';
+            $labels[] = 'Non renseigné ('.$sansAge.')';
             $colors[] = 'rgba(156, 163, 175, 0.8)';
         }
 

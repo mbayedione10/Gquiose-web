@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class AdminInvitation extends Model
@@ -47,7 +47,7 @@ class AdminInvitation extends Model
 
     public function isPending(): bool
     {
-        return !$this->isExpired() && !$this->isAccepted();
+        return ! $this->isExpired() && ! $this->isAccepted();
     }
 
     public static function generateToken(): string

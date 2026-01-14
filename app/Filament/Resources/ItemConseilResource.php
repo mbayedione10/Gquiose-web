@@ -2,21 +2,21 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\ItemConseilResource\Pages;
 use App\Models\ItemConseil;
 use App\Models\SectionConseil;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
 use Filament\Tables\Filters\SelectFilter;
-use App\Filament\Resources\ItemConseilResource\Pages;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
 
 class ItemConseilResource extends Resource
 {
@@ -26,6 +26,7 @@ class ItemConseilResource extends Resource
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $modelLabel = 'Item';
+
     protected static ?string $pluralModelLabel = 'Items';
 
     public static function form(Form $form): Form
@@ -36,8 +37,7 @@ class ItemConseilResource extends Resource
                     Select::make('section_conseil_id')
                         ->label('Section parente')
                         ->relationship('sectionConseil', 'titre')
-                        ->getOptionLabelFromRecordUsing(fn (SectionConseil $record) =>
-                            "{$record->categorieConseil?->nom} > {$record->titre}"
+                        ->getOptionLabelFromRecordUsing(fn (SectionConseil $record) => "{$record->categorieConseil?->nom} > {$record->titre}"
                         )
                         ->required()
                         ->searchable()

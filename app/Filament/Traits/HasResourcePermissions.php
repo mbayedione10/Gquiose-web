@@ -39,7 +39,7 @@ trait HasResourcePermissions
     {
         $className = class_basename(static::class);
         $map = static::getPermissionMap();
-        
+
         return $map[$className] ?? null;
     }
 
@@ -49,8 +49,8 @@ trait HasResourcePermissions
     public static function canViewAny(): bool
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return false;
         }
 
@@ -60,8 +60,8 @@ trait HasResourcePermissions
         }
 
         $permission = static::getRequiredPermission();
-        
-        if (!$permission) {
+
+        if (! $permission) {
             return true; // Pas de permission définie, accès par défaut
         }
 
@@ -74,8 +74,8 @@ trait HasResourcePermissions
     public static function canCreate(): bool
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return false;
         }
 
@@ -84,8 +84,8 @@ trait HasResourcePermissions
         }
 
         $permission = static::getRequiredPermission();
-        
-        if (!$permission) {
+
+        if (! $permission) {
             return true;
         }
 
@@ -98,8 +98,8 @@ trait HasResourcePermissions
     public static function canEdit(Model $record): bool
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return false;
         }
 
@@ -108,8 +108,8 @@ trait HasResourcePermissions
         }
 
         $permission = static::getRequiredPermission();
-        
-        if (!$permission) {
+
+        if (! $permission) {
             return true;
         }
 
@@ -122,8 +122,8 @@ trait HasResourcePermissions
     public static function canDelete(Model $record): bool
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return false;
         }
 
@@ -132,8 +132,8 @@ trait HasResourcePermissions
         }
 
         $permission = static::getRequiredPermission();
-        
-        if (!$permission) {
+
+        if (! $permission) {
             return true;
         }
 
@@ -162,8 +162,8 @@ trait HasResourcePermissions
     public static function canForceDelete(Model $record): bool
     {
         $user = Auth::user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return false;
         }
 

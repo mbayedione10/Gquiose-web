@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\RubriqueResource\Pages;
 
-use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\RubriqueResource;
+use Filament\Resources\Pages\EditRecord;
 
 class EditRubrique extends EditRecord
 {

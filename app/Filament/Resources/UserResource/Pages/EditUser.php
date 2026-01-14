@@ -3,10 +3,9 @@
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Actions;
 use Filament\Forms\Components\TextInput;
-use App\Models\User;
+use Filament\Resources\Pages\EditRecord;
 
 class EditUser extends EditRecord
 {
@@ -36,9 +35,9 @@ class EditUser extends EditRecord
                 ])
                 ->action(function (array $data): void {
                     $this->record->update([
-                        'password' => \Hash::make($data['new_password'])
+                        'password' => \Hash::make($data['new_password']),
                     ]);
-                    
+
                     \Filament\Notifications\Notification::make()
                         ->success()
                         ->title('Mot de passe modifié')

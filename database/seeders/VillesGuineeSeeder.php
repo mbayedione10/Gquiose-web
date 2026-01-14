@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Ville;
+use Illuminate\Database\Seeder;
 
 class VillesGuineeSeeder extends Seeder
 {
@@ -68,6 +68,6 @@ class VillesGuineeSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ ' . count($villes) . ' villes de Guinée créées');
+        $this->command->info('✅ '.count($villes).' villes de Guinée créées');
     }
 }

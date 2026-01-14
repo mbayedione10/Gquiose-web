@@ -7,8 +7,8 @@ use App\Models\NotificationLog;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class NotificationLogResource extends Resource
 {
@@ -37,19 +37,19 @@ class NotificationLogResource extends Resource
                             ->relationship('utilisateur', 'nom')
                             ->searchable()
                             ->disabled(),
-                        
+
                         Forms\Components\TextInput::make('title')
                             ->label('Titre')
                             ->disabled(),
-                        
+
                         Forms\Components\Textarea::make('message')
                             ->label('Message')
                             ->disabled(),
-                        
+
                         Forms\Components\TextInput::make('icon')
                             ->label('Icône')
                             ->disabled(),
-                        
+
                         Forms\Components\Select::make('type')
                             ->label('Type')
                             ->options([
@@ -58,7 +58,7 @@ class NotificationLogResource extends Resource
                                 'scheduled' => 'Programmé',
                             ])
                             ->disabled(),
-                        
+
                         Forms\Components\Select::make('category')
                             ->label('Catégorie')
                             ->options([
@@ -72,7 +72,7 @@ class NotificationLogResource extends Resource
                                 'video' => 'Vidéo',
                             ])
                             ->disabled(),
-                        
+
                         Forms\Components\Select::make('status')
                             ->label('Statut')
                             ->options([
@@ -86,29 +86,29 @@ class NotificationLogResource extends Resource
                             ->disabled(),
                     ])
                     ->columns(2),
-                
+
                 Forms\Components\Section::make('Détails de livraison')
                     ->schema([
                         Forms\Components\DateTimePicker::make('sent_at')
                             ->label('Envoyée le')
                             ->disabled(),
-                        
+
                         Forms\Components\DateTimePicker::make('delivered_at')
                             ->label('Livrée le')
                             ->disabled(),
-                        
+
                         Forms\Components\DateTimePicker::make('opened_at')
                             ->label('Ouverte le')
                             ->disabled(),
-                        
+
                         Forms\Components\DateTimePicker::make('clicked_at')
                             ->label('Cliquée le')
                             ->disabled(),
-                        
+
                         Forms\Components\TextInput::make('platform')
                             ->label('Plateforme')
                             ->disabled(),
-                        
+
                         Forms\Components\TextInput::make('fcm_message_id')
                             ->label('FCM Message ID')
                             ->disabled(),
@@ -125,24 +125,24 @@ class NotificationLogResource extends Resource
                     ->label('Utilisateur')
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('title')
                     ->label('Titre')
                     ->searchable()
                     ->limit(30),
-                
+
                 Tables\Columns\TextColumn::make('message')
                     ->label('Message')
                     ->limit(40)
                     ->wrap(),
-                
+
                 Tables\Columns\TextColumn::make('icon')
                     ->label('Icône'),
-                
+
                 Tables\Columns\TextColumn::make('category')
                     ->label('Catégorie')
                     ->badge()
-                    ->color(fn ($state) => match($state) {
+                    ->color(fn ($state) => match ($state) {
                         'alert' => 'danger',
                         'reminder' => 'warning',
                         'health_tip' => 'success',
@@ -151,7 +151,7 @@ class NotificationLogResource extends Resource
                         'quiz', 'article', 'video' => 'info',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn ($state) => match($state) {
+                    ->formatStateUsing(fn ($state) => match ($state) {
                         'alert' => 'Alerte',
                         'reminder' => 'Rappel',
                         'health_tip' => 'Conseil',
@@ -162,11 +162,11 @@ class NotificationLogResource extends Resource
                         'video' => 'Vidéo',
                         default => $state,
                     }),
-                
+
                 Tables\Columns\TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
-                    ->color(fn ($state) => match($state) {
+                    ->color(fn ($state) => match ($state) {
                         'pending' => 'gray',
                         'sent' => 'primary',
                         'delivered' => 'success',
@@ -175,7 +175,7 @@ class NotificationLogResource extends Resource
                         'failed' => 'danger',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn ($state) => match($state) {
+                    ->formatStateUsing(fn ($state) => match ($state) {
                         'pending' => 'En attente',
                         'sent' => 'Envoyée',
                         'delivered' => 'Livrée',
@@ -184,16 +184,16 @@ class NotificationLogResource extends Resource
                         'failed' => 'Échouée',
                         default => $state,
                     }),
-                
+
                 Tables\Columns\TextColumn::make('platform')
                     ->label('Plateforme')
                     ->badge()
-                    ->color(fn ($state) => match($state) {
+                    ->color(fn ($state) => match ($state) {
                         'android' => 'success',
                         'ios' => 'primary',
                         default => 'gray',
                     }),
-                
+
                 Tables\Columns\TextColumn::make('sent_at')
                     ->label('Envoyée le')
                     ->dateTime('d/m/Y H:i')
@@ -211,7 +211,7 @@ class NotificationLogResource extends Resource
                         'clicked' => 'Cliquée',
                         'failed' => 'Échouée',
                     ]),
-                
+
                 Tables\Filters\SelectFilter::make('category')
                     ->label('Catégorie')
                     ->options([
@@ -224,14 +224,14 @@ class NotificationLogResource extends Resource
                         'article' => 'Article',
                         'video' => 'Vidéo',
                     ]),
-                
+
                 Tables\Filters\SelectFilter::make('platform')
                     ->label('Plateforme')
                     ->options([
                         'android' => 'Android',
                         'ios' => 'iOS',
                     ]),
-                
+
                 Tables\Filters\Filter::make('sent_at')
                     ->form([
                         Forms\Components\DatePicker::make('sent_from')
@@ -252,14 +252,14 @@ class NotificationLogResource extends Resource
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [

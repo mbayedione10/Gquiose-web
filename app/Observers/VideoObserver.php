@@ -10,7 +10,8 @@ class VideoObserver
 {
     public function __construct(
         private YouTubeService $youtubeService
-    ) {}
+    ) {
+    }
 
     /**
      * Handle the Video "creating" event.
@@ -84,17 +85,17 @@ class VideoObserver
      */
     private function updateYouTubeInfo(Video $video): void
     {
-        if ($video->type !== 'youtube' || !$video->url) {
+        if ($video->type !== 'youtube' || ! $video->url) {
             return;
         }
 
         $original = $video->getOriginal();
-        $urlChanged = !isset($original['url']) || $original['url'] !== $video->url;
+        $urlChanged = ! isset($original['url']) || $original['url'] !== $video->url;
 
         // Vérifier si on doit récupérer les infos
-        $needsUpdate = $urlChanged || !$video->duration || !$video->youtube_thumbnail;
+        $needsUpdate = $urlChanged || ! $video->duration || ! $video->youtube_thumbnail;
 
-        if (!$needsUpdate) {
+        if (! $needsUpdate) {
             return;
         }
 
@@ -102,17 +103,17 @@ class VideoObserver
 
         if ($info) {
             // Mettre à jour le titre si vide ou si URL a changé
-            if ($info['title'] && (!$video->name || $urlChanged)) {
+            if ($info['title'] && (! $video->name || $urlChanged)) {
                 $video->name = $info['title'];
             }
 
             // Mettre à jour la durée si vide
-            if ($info['duration'] && !$video->duration) {
+            if ($info['duration'] && ! $video->duration) {
                 $video->duration = $info['duration'];
             }
 
             // Mettre à jour la miniature YouTube si vide ou si URL a changé
-            if ($info['thumbnail'] && (!$video->youtube_thumbnail || $urlChanged)) {
+            if ($info['thumbnail'] && (! $video->youtube_thumbnail || $urlChanged)) {
                 $video->youtube_thumbnail = $info['thumbnail'];
             }
         }

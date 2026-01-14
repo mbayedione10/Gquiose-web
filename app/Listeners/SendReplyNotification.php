@@ -37,7 +37,7 @@ class SendReplyNotification
         }
 
         // Check notification preferences
-        if (!$messageAuthor->notificationPreferences?->forum_notifications) {
+        if (! $messageAuthor->notificationPreferences?->forum_notifications) {
             return;
         }
 

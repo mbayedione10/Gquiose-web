@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\VilleResource\Pages;
 
-use Filament\Resources\Pages\ViewRecord;
 use App\Filament\Resources\VilleResource;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewVille extends ViewRecord
 {

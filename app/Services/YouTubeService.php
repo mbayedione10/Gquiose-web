@@ -32,12 +32,12 @@ class YouTubeService
     {
         $videoId = $this->extractVideoId($url);
 
-        if (!$videoId) {
+        if (! $videoId) {
             return null;
         }
 
         // Si pas de clé API, retourner les infos de base
-        if (!$this->apiKey) {
+        if (! $this->apiKey) {
             return [
                 'video_id' => $videoId,
                 'thumbnail' => "https://img.youtube.com/vi/{$videoId}/hqdefault.jpg",
@@ -56,7 +56,7 @@ class YouTubeService
             if ($response->successful()) {
                 $data = $response->json();
 
-                if (!empty($data['items'])) {
+                if (! empty($data['items'])) {
                     $item = $data['items'][0];
 
                     return [
@@ -70,7 +70,7 @@ class YouTubeService
                 }
             }
         } catch (\Exception $e) {
-            Log::error("YouTube API error: " . $e->getMessage());
+            Log::error('YouTube API error: '.$e->getMessage());
         }
 
         return [
@@ -86,7 +86,7 @@ class YouTubeService
      */
     public function parseDuration(?string $isoDuration): ?string
     {
-        if (!$isoDuration) {
+        if (! $isoDuration) {
             return null;
         }
 
@@ -112,6 +112,6 @@ class YouTubeService
      */
     public function isConfigured(): bool
     {
-        return !empty($this->apiKey);
+        return ! empty($this->apiKey);
     }
 }

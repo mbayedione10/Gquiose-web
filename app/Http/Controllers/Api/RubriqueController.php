@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\RubriqueStoreRequest;
+use App\Http\Requests\RubriqueUpdateRequest;
+use App\Http\Resources\RubriqueCollection;
+use App\Http\Resources\RubriqueResource;
 use App\Models\Rubrique;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\RubriqueResource;
-use App\Http\Resources\RubriqueCollection;
-use App\Http\Requests\RubriqueStoreRequest;
-use App\Http\Requests\RubriqueUpdateRequest;
 
 class RubriqueController extends Controller
 {

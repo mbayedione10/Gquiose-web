@@ -30,7 +30,7 @@ class SendMentionNotification
         }
 
         // Check notification preferences
-        if (!$mentionedUser->notificationPreferences?->forum_notifications) {
+        if (! $mentionedUser->notificationPreferences?->forum_notifications) {
             return;
         }
 

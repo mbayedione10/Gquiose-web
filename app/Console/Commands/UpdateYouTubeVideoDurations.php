@@ -23,10 +23,11 @@ class UpdateYouTubeVideoDurations extends Command
 
     public function handle(): int
     {
-        if (!$this->youtubeService->isConfigured()) {
+        if (! $this->youtubeService->isConfigured()) {
             $this->error('Clé API YouTube non configurée!');
             $this->line('Ajoutez YOUTUBE_API_KEY dans votre fichier .env');
             $this->line('Obtenez une clé sur: https://console.cloud.google.com/apis/credentials');
+
             return self::FAILURE;
         }
 
@@ -36,10 +37,10 @@ class UpdateYouTubeVideoDurations extends Command
             $query->where('id', $this->option('id'));
         }
 
-        if (!$this->option('force')) {
+        if (! $this->option('force')) {
             $query->where(function ($q) {
                 $q->whereNull('duration')
-                  ->orWhereNull('youtube_thumbnail');
+                    ->orWhereNull('youtube_thumbnail');
             });
         }
 
@@ -47,6 +48,7 @@ class UpdateYouTubeVideoDurations extends Command
 
         if ($videos->isEmpty()) {
             $this->info('Aucune vidéo YouTube à mettre à jour.');
+
             return self::SUCCESS;
         }
 
@@ -68,23 +70,23 @@ class UpdateYouTubeVideoDurations extends Command
                 $updateData = [];
 
                 // Mettre à jour la durée si disponible
-                if ($info['duration'] && (!$video->duration || $this->option('force'))) {
+                if ($info['duration'] && (! $video->duration || $this->option('force'))) {
                     $updateData['duration'] = $info['duration'];
                 }
 
-                if (!$durationOnly) {
+                if (! $durationOnly) {
                     // Mettre à jour le titre si disponible et vide
-                    if ($info['title'] && (!$video->name || $this->option('force'))) {
+                    if ($info['title'] && (! $video->name || $this->option('force'))) {
                         $updateData['name'] = $info['title'];
                     }
 
                     // Mettre à jour la miniature YouTube si disponible
-                    if ($info['thumbnail'] && (!$video->youtube_thumbnail || $this->option('force'))) {
+                    if ($info['thumbnail'] && (! $video->youtube_thumbnail || $this->option('force'))) {
                         $updateData['youtube_thumbnail'] = $info['thumbnail'];
                     }
                 }
 
-                if (!empty($updateData)) {
+                if (! empty($updateData)) {
                     $video->update($updateData);
                     $updated++;
                 } else {

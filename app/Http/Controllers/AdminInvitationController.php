@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\AdminInvitation;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
 class AdminInvitationController extends Controller
@@ -15,7 +15,7 @@ class AdminInvitationController extends Controller
     {
         $invitation = AdminInvitation::where('token', $token)->first();
 
-        if (!$invitation) {
+        if (! $invitation) {
             return view('admin.invitation.invalid', [
                 'message' => 'Cette invitation n\'existe pas ou a été supprimée.',
             ]);
@@ -42,7 +42,7 @@ class AdminInvitationController extends Controller
     {
         $invitation = AdminInvitation::where('token', $token)->first();
 
-        if (!$invitation || $invitation->isAccepted() || $invitation->isExpired()) {
+        if (! $invitation || $invitation->isAccepted() || $invitation->isExpired()) {
             return redirect()->route('admin.invitation.accept', $token)
                 ->with('error', 'Cette invitation n\'est plus valide.');
         }

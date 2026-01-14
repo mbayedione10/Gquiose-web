@@ -1,17 +1,15 @@
 <?php
 
-
 namespace App\Services;
 
-
 use App\Exceptions\ResourceNotFoundException;
-use App\Models\Article;
 use App\Models\Rubrique;
 use Illuminate\Support\Facades\DB;
 
 class ArticleService
 {
     private $VEDETTE_LIMIT = 3;
+
     private $ARTICLES_LIMIT = 25;
 
     public function vedette()
@@ -57,6 +55,7 @@ class ArticleService
             ->orderByDesc('articles.id')
             ->get();
     }
+
     public function show($slug)
     {
         return DB::table('articles')
@@ -82,8 +81,9 @@ class ArticleService
     {
         $rubrique = Rubrique::whereId($rubriqueId)->first();
 
-        if ($rubrique == null)
-            throw new ResourceNotFoundException("La rubrique avec pour ID " .$rubriqueId. " n'existe pas");
+        if ($rubrique == null) {
+            throw new ResourceNotFoundException('La rubrique avec pour ID '.$rubriqueId." n'existe pas");
+        }
 
         return DB::table('articles')
             ->join('rubriques', 'articles.rubrique_id', 'rubriques.id')

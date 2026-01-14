@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\TypeStructureResource\Pages;
 
-use Filament\Resources\Pages\ViewRecord;
 use App\Filament\Resources\TypeStructureResource;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewTypeStructure extends ViewRecord
 {

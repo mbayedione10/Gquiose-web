@@ -2,33 +2,36 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\User;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Livewire\Component;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Traits\HasResourcePermissions;
+use App\Models\User;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use Livewire\Component;
 
 class UserResource extends Resource
 {
     use HasResourcePermissions;
-    protected static ?string $model = User::class;
 
+    protected static ?string $model = User::class;
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationLabel = "Administrateurs";
-    protected static ?string $navigationGroup = "Gestion des utilisateurs";
+    protected static ?string $navigationLabel = 'Administrateurs';
+
+    protected static ?string $navigationGroup = 'Gestion des utilisateurs';
+
     protected static ?string $navigationIcon = 'heroicon-o-users';
+
     protected static ?int $navigationSort = 100;
 
     public static function form(Form $form): Form
@@ -52,7 +55,7 @@ class UserResource extends Resource
                         ->unique(
                             'users',
                             'phone',
-                            fn(?Model $record) => $record
+                            fn (?Model $record) => $record
                         )
                         ->placeholder('Phone')
                         ->columnSpan([
@@ -67,7 +70,7 @@ class UserResource extends Resource
                         ->unique(
                             'users',
                             'email',
-                            fn(?Model $record) => $record
+                            fn (?Model $record) => $record
                         )
                         ->email()
                         ->placeholder('Email')
@@ -80,10 +83,9 @@ class UserResource extends Resource
                     TextInput::make('password')
                         ->required()
                         ->password()
-                        ->dehydrateStateUsing(fn($state) => \Hash::make($state))
+                        ->dehydrateStateUsing(fn ($state) => \Hash::make($state))
                         ->required(
-                            fn(Component $livewire) => $livewire instanceof
-                                Pages\CreateUser
+                            fn (Component $livewire) => $livewire instanceof Pages\CreateUser
                         )
                         ->placeholder('Password')
                         ->columnSpan([
@@ -162,9 +164,9 @@ class UserResource extends Resource
                         ])
                         ->action(function (User $record, array $data): void {
                             $record->update([
-                                'password' => \Hash::make($data['new_password'])
+                                'password' => \Hash::make($data['new_password']),
                             ]);
-                            
+
                             \Filament\Notifications\Notification::make()
                                 ->success()
                                 ->title('Mot de passe modifié')

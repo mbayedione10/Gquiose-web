@@ -11,10 +11,7 @@ class UtilisateurMauvaiseReponseChart extends DoughnutChartWidget
 {
     protected static ?string $heading = 'Base de connaissances des mauvaises réponses par thématique';
 
-
     public ?Utilisateur $record;
-
-
 
     protected function getData(): array
     {
@@ -29,13 +26,12 @@ class UtilisateurMauvaiseReponseChart extends DoughnutChartWidget
         $labels = $query->pluck('name')->toArray();
         $data = $query->pluck('data')->toArray();
 
-
         return [
             'datasets' => [
                 [
                     'label' => 'Thématique',
                     'data' => $data,
-                    'backgroundColor' => chartColors()
+                    'backgroundColor' => chartColors(),
                 ],
             ],
             'labels' => $labels,

@@ -3,8 +3,8 @@
 namespace App\Jobs;
 
 use App\Models\PushNotification;
-use App\Services\Push\FCMService;
 use App\Services\Push\APNsService;
+use App\Services\Push\FCMService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -47,10 +47,6 @@ class SendBatchNotifications implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @param PushNotification $notification
-     * @param array $userIds
-     * @param string $platform
      */
     public function __construct(PushNotification $notification, array $userIds, string $platform = 'all')
     {
@@ -65,13 +61,14 @@ class SendBatchNotifications implements ShouldQueue
     public function handle(): void
     {
         try {
-            Log::info("Starting batch notification send for notification {$this->notification->id} to " . count($this->userIds) . " users");
+            Log::info("Starting batch notification send for notification {$this->notification->id} to ".count($this->userIds).' users');
 
             // Charger les utilisateurs
             $users = \App\Models\Utilisateur::whereIn('id', $this->userIds)->get();
 
             if ($users->isEmpty()) {
-                Log::warning("No users found for batch send");
+                Log::warning('No users found for batch send');
+
                 return;
             }
 
@@ -80,10 +77,10 @@ class SendBatchNotifications implements ShouldQueue
             $apnsUsers = [];
 
             foreach ($users as $user) {
-                if (($this->platform === 'all' || $this->platform === 'fcm') && !empty($user->fcm_token)) {
+                if (($this->platform === 'all' || $this->platform === 'fcm') && ! empty($user->fcm_token)) {
                     $fcmUsers[] = $user;
                 }
-                if (($this->platform === 'all' || $this->platform === 'apns') && !empty($user->apns_token)) {
+                if (($this->platform === 'all' || $this->platform === 'apns') && ! empty($user->apns_token)) {
                     $apnsUsers[] = $user;
                 }
             }
@@ -92,8 +89,8 @@ class SendBatchNotifications implements ShouldQueue
             $totalFailed = 0;
 
             // Envoyer via FCM
-            if (!empty($fcmUsers)) {
-                Log::info("Sending to " . count($fcmUsers) . " FCM users");
+            if (! empty($fcmUsers)) {
+                Log::info('Sending to '.count($fcmUsers).' FCM users');
                 $fcmService = app(FCMService::class);
                 $result = $fcmService->sendToMultipleDevices($fcmUsers, $this->notification);
 
@@ -102,8 +99,8 @@ class SendBatchNotifications implements ShouldQueue
             }
 
             // Envoyer via APNs
-            if (!empty($apnsUsers)) {
-                Log::info("Sending to " . count($apnsUsers) . " APNs users");
+            if (! empty($apnsUsers)) {
+                Log::info('Sending to '.count($apnsUsers).' APNs users');
                 $apnsService = app(APNsService::class);
                 $result = $apnsService->sendToMultipleDevices($apnsUsers, $this->notification);
 
@@ -117,7 +114,7 @@ class SendBatchNotifications implements ShouldQueue
             Log::info("Batch notification send completed: {$totalSuccess} success, {$totalFailed} failed");
 
         } catch (\Exception $e) {
-            Log::error("Batch notification send error: " . $e->getMessage());
+            Log::error('Batch notification send error: '.$e->getMessage());
             throw $e; // Relancer l'exception pour déclencher les tentatives
         }
     }
@@ -127,7 +124,7 @@ class SendBatchNotifications implements ShouldQueue
      */
     public function failed(\Throwable $exception): void
     {
-        Log::error("Batch notification send failed permanently for notification {$this->notification->id}: " . $exception->getMessage());
+        Log::error("Batch notification send failed permanently for notification {$this->notification->id}: ".$exception->getMessage());
 
         // Optionnel: marquer la notification comme échouée
         $this->notification->update([

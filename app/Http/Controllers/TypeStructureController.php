@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\View\View;
-use Illuminate\Http\Request;
-use App\Models\TypeStructure;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\TypeStructureStoreRequest;
 use App\Http\Requests\TypeStructureUpdateRequest;
+use App\Models\TypeStructure;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class TypeStructureController extends Controller
 {

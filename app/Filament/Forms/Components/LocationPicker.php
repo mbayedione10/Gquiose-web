@@ -16,12 +16,14 @@ class LocationPicker extends Field
     public function latitudeField(string $field): static
     {
         $this->latitudeField = $field;
+
         return $this;
     }
 
     public function longitudeField(string $field): static
     {
         $this->longitudeField = $field;
+
         return $this;
     }
 

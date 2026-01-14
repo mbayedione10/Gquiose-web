@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\View\View;
-use App\Models\TypeAlerte;
-use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\TypeAlerteStoreRequest;
 use App\Http\Requests\TypeAlerteUpdateRequest;
+use App\Models\TypeAlerte;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class TypeAlerteController extends Controller
 {

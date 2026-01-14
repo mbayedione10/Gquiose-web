@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Resources\StructureCollection;
+use App\Http\Resources\StructureResource;
 use App\Models\Ville;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\StructureResource;
-use App\Http\Resources\StructureCollection;
 
 class VilleStructuresController extends Controller
 {

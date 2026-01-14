@@ -3,10 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\CategorieConseil;
-use App\Models\SectionConseil;
 use App\Models\ItemConseil;
-use App\Models\TypeAlerte;
+use App\Models\SectionConseil;
 use App\Models\SousTypeViolenceNumerique;
+use App\Models\TypeAlerte;
 use Illuminate\Database\Seeder;
 
 class ConseilsMigrationSeeder extends Seeder

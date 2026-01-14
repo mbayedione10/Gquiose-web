@@ -29,6 +29,6 @@ class RubriqueSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ ' . count($rubriques) . ' rubriques pour jeunes créées');
+        $this->command->info('✅ '.count($rubriques).' rubriques pour jeunes créées');
     }
 }

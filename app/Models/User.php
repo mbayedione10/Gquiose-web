@@ -5,23 +5,21 @@ namespace App\Models;
 use App\Models\Scopes\Searchable;
 use App\Models\Traits\FilamentTrait;
 use App\Models\Traits\HasPermissions;
-use Illuminate\Notifications\Notifiable;
-use Filament\Panel;
 use Filament\Models\Contracts\FilamentUser;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable implements FilamentUser, CanResetPasswordContract
+class User extends Authenticatable implements CanResetPasswordContract, FilamentUser
 {
-    use Notifiable;
-    use HasFactory;
-    use Searchable;
-    use FilamentTrait;
-    use HasPermissions;
     use CanResetPassword;
+    use FilamentTrait;
+    use HasFactory;
+    use HasPermissions;
+    use Notifiable;
+    use Searchable;
 
     protected $fillable = ['name', 'phone', 'email', 'password', 'role_id'];
 

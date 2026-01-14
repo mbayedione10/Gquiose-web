@@ -3,15 +3,12 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\NotificationTemplateResource\Pages;
-use App\Filament\Resources\NotificationTemplateResource\RelationManagers;
 use App\Models\NotificationTemplate;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Table;
 
 class NotificationTemplateResource extends Resource
 {
@@ -22,7 +19,7 @@ class NotificationTemplateResource extends Resource
     protected static ?string $navigationLabel = 'Templates de Notifications';
 
     protected static ?string $pluralLabel = 'Templates de Notifications';
-    
+
     protected static ?string $navigationGroup = 'Notifications';
 
     protected static ?int $navigationSort = 9;
@@ -122,7 +119,7 @@ class NotificationTemplateResource extends Resource
                 Tables\Columns\TextColumn::make('category')
                     ->label('Catégorie')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => match($state) {
+                    ->formatStateUsing(fn ($state) => match ($state) {
                         'cycle' => 'Cycle menstruel',
                         'content' => 'Nouveaux contenus',
                         'forum' => 'Forum',
@@ -131,7 +128,7 @@ class NotificationTemplateResource extends Resource
                         'other' => 'Autre',
                         default => $state,
                     })
-                    ->color(fn ($state) => match($state) {
+                    ->color(fn ($state) => match ($state) {
                         'cycle' => 'danger',
                         'content' => 'success',
                         'forum' => 'primary',
@@ -173,14 +170,14 @@ class NotificationTemplateResource extends Resource
             ])
             ->defaultSort('created_at', 'desc');
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -188,5 +185,5 @@ class NotificationTemplateResource extends Resource
             'create' => Pages\CreateNotificationTemplate::route('/create'),
             'edit' => Pages\EditNotificationTemplate::route('/{record}/edit'),
         ];
-    }    
+    }
 }

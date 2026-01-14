@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\PermissionResource\Pages;
 
-use Filament\Resources\Pages\ListRecords;
-use App\Filament\Traits\HasDescendingOrder;
 use App\Filament\Resources\PermissionResource;
+use App\Filament\Traits\HasDescendingOrder;
+use Filament\Resources\Pages\ListRecords;
 
 class ListPermissions extends ListRecords
 {

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Question;
-use Illuminate\View\View;
-use App\Models\Thematique;
-use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\QuestionStoreRequest;
 use App\Http\Requests\QuestionUpdateRequest;
+use App\Models\Question;
+use App\Models\Thematique;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class QuestionController extends Controller
 {

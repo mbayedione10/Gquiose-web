@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\VilleStoreRequest;
+use App\Http\Requests\VilleUpdateRequest;
+use App\Http\Resources\VilleCollection;
+use App\Http\Resources\VilleResource;
 use App\Models\Ville;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\VilleResource;
-use App\Http\Resources\VilleCollection;
-use App\Http\Requests\VilleStoreRequest;
-use App\Http\Requests\VilleUpdateRequest;
 
 class VilleController extends Controller
 {

@@ -36,20 +36,20 @@ return new class extends Migration
             $table->foreignId('utilisateur_id')->constrained('utilisateurs')->onDelete('cascade');
             $table->foreignId('menstrual_cycle_id')->nullable()->constrained('menstrual_cycles')->onDelete('set null');
             $table->date('symptom_date');
-            
+
             // Symptômes physiques
             $table->json('physical_symptoms')->nullable(); // ['crampes', 'fatigue', 'maux_tete', 'nausee', 'sensibilite_seins', 'ballonnements', 'douleurs_dos']
             $table->integer('pain_level')->nullable(); // 0-10
-            
+
             // Symptômes émotionnels/humeur
             $table->json('mood')->nullable(); // ['joyeuse', 'triste', 'irritable', 'anxieuse', 'calme', 'energique']
-            
+
             // Autres observations
             $table->enum('discharge_type', ['aucune', 'creamy', 'sticky', 'watery', 'egg_white'])->nullable();
             $table->decimal('temperature', 4, 2)->nullable(); // Température basale
             $table->boolean('sexual_activity')->default(false);
             $table->boolean('contraception_used')->default(false);
-            
+
             $table->text('notes')->nullable();
             $table->timestamps();
 
@@ -67,7 +67,7 @@ return new class extends Migration
                 'ovulation_approaching', // Ovulation qui approche
                 'fertile_window', // Fenêtre de fertilité
                 'log_symptoms', // Rappel de noter symptômes
-                'pill_reminder' // Rappel pilule contraceptive
+                'pill_reminder', // Rappel pilule contraceptive
             ]);
             $table->time('reminder_time')->default('09:00:00'); // Heure du rappel
             $table->boolean('enabled')->default(true);

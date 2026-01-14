@@ -99,7 +99,7 @@ class Video extends Model
      */
     public function getFormattedFileSizeAttribute()
     {
-        if (!$this->file_size) {
+        if (! $this->file_size) {
             return null;
         }
 
@@ -112,7 +112,7 @@ class Video extends Model
             $i++;
         }
 
-        return round($bytes, 2) . ' ' . $units[$i];
+        return round($bytes, 2).' '.$units[$i];
     }
 
     /**

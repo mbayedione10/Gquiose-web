@@ -30,7 +30,7 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
-     // API SMS pour vérification
+    // API SMS pour vérification
     'sms' => [
         'provider' => env('SMS_PROVIDER', 'nimba'), // nimba, twilio, vonage
         'nimba' => [

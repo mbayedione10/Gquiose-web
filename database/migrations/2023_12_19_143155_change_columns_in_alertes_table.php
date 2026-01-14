@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('alertes', function (Blueprint $table) {
-            $table->string("description")->nullable()->change();
-            $table->unsignedBigInteger("ville_id")->nullable()->change();
-            $table->unsignedBigInteger("type_alerte_id")->nullable()->change();
+            $table->string('description')->nullable()->change();
+            $table->unsignedBigInteger('ville_id')->nullable()->change();
+            $table->unsignedBigInteger('type_alerte_id')->nullable()->change();
 
-            $table->unsignedBigInteger("utilisateur_id");
-            $table->foreign("utilisateur_id")
-                ->references("id")
-                ->on("utilisateurs")
+            $table->unsignedBigInteger('utilisateur_id');
+            $table->foreign('utilisateur_id')
+                ->references('id')
+                ->on('utilisateurs')
                 ->cascadeOnDelete()
                 ->cascadeOnUpdate();
         });

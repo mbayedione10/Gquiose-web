@@ -6,7 +6,6 @@ use App\Models\Evaluation;
 use App\Models\QuestionEvaluation;
 use App\Models\ReponseEvaluation;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class APIEvaluationStatsController extends Controller
 {
@@ -16,20 +15,20 @@ class APIEvaluationStatsController extends Controller
     public function globalStats(Request $request)
     {
         $formulaireType = $request->input('formulaire_type');
-        
+
         $stats = [
-            'total_evaluations' => Evaluation::when($formulaireType, function($q) use ($formulaireType) {
-                return $q->whereHas('reponsesDetails.questionEvaluation', function($sq) use ($formulaireType) {
+            'total_evaluations' => Evaluation::when($formulaireType, function ($q) use ($formulaireType) {
+                return $q->whereHas('reponsesDetails.questionEvaluation', function ($sq) use ($formulaireType) {
                     $sq->where('formulaire_type', $formulaireType);
                 });
             })->count(),
-            
-            'score_moyen_global' => Evaluation::when($formulaireType, function($q) use ($formulaireType) {
-                return $q->whereHas('reponsesDetails.questionEvaluation', function($sq) use ($formulaireType) {
+
+            'score_moyen_global' => Evaluation::when($formulaireType, function ($q) use ($formulaireType) {
+                return $q->whereHas('reponsesDetails.questionEvaluation', function ($sq) use ($formulaireType) {
                     $sq->where('formulaire_type', $formulaireType);
                 });
             })->avg('score_global'),
-            
+
             'evolution_mensuelle' => $this->getMonthlyEvolution($formulaireType),
             'repartition_par_contexte' => $this->getContextDistribution($formulaireType),
         ];
@@ -46,7 +45,7 @@ class APIEvaluationStatsController extends Controller
     public function questionStats($questionId)
     {
         $question = QuestionEvaluation::findOrFail($questionId);
-        
+
         $reponses = ReponseEvaluation::where('question_evaluation_id', $questionId)
             ->with('evaluation')
             ->get();
@@ -78,9 +77,9 @@ class APIEvaluationStatsController extends Controller
             ->orderBy('ordre')
             ->get();
 
-        $stats = $questions->map(function($question) {
+        $stats = $questions->map(function ($question) {
             $reponses = ReponseEvaluation::where('question_evaluation_id', $question->id)->get();
-            
+
             return [
                 'question_id' => $question->id,
                 'question' => $question->question,
@@ -129,14 +128,14 @@ class APIEvaluationStatsController extends Controller
         foreach ($evaluations as $evaluation) {
             foreach ($evaluation->reponsesDetails as $reponse) {
                 $questionId = $reponse->question_evaluation_id;
-                
-                if (!isset($questionsStats[$questionId])) {
+
+                if (! isset($questionsStats[$questionId])) {
                     $questionsStats[$questionId] = [
                         'question' => $reponse->questionEvaluation,
                         'reponses' => [],
                     ];
                 }
-                
+
                 $questionsStats[$questionId]['reponses'][] = $reponse;
             }
         }
@@ -148,7 +147,7 @@ class APIEvaluationStatsController extends Controller
             ],
             'total_evaluations' => $evaluations->count(),
             'score_moyen' => $evaluations->avg('score_global'),
-            'questions' => collect($questionsStats)->map(function($data, $questionId) {
+            'questions' => collect($questionsStats)->map(function ($data, $questionId) {
                 return [
                     'question_id' => $questionId,
                     'question' => $data['question']->question,
@@ -171,16 +170,16 @@ class APIEvaluationStatsController extends Controller
             case 'rating':
             case 'scale':
                 return $this->generateNumericChart($reponses);
-                
+
             case 'yesno':
                 return $this->generateBinaryChart($reponses);
-                
+
             case 'multiple_choice':
                 return $this->generateMultipleChoiceChart($reponses, $question->options);
-                
+
             case 'text':
                 return $this->generateTextAnalysis($reponses);
-                
+
             default:
                 return null;
         }
@@ -211,7 +210,7 @@ class APIEvaluationStatsController extends Controller
             'type' => 'pie',
             'labels' => $distribution->keys()->toArray(),
             'values' => $distribution->values()->toArray(),
-            'percentages' => $distribution->map(function($count) use ($reponses) {
+            'percentages' => $distribution->map(function ($count) use ($reponses) {
                 return round(($count / $reponses->count()) * 100, 1);
             })->toArray(),
         ];
@@ -232,7 +231,7 @@ class APIEvaluationStatsController extends Controller
     private function generateTextAnalysis($reponses)
     {
         $totalReponses = $reponses->count();
-        $moyenneLongueur = $reponses->avg(function($r) {
+        $moyenneLongueur = $reponses->avg(function ($r) {
             return strlen($r->reponse);
         });
 
@@ -247,8 +246,8 @@ class APIEvaluationStatsController extends Controller
     private function getMonthlyEvolution($formulaireType)
     {
         return Evaluation::selectRaw('DATE_FORMAT(created_at, "%Y-%m") as mois, COUNT(*) as total, AVG(score_global) as score_moyen')
-            ->when($formulaireType, function($q) use ($formulaireType) {
-                return $q->whereHas('reponsesDetails.questionEvaluation', function($sq) use ($formulaireType) {
+            ->when($formulaireType, function ($q) use ($formulaireType) {
+                return $q->whereHas('reponsesDetails.questionEvaluation', function ($sq) use ($formulaireType) {
                     $sq->where('formulaire_type', $formulaireType);
                 });
             })
@@ -260,8 +259,8 @@ class APIEvaluationStatsController extends Controller
     private function getContextDistribution($formulaireType)
     {
         return Evaluation::selectRaw('contexte, COUNT(*) as total')
-            ->when($formulaireType, function($q) use ($formulaireType) {
-                return $q->whereHas('reponsesDetails.questionEvaluation', function($sq) use ($formulaireType) {
+            ->when($formulaireType, function ($q) use ($formulaireType) {
+                return $q->whereHas('reponsesDetails.questionEvaluation', function ($sq) use ($formulaireType) {
                     $sq->where('formulaire_type', $formulaireType);
                 });
             })

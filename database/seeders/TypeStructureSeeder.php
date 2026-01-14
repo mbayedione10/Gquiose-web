@@ -30,6 +30,6 @@ class TypeStructureSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ ' . count($types) . ' types de structures créés');
+        $this->command->info('✅ '.count($types).' types de structures créés');
     }
 }

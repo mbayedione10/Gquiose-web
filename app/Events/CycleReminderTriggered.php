@@ -13,7 +13,9 @@ class CycleReminderTriggered
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $user;
+
     public $reminderType; // 'period_coming', 'ovulation', 'fertile_window'
+
     public $daysUntil;
 
     public function __construct(Utilisateur $user, string $reminderType, int $daysUntil)

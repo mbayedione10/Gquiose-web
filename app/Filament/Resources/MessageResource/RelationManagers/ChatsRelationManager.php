@@ -5,11 +5,9 @@ namespace App\Filament\Resources\MessageResource\RelationManagers;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ChatsRelationManager extends RelationManager
 {
@@ -52,17 +50,16 @@ class ChatsRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('utilisateur.name')
-                    ->label("Utilisateur")
+                    ->label('Utilisateur')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('message')
-                    ->label("Message")
+                    ->label('Message')
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label("Date de création")
-                    ->date('d F Y H:i')
-
+                    ->label('Date de création')
+                    ->date('d F Y H:i'),
 
             ])
             ->filters([

@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\PlateformeResource\Pages;
 
-use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\PlateformeResource;
 use Filament\Actions\DeleteAction;
+use Filament\Resources\Pages\EditRecord;
 
 class EditPlateforme extends EditRecord
 {

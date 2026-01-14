@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Resources\QuestionCollection;
+use App\Http\Resources\QuestionResource;
 use App\Models\Thematique;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\QuestionResource;
-use App\Http\Resources\QuestionCollection;
 
 class ThematiqueQuestionsController extends Controller
 {

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Resources\AlerteCollection;
+use App\Http\Resources\AlerteResource;
 use App\Models\TypeAlerte;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\AlerteResource;
-use App\Http\Resources\AlerteCollection;
 
 class TypeAlerteAlertesController extends Controller
 {

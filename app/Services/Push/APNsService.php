@@ -14,6 +14,7 @@ use Pushok\Payload\Alert;
 class APNsService
 {
     protected $client;
+
     protected $isConfigured = false;
 
     public function __construct()
@@ -25,13 +26,15 @@ class APNsService
             $keyPath = config('services.apns.key_path');
             $environment = config('services.apns.environment', 'production');
 
-            if (!$keyId || !$teamId || !$bundleId || !$keyPath) {
+            if (! $keyId || ! $teamId || ! $bundleId || ! $keyPath) {
                 Log::warning('APNs configuration incomplete');
+
                 return;
             }
 
-            if (!file_exists($keyPath)) {
-                Log::warning('APNs key file not found at: ' . $keyPath);
+            if (! file_exists($keyPath)) {
+                Log::warning('APNs key file not found at: '.$keyPath);
+
                 return;
             }
 
@@ -49,26 +52,24 @@ class APNsService
             $this->isConfigured = true;
 
         } catch (\Exception $e) {
-            Log::error('Failed to initialize APNs client: ' . $e->getMessage());
+            Log::error('Failed to initialize APNs client: '.$e->getMessage());
         }
     }
 
     /**
      * Envoie une notification push à un utilisateur via APNs.
-     *
-     * @param Utilisateur $user
-     * @param PushNotification $notification
-     * @return bool
      */
     public function sendToDevice(Utilisateur $user, PushNotification $notification): bool
     {
-        if (!$this->isConfigured) {
+        if (! $this->isConfigured) {
             Log::error('APNs client not configured');
+
             return false;
         }
 
         if (empty($user->apns_token)) {
             Log::warning("User {$user->id} has no APNs token");
+
             return false;
         }
 
@@ -123,6 +124,7 @@ class APNsService
             foreach ($responses as $response) {
                 if ($response->getStatusCode() === 200) {
                     Log::info("APNs notification sent successfully to user {$user->id}");
+
                     return true;
                 } else {
                     $errorReason = $response->getReasonPhrase();
@@ -141,7 +143,8 @@ class APNsService
             return false;
 
         } catch (\Exception $e) {
-            Log::error("APNs error for user {$user->id}: " . $e->getMessage());
+            Log::error("APNs error for user {$user->id}: ".$e->getMessage());
+
             return false;
         }
     }
@@ -150,14 +153,14 @@ class APNsService
      * Envoie une notification à plusieurs utilisateurs.
      * APNs supporte jusqu'à 5000 notifications concurrentes par connexion.
      *
-     * @param array $users Array of Utilisateur models
-     * @param PushNotification $notification
+     * @param  array  $users  Array of Utilisateur models
      * @return array ['success' => int, 'failed' => int, 'invalid_tokens' => array]
      */
     public function sendToMultipleDevices(array $users, PushNotification $notification): array
     {
-        if (!$this->isConfigured) {
+        if (! $this->isConfigured) {
             Log::error('APNs client not configured');
+
             return ['success' => 0, 'failed' => count($users), 'invalid_tokens' => []];
         }
 
@@ -165,7 +168,7 @@ class APNsService
         $userTokenMap = [];
 
         foreach ($users as $user) {
-            if (!empty($user->apns_token)) {
+            if (! empty($user->apns_token)) {
                 $tokens[] = $user->apns_token;
                 $userTokenMap[$user->apns_token] = $user->id;
             }
@@ -173,6 +176,7 @@ class APNsService
 
         if (empty($tokens)) {
             Log::warning('No valid APNs tokens found for batch send');
+
             return ['success' => 0, 'failed' => 0, 'invalid_tokens' => []];
         }
 
@@ -252,7 +256,7 @@ class APNsService
                 }
             }
 
-            Log::info("APNs batch send completed: {$totalSuccess} success, {$totalFailed} failed, " . count($invalidTokens) . " invalid tokens removed");
+            Log::info("APNs batch send completed: {$totalSuccess} success, {$totalFailed} failed, ".count($invalidTokens).' invalid tokens removed');
 
             return [
                 'success' => $totalSuccess,
@@ -261,21 +265,18 @@ class APNsService
             ];
 
         } catch (\Exception $e) {
-            Log::error("APNs batch send error: " . $e->getMessage());
+            Log::error('APNs batch send error: '.$e->getMessage());
+
             return ['success' => 0, 'failed' => count($tokens), 'invalid_tokens' => []];
         }
     }
 
     /**
      * Envoie une notification silencieuse (background notification).
-     *
-     * @param Utilisateur $user
-     * @param array $data
-     * @return bool
      */
     public function sendSilentNotification(Utilisateur $user, array $data): bool
     {
-        if (!$this->isConfigured || empty($user->apns_token)) {
+        if (! $this->isConfigured || empty($user->apns_token)) {
             return false;
         }
 
@@ -299,7 +300,8 @@ class APNsService
 
             return false;
         } catch (\Exception $e) {
-            Log::error("APNs silent notification error: " . $e->getMessage());
+            Log::error('APNs silent notification error: '.$e->getMessage());
+
             return false;
         }
     }

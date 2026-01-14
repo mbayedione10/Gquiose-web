@@ -3,7 +3,6 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Alerte;
-use Closure;
 use Filament\Tables;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,10 +11,10 @@ class LastAlert extends BaseWidget
 {
     protected static ?string $heading = 'Alertes VBG récentes';
 
-    protected int | string | array $columnSpan = "full";
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?int $sort = 6;
-    
+
     protected function getTableQuery(): Builder
     {
         return Alerte::query()

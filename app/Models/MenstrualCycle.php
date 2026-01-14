@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
 
 class MenstrualCycle extends Model
 {
@@ -50,20 +50,20 @@ class MenstrualCycle extends Model
      */
     public function calculatePredictions(int $avgCycleLength = 28, int $avgPeriodLength = 5)
     {
-        if (!$this->period_start_date) {
+        if (! $this->period_start_date) {
             return;
         }
 
         // Prochaines règles = début + durée cycle moyenne
         $this->next_period_prediction = Carbon::parse($this->period_start_date)->addDays($avgCycleLength);
-        
+
         // Ovulation = environ 14 jours avant les prochaines règles
         $this->ovulation_prediction = Carbon::parse($this->next_period_prediction)->subDays(14);
-        
+
         // Fenêtre fertile = 5 jours avant ovulation et jour de l'ovulation
         $this->fertile_window_start = Carbon::parse($this->ovulation_prediction)->subDays(5);
         $this->fertile_window_end = Carbon::parse($this->ovulation_prediction)->addDay();
-        
+
         // Durée du cycle si période terminée
         if ($this->period_end_date) {
             $this->period_length = Carbon::parse($this->period_start_date)
@@ -78,11 +78,12 @@ class MenstrualCycle extends Model
      */
     public function isInFertileWindow(): bool
     {
-        if (!$this->fertile_window_start || !$this->fertile_window_end) {
+        if (! $this->fertile_window_start || ! $this->fertile_window_end) {
             return false;
         }
 
         $today = Carbon::today();
+
         return $today->between($this->fertile_window_start, $this->fertile_window_end);
     }
 
@@ -91,7 +92,7 @@ class MenstrualCycle extends Model
      */
     public function daysUntilNextPeriod(): ?int
     {
-        if (!$this->next_period_prediction) {
+        if (! $this->next_period_prediction) {
             return null;
         }
 

@@ -10,7 +10,7 @@ class EditQuestionEvaluation extends EditRecord
 {
     protected static string $resource = QuestionEvaluationResource::class;
 
-    protected static ?string $title = "Modifier la question";
+    protected static ?string $title = 'Modifier la question';
 
     protected function getHeaderActions(): array
     {

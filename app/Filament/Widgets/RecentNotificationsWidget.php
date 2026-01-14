@@ -11,7 +11,7 @@ class RecentNotificationsWidget extends BaseWidget
 {
     protected static ?int $sort = 12;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected function getTableQuery(): Builder
     {
@@ -37,7 +37,7 @@ class RecentNotificationsWidget extends BaseWidget
             Tables\Columns\TextColumn::make('icon')
                 ->label('Type')
                 ->badge()
-                ->color(fn ($state) => match($state) {
+                ->color(fn ($state) => match ($state) {
                     'bell' => 'info',
                     'warning' => 'warning',
                     'success' => 'success',

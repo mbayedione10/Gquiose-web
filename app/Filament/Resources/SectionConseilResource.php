@@ -2,18 +2,18 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\SectionConseil;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use App\Filament\Resources\SectionConseilResource\Pages;
 use App\Filament\Resources\SectionConseilResource\RelationManagers;
+use App\Models\SectionConseil;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 class SectionConseilResource extends Resource
 {
@@ -23,6 +23,7 @@ class SectionConseilResource extends Resource
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $modelLabel = 'Section';
+
     protected static ?string $pluralModelLabel = 'Sections';
 
     public static function form(Form $form): Form

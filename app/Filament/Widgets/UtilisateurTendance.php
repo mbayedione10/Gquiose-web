@@ -10,7 +10,7 @@ class UtilisateurTendance extends LineChartWidget
 {
     protected static ?string $heading = 'Croissance des utilisateurs - Année en cours';
 
-    protected int | string | array $columnSpan = "full";
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?int $sort = 3;
 
@@ -21,7 +21,7 @@ class UtilisateurTendance extends LineChartWidget
         $months = [
             1 => 'Jan', 2 => 'Fév', 3 => 'Mar', 4 => 'Avr',
             5 => 'Mai', 6 => 'Juin', 7 => 'Juil', 8 => 'Août',
-            9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Déc'
+            9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Déc',
         ];
 
         $currentYear = Carbon::now()->year;
@@ -43,7 +43,7 @@ class UtilisateurTendance extends LineChartWidget
             if ($monthNum > $currentMonth) {
                 break;
             }
-            
+
             $labels[] = $months[$monthNum];
             $count = $dataByMonth->get($monthNum, 0);
             $nouveauxUtilisateurs[] = $count;

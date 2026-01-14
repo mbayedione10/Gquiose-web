@@ -10,8 +10,7 @@ class SafetyAdviceService
     /**
      * Génère des conseils de sécurité pour une alerte donnée
      *
-     * @param \App\Models\Alerte $alerte
-     * @return string
+     * @param  \App\Models\Alerte  $alerte
      */
     public function getAdviceForAlert($alerte): string
     {
@@ -23,16 +22,12 @@ class SafetyAdviceService
 
     /**
      * Génère des conseils de sécurité automatiques basés sur le type de violence
-     *
-     * @param int|null $typeAlerteId
-     * @param int|null $sousTypeId
-     * @return string
      */
     public function generateSafetyAdvice(?int $typeAlerteId, ?int $sousTypeId = null): string
     {
         $categorie = $this->findCategorie($typeAlerteId, $sousTypeId);
 
-        if (!$categorie) {
+        if (! $categorie) {
             return $this->getDefaultAdviceText();
         }
 
@@ -44,10 +39,6 @@ class SafetyAdviceService
      * 1. Sous-type de violence numérique
      * 2. Type d'alerte
      * 3. Catégorie par défaut
-     *
-     * @param int|null $typeAlerteId
-     * @param int|null $sousTypeId
-     * @return CategorieConseil|null
      */
     private function findCategorie(?int $typeAlerteId, ?int $sousTypeId): ?CategorieConseil
     {
@@ -81,9 +72,6 @@ class SafetyAdviceService
 
     /**
      * Formate une catégorie de conseils en texte lisible
-     *
-     * @param CategorieConseil $categorie
-     * @return string
      */
     private function formatCategorie(CategorieConseil $categorie): string
     {
@@ -96,7 +84,7 @@ class SafetyAdviceService
             ->with([
                 'items' => fn ($query) => $query
                     ->where('status', true)
-                    ->orderBy('ordre')
+                    ->orderBy('ordre'),
             ])
             ->get();
 
@@ -109,9 +97,6 @@ class SafetyAdviceService
 
     /**
      * Formate une section avec ses items
-     *
-     * @param SectionConseil $section
-     * @return string
      */
     private function formatSection(SectionConseil $section): string
     {
@@ -130,25 +115,23 @@ class SafetyAdviceService
     /**
      * Retourne un texte par défaut si aucune catégorie n'est trouvée
      * (fallback de sécurité)
-     *
-     * @return string
      */
     private function getDefaultAdviceText(): string
     {
-        return "⚠️ CONSEILS DE SÉCURITÉ GÉNÉRAUX :\n\n" .
-            "🔒 SÉCURITÉ IMMÉDIATE :\n" .
-            "• Si tu es en danger immédiat, appelle la police (117) ou OPROGEM (116)\n" .
-            "• Éloigne-toi de la situation dangereuse si possible\n" .
-            "• Parle à une personne de confiance\n\n" .
-            "📱 SÉCURITÉ NUMÉRIQUE :\n" .
-            "• Ne supprime pas les preuves (messages, photos, emails)\n" .
-            "• Fais des captures d'écran de tout\n" .
-            "• Sauvegarde les preuves dans un endroit sûr (cloud privé, clé USB cachée)\n\n" .
-            "🆘 OBTENIR DE L'AIDE :\n" .
-            "• Centre d'Écoute OPROGEM : 116 (gratuit, 24h/24)\n" .
-            "• Centre Sabou Guinée : +224 621 000 006\n" .
-            "• Guichet Unique VBG CHU Donka : +224 621 000 007\n" .
-            "• Utilise l'app GquiOse pour trouver un centre d'aide près de toi\n\n" .
+        return "⚠️ CONSEILS DE SÉCURITÉ GÉNÉRAUX :\n\n".
+            "🔒 SÉCURITÉ IMMÉDIATE :\n".
+            "• Si tu es en danger immédiat, appelle la police (117) ou OPROGEM (116)\n".
+            "• Éloigne-toi de la situation dangereuse si possible\n".
+            "• Parle à une personne de confiance\n\n".
+            "📱 SÉCURITÉ NUMÉRIQUE :\n".
+            "• Ne supprime pas les preuves (messages, photos, emails)\n".
+            "• Fais des captures d'écran de tout\n".
+            "• Sauvegarde les preuves dans un endroit sûr (cloud privé, clé USB cachée)\n\n".
+            "🆘 OBTENIR DE L'AIDE :\n".
+            "• Centre d'Écoute OPROGEM : 116 (gratuit, 24h/24)\n".
+            "• Centre Sabou Guinée : +224 621 000 006\n".
+            "• Guichet Unique VBG CHU Donka : +224 621 000 007\n".
+            "• Utilise l'app GquiOse pour trouver un centre d'aide près de toi\n\n".
             "⚠️ IMPORTANT : Tes informations sont confidentielles. Tu n'es pas seul.e.";
     }
 
@@ -167,16 +150,13 @@ class SafetyAdviceService
                 'sections' => fn ($query) => $query
                     ->where('status', true)
                     ->orderBy('ordre')
-                    ->withCount('items')
+                    ->withCount('items'),
             ])
             ->get();
     }
 
     /**
      * Récupère une catégorie par son ID avec toutes ses sections et items
-     *
-     * @param int $categorieId
-     * @return CategorieConseil|null
      */
     public function getCategorieWithDetails(int $categorieId): ?CategorieConseil
     {
@@ -191,24 +171,20 @@ class SafetyAdviceService
                     ->with([
                         'items' => fn ($q) => $q
                             ->where('status', true)
-                            ->orderBy('ordre')
-                    ])
+                            ->orderBy('ordre'),
+                    ]),
             ])
             ->first();
     }
 
     /**
      * Génère un aperçu des conseils (pour affichage rapide)
-     *
-     * @param int|null $typeAlerteId
-     * @param int|null $sousTypeId
-     * @return array
      */
     public function getAdvicePreview(?int $typeAlerteId, ?int $sousTypeId = null): array
     {
         $categorie = $this->findCategorie($typeAlerteId, $sousTypeId);
 
-        if (!$categorie) {
+        if (! $categorie) {
             return [
                 'titre' => 'Conseils de sécurité généraux',
                 'emoji' => '⚠️',

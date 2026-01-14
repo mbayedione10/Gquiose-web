@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\NatureContenuResource\Pages;
 
-use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\NatureContenuResource;
 use Filament\Actions\DeleteAction;
+use Filament\Resources\Pages\EditRecord;
 
 class EditNatureContenu extends EditRecord
 {

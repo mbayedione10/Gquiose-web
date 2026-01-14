@@ -5,11 +5,9 @@ namespace App\Filament\Resources\UtilisateurResource\RelationManagers;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class AlertesRelationManager extends RelationManager
 {
@@ -57,18 +55,17 @@ class AlertesRelationManager extends RelationManager
                     ->limit(50)
                     ->url(fn ($record) => \App\Filament\Resources\AlerteResource::getUrl('view', ['record' => $record])),
 
-
-                Tables\Columns\TextColumn::make("utilisateur.name")
-                    ->label("Signalée par")
+                Tables\Columns\TextColumn::make('utilisateur.name')
+                    ->label('Signalée par')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make("type")
-                    ->label("Type")
+                Tables\Columns\TextColumn::make('type')
+                    ->label('Type')
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('etat')
-                    ->label("État")
+                    ->label('État')
                     ->colors([
                         'warning' => static fn ($state): bool => $state === 'Non approuvée',
                         'success' => static fn ($state): bool => $state === 'Confirmée',
@@ -78,13 +75,13 @@ class AlertesRelationManager extends RelationManager
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('description')
-                    ->label("Information")
+                    ->label('Information')
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label("Signalée ")
+                    ->label('Signalée ')
                     ->searchable()
-                    ->date("d F Y H:i")
+                    ->date('d F Y H:i')
                     ->limit(50),
             ]);
     }

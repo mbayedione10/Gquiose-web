@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\EvaluationResource\Pages;
 
-use App\Filament\Resources\EvaluationResource;
 use App\Exports\EvaluationReponsesExport;
-use Filament\Resources\Pages\ListRecords;
+use App\Filament\Resources\EvaluationResource;
 use Filament\Actions;
+use Filament\Resources\Pages\ListRecords;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ListEvaluations extends ListRecords
@@ -33,7 +33,7 @@ class ListEvaluations extends ListRecords
 
         return Excel::download(
             new EvaluationReponsesExport($evaluations),
-            'evaluations-reponses-' . now()->format('Y-m-d') . '.xlsx'
+            'evaluations-reponses-'.now()->format('Y-m-d').'.xlsx'
         );
     }
 }

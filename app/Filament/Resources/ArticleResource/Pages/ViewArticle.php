@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\ArticleResource\Pages;
 
+use App\Filament\Resources\ArticleResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
-use App\Filament\Resources\ArticleResource;
 
 class ViewArticle extends ViewRecord
 {

@@ -3,16 +3,16 @@
 namespace App\Models;
 
 use App\Models\Scopes\Searchable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
 class Article extends Model
 {
     use HasFactory;
+    use HasSlug;
     use Searchable;
-    use  HasSlug;
 
     protected $fillable = [
         'title',
@@ -52,7 +52,7 @@ class Article extends Model
     /**
      * Get the options for generating the slug.
      */
-    public function getSlugOptions() : SlugOptions
+    public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
             ->generateSlugsFrom('title')

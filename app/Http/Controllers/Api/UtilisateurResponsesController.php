@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Resources\ResponseCollection;
+use App\Http\Resources\ResponseResource;
 use App\Models\Utilisateur;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\ResponseResource;
-use App\Http\Resources\ResponseCollection;
 
 class UtilisateurResponsesController extends Controller
 {

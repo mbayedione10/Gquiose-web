@@ -77,6 +77,6 @@ class SousTypeViolenceNumeriqueSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ ' . count($sousTypes) . ' sous-types de violence numérique créés');
+        $this->command->info('✅ '.count($sousTypes).' sous-types de violence numérique créés');
     }
 }

@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\StructureStoreRequest;
+use App\Http\Requests\StructureUpdateRequest;
+use App\Http\Resources\StructureCollection;
+use App\Http\Resources\StructureResource;
 use App\Models\Structure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\StructureResource;
-use App\Http\Resources\StructureCollection;
-use App\Http\Requests\StructureStoreRequest;
-use App\Http\Requests\StructureUpdateRequest;
 
 class StructureController extends Controller
 {

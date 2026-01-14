@@ -6,8 +6,8 @@ use App\Models\Evaluation;
 use App\Models\QuestionEvaluation;
 use App\Models\ReponseEvaluation;
 use App\Models\Utilisateur;
-use Illuminate\Database\Seeder;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 class ReponseEvaluationSeeder extends Seeder
 {
@@ -36,6 +36,7 @@ class ReponseEvaluationSeeder extends Seeder
 
             if ($questions->isEmpty()) {
                 $this->command->warn("Aucune question trouvée pour le formulaire de type: {$formulaireType}");
+
                 continue;
             }
 
@@ -43,6 +44,7 @@ class ReponseEvaluationSeeder extends Seeder
                 // Vérifier si des utilisateurs existent
                 if ($utilisateurs->isEmpty()) {
                     $this->command->warn('Aucun utilisateur trouvé. Impossible de créer des évaluations.');
+
                     return;
                 }
                 $utilisateur = $utilisateurs->random();
@@ -110,7 +112,7 @@ class ReponseEvaluationSeeder extends Seeder
         }
 
         $this->command->info("✅ {$evaluationsCreated} évaluation avec réponses créées");
-        $this->command->info('   - Total réponses: ' . ReponseEvaluation::count());
+        $this->command->info('   - Total réponses: '.ReponseEvaluation::count());
     }
 
     private function generateReponse(QuestionEvaluation $question): array
@@ -118,8 +120,9 @@ class ReponseEvaluationSeeder extends Seeder
         switch ($question->type) {
             case 'rating':
                 $valeur = rand(1, 5);
+
                 return [
-                    'reponse' => $valeur . '/5',
+                    'reponse' => $valeur.'/5',
                     'valeur_numerique' => $valeur,
                 ];
 
@@ -127,13 +130,15 @@ class ReponseEvaluationSeeder extends Seeder
                 $options = is_array($question->options) ? $question->options : json_decode($question->options, true);
                 $max = $options['max'] ?? 10;
                 $valeur = rand(1, $max);
+
                 return [
-                    'reponse' => $valeur . '/' . $max,
+                    'reponse' => $valeur.'/'.$max,
                     'valeur_numerique' => $valeur,
                 ];
 
             case 'yesno':
                 $reponse = rand(0, 1) === 1 ? 'oui' : 'non';
+
                 return [
                     'reponse' => $reponse,
                     'valeur_numerique' => $reponse === 'oui' ? 1 : 0,
@@ -141,11 +146,12 @@ class ReponseEvaluationSeeder extends Seeder
 
             case 'multiple_choice':
                 $options = is_array($question->options) ? $question->options : json_decode($question->options, true);
-                if (!empty($options)) {
+                if (! empty($options)) {
                     $reponse = $options[array_rand($options)];
                 } else {
-                    $reponse = 'Option ' . rand(1, 3);
+                    $reponse = 'Option '.rand(1, 3);
                 }
+
                 return [
                     'reponse' => $reponse,
                     'valeur_numerique' => null,
@@ -164,6 +170,7 @@ class ReponseEvaluationSeeder extends Seeder
                     'Très utile pour ma situation',
                     'Merci pour cette initiative',
                 ];
+
                 return [
                     'reponse' => $phrases[array_rand($phrases)],
                     'valeur_numerique' => null,
@@ -180,7 +187,7 @@ class ReponseEvaluationSeeder extends Seeder
     /**
      * Mappe le contexte au type de formulaire correspondant.
      *
-     * @param string $contexte Le contexte de l'évaluation (ex: 'quiz', 'article', 'alerte').
+     * @param  string  $contexte  Le contexte de l'évaluation (ex: 'quiz', 'article', 'alerte').
      * @return string Le type de formulaire associé (ex: 'satisfaction_quiz', 'generale').
      */
     private function mapContexteToFormulaireType(string $contexte): string
@@ -236,7 +243,7 @@ class ReponseEvaluationSeeder extends Seeder
             return null;
         }
 
-        $comments = match($formulaireType) {
+        $comments = match ($formulaireType) {
             'generale' => [
                 'Application très utile et facile à utiliser',
                 'Interface intuitive, je recommande',

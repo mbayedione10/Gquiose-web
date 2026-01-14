@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources\StructureResource\Pages;
 
-use App\Filament\Resources\StructureResource;
 use App\Events\NewHealthCenterAdded;
-use Filament\Actions;
+use App\Filament\Resources\StructureResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateStructure extends CreateRecord

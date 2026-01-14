@@ -3,26 +3,25 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PushNotificationResource\Pages;
-use App\Models\PushNotification;
 use App\Models\NotificationTemplate;
+use App\Models\PushNotification;
 use App\Models\Ville;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Table;
 
 class PushNotificationResource extends Resource
 {
     protected static ?string $model = PushNotification::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-bell';
-    
+
     protected static ?string $navigationLabel = 'Notifications Push';
-    
+
     protected static ?string $pluralLabel = 'Notifications Push';
-    
+
     protected static ?string $navigationGroup = 'Notifications';
 
     protected static ?int $navigationSort = 8;
@@ -92,18 +91,18 @@ class PushNotificationResource extends Resource
                             ])
                             ->searchable()
                             ->placeholder('Choisir un emoji'),
-                        
+
                         Forms\Components\FileUpload::make('image')
                             ->label('Image (optionnelle)')
                             ->image()
                             ->directory('notifications/images'),
-                        
+
                         Forms\Components\TextInput::make('action')
                             ->label('Action (route/URL)')
                             ->maxLength(255),
                     ])
                     ->columns(2),
-                
+
                 Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Select::make('type')
@@ -116,12 +115,12 @@ class PushNotificationResource extends Resource
                             ->default('manual')
                             ->required()
                             ->reactive(),
-                        
+
                         Forms\Components\DateTimePicker::make('scheduled_at')
                             ->label('Programmer pour')
                             ->visible(fn ($get) => $get('type') === 'scheduled')
                             ->required(fn ($get) => $get('type') === 'scheduled'),
-                        
+
                         Forms\Components\Select::make('target_audience')
                             ->label('Audience cible')
                             ->options([
@@ -133,7 +132,7 @@ class PushNotificationResource extends Resource
                             ->reactive(),
                     ])
                     ->columns(2),
-                
+
                 Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Section::make('Filtres démographiques')
@@ -146,14 +145,14 @@ class PushNotificationResource extends Resource
                                             ->minValue(10)
                                             ->maxValue(100)
                                             ->helperText('Âge minimum des utilisateurs ciblés'),
-                                        
+
                                         Forms\Components\TextInput::make('filters.age_max')
                                             ->label('Âge maximum')
                                             ->numeric()
                                             ->minValue(10)
                                             ->maxValue(100)
                                             ->helperText('Âge maximum des utilisateurs ciblés'),
-                                        
+
                                         Forms\Components\Select::make('filters.sexe')
                                             ->label('Sexe')
                                             ->options([
@@ -163,7 +162,7 @@ class PushNotificationResource extends Resource
                                             ->placeholder('Tous les sexes'),
                                     ]),
                             ]),
-                        
+
                         Forms\Components\Section::make('Filtres géographiques')
                             ->schema([
                                 Forms\Components\Select::make('filters.ville_id')
@@ -172,7 +171,7 @@ class PushNotificationResource extends Resource
                                     ->searchable()
                                     ->placeholder('Toutes les villes')
                                     ->helperText('Cibler les utilisateurs d\'une ville spécifique'),
-                                
+
                                 Forms\Components\Select::make('filters.villes')
                                     ->label('Villes multiples')
                                     ->options(Ville::pluck('name', 'id'))
@@ -181,7 +180,7 @@ class PushNotificationResource extends Resource
                                     ->placeholder('Sélectionner plusieurs villes')
                                     ->helperText('Cibler les utilisateurs de plusieurs villes'),
                             ]),
-                        
+
                         Forms\Components\Section::make('Filtres d\'activité')
                             ->schema([
                                 Forms\Components\Select::make('filters.active_users')
@@ -192,17 +191,17 @@ class PushNotificationResource extends Resource
                                         'last_90_days' => 'Actifs dans les 90 derniers jours',
                                     ])
                                     ->placeholder('Tous les utilisateurs'),
-                                
+
                                 Forms\Components\Toggle::make('filters.has_cycle_data')
                                     ->label('Utilisateurs avec données de cycle')
                                     ->helperText('Cibler uniquement les utilisateurs qui suivent leur cycle'),
-                                
+
                                 Forms\Components\Toggle::make('filters.has_alerts')
                                     ->label('Utilisateurs ayant créé des alertes')
                                     ->helperText('Cibler les utilisateurs ayant déjà signalé des alertes'),
                             ])
                             ->columns(2),
-                        
+
                         Forms\Components\Section::make('Aperçu du ciblage')
                             ->schema([
                                 Forms\Components\Placeholder::make('estimated_reach')
@@ -215,7 +214,7 @@ class PushNotificationResource extends Resource
                                             'ville_id' => $get('filters.ville_id'),
                                             'villes' => $get('filters.villes'),
                                         ];
-                                        
+
                                         $query = \App\Models\Utilisateur::query();
 
                                         if ($filters['age_min']) {
@@ -235,9 +234,9 @@ class PushNotificationResource extends Resource
                                         if ($filters['villes'] && is_array($filters['villes']) && count($filters['villes']) > 0) {
                                             $query->whereIn('ville_id', $filters['villes']);
                                         }
-                                        
+
                                         $count = $query->whereNotNull('fcm_token')->count();
-                                        
+
                                         return "{$count} utilisateurs seront ciblés";
                                     }),
                             ]),
@@ -255,22 +254,22 @@ class PushNotificationResource extends Resource
                     ->label('Titre')
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('message')
                     ->label('Message')
                     ->limit(50)
                     ->searchable(),
-                
+
                 Tables\Columns\TextColumn::make('type')
                     ->label('Type')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => match($state) {
+                    ->formatStateUsing(fn ($state) => match ($state) {
                         'manual' => 'Manuel',
                         'automatic' => 'Automatique',
                         'scheduled' => 'Programmé',
                         default => $state,
                     })
-                    ->color(fn ($state) => match($state) {
+                    ->color(fn ($state) => match ($state) {
                         'manual' => 'primary',
                         'automatic' => 'warning',
                         'scheduled' => 'success',
@@ -280,40 +279,40 @@ class PushNotificationResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => match($state) {
+                    ->formatStateUsing(fn ($state) => match ($state) {
                         'pending' => 'En attente',
                         'sent' => 'Envoyé',
                         'failed' => 'Échoué',
                         default => $state,
                     })
-                    ->color(fn ($state) => match($state) {
+                    ->color(fn ($state) => match ($state) {
                         'pending' => 'warning',
                         'sent' => 'success',
                         'failed' => 'danger',
                         default => 'gray',
                     }),
-                
+
                 Tables\Columns\TextColumn::make('sent_count')
                     ->label('Envoyés')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('delivered_count')
                     ->label('Livrés')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('opened_count')
                     ->label('Ouverts')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('clicked_count')
                     ->label('Cliqués')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('scheduled_at')
                     ->label('Programmé pour')
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('sent_at')
                     ->label('Envoyé le')
                     ->dateTime('d/m/Y H:i')
@@ -326,7 +325,7 @@ class PushNotificationResource extends Resource
                         'automatic' => 'Automatique',
                         'scheduled' => 'Programmé',
                     ]),
-                
+
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
                         'pending' => 'En attente',

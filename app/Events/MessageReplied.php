@@ -13,6 +13,7 @@ class MessageReplied
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public Chat $chat;
+
     public Message $message;
 
     /**

@@ -28,7 +28,7 @@ class APIVideoController extends Controller
     {
         $video = Video::find($id);
 
-        if (!$video) {
+        if (! $video) {
             return ApiResponse::error('Vidéo non trouvée', 404);
         }
 
@@ -53,8 +53,8 @@ class APIVideoController extends Controller
             'file_size_formatted' => $video->formatted_file_size,
             'subtitle_url' => $video->subtitle_url,
             'audiodescription_url' => $video->audiodescription_url,
-            'has_subtitles' => !empty($video->subtitle_file),
-            'has_audiodescription' => !empty($video->audiodescription_file),
+            'has_subtitles' => ! empty($video->subtitle_file),
+            'has_audiodescription' => ! empty($video->audiodescription_file),
             'created_at' => $video->created_at?->toIso8601String(),
         ];
     }

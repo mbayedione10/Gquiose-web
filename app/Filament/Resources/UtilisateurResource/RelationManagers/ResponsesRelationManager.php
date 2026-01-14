@@ -2,18 +2,14 @@
 
 namespace App\Filament\Resources\UtilisateurResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\BelongsToSelect;
-use Filament\Tables\Filters\MultiSelectFilter;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 class ResponsesRelationManager extends RelationManager
 {
@@ -61,22 +57,21 @@ class ResponsesRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('question.name')
-                    ->label("Question ")
+                    ->label('Question ')
                     ->limit(50)
                     ->url(fn ($record) => \App\Filament\Resources\ResponseResource::getUrl('view', ['record' => $record])),
 
                 Tables\Columns\TextColumn::make('question.thematique.name')
-                    ->label("Thématique")
+                    ->label('Thématique')
                     ->limit(50),
 
-
                 Tables\Columns\TextColumn::make('reponse')
-                    ->label("Réponse")
+                    ->label('Réponse')
                     ->searchable()
                     ->limit(50),
 
                 Tables\Columns\IconColumn::make('isValid')
-                    ->label("Trouvée")
+                    ->label('Trouvée')
                     ->sortable()
                     ->boolean(),
             ]);

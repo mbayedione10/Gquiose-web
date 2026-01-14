@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\PermissionStoreRequest;
+use App\Http\Requests\PermissionUpdateRequest;
+use App\Http\Resources\PermissionCollection;
+use App\Http\Resources\PermissionResource;
 use App\Models\Permission;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\PermissionResource;
-use App\Http\Resources\PermissionCollection;
-use App\Http\Requests\PermissionStoreRequest;
-use App\Http\Requests\PermissionUpdateRequest;
 
 class PermissionController extends Controller
 {

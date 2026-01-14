@@ -4,8 +4,8 @@
  * Exécutez ce script sur le serveur AVANT de lancer les migrations
  */
 
-require __DIR__ . '/vendor/autoload.php';
-$app = require_once __DIR__ . '/bootstrap/app.php';
+require __DIR__.'/vendor/autoload.php';
+$app = require_once __DIR__.'/bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use Illuminate\Support\Facades\DB;
@@ -18,8 +18,8 @@ echo "1. Vérification de la structure de la table utilisateurs...\n";
 $hasAnnee = Schema::hasColumn('utilisateurs', 'anneedenaissance');
 $hasDob = Schema::hasColumn('utilisateurs', 'dob');
 
-echo "   - Champ 'anneedenaissance': " . ($hasAnnee ? "✅ Présent" : "❌ MANQUANT") . "\n";
-echo "   - Champ 'dob': " . ($hasDob ? "✅ Présent" : "❌ MANQUANT") . "\n\n";
+echo "   - Champ 'anneedenaissance': ".($hasAnnee ? '✅ Présent' : '❌ MANQUANT')."\n";
+echo "   - Champ 'dob': ".($hasDob ? '✅ Présent' : '❌ MANQUANT')."\n\n";
 
 // 2. Compter les utilisateurs
 $totalUsers = DB::table('utilisateurs')->count();
@@ -28,20 +28,20 @@ echo "2. Total utilisateurs: {$totalUsers}\n\n";
 // 3. Analyser les données dob actuelles
 if ($hasDob && $totalUsers > 0) {
     echo "3. Analyse des données 'dob' actuelles:\n";
-    
+
     $dobStats = DB::table('utilisateurs')
         ->select('dob', DB::raw('COUNT(*) as count'))
         ->groupBy('dob')
         ->orderByDesc('count')
         ->limit(20)
         ->get();
-    
+
     $needsNormalization = 0;
     $alreadyNormalized = 0;
     $nullValues = 0;
-    
+
     $validRanges = ['-15 ans', '15-17 ans', '18-24 ans', '25-29 ans', '30-35 ans', '+35 ans'];
-    
+
     foreach ($dobStats as $stat) {
         if ($stat->dob === null) {
             $nullValues = $stat->count;
@@ -54,7 +54,7 @@ if ($hasDob && $totalUsers > 0) {
             echo "   ⚠️  '{$stat->dob}': {$stat->count} utilisateurs (NÉCESSITE normalisation)\n";
         }
     }
-    
+
     echo "\n   Résumé:\n";
     echo "   - Déjà normalisés: {$alreadyNormalized}\n";
     echo "   - À normaliser: {$needsNormalization}\n";
@@ -64,19 +64,19 @@ if ($hasDob && $totalUsers > 0) {
 // 4. Analyser les années de naissance
 if ($hasAnnee && $totalUsers > 0) {
     echo "4. Analyse des années de naissance:\n";
-    
+
     $withYear = DB::table('utilisateurs')->whereNotNull('anneedenaissance')->count();
     $withoutYear = $totalUsers - $withYear;
-    
+
     echo "   - Avec année: {$withYear}\n";
     echo "   - Sans année: {$withoutYear}\n";
-    
+
     if ($withYear > 0) {
         $yearRange = DB::table('utilisateurs')
             ->whereNotNull('anneedenaissance')
             ->selectRaw('MIN(anneedenaissance) as min_year, MAX(anneedenaissance) as max_year')
             ->first();
-        
+
         echo "   - Plage: {$yearRange->min_year} - {$yearRange->max_year}\n";
     }
     echo "\n";
@@ -85,7 +85,7 @@ if ($hasAnnee && $totalUsers > 0) {
 // 5. Recommandations
 echo "=== RECOMMANDATIONS ===\n\n";
 
-if (!$hasAnnee && !$hasDob) {
+if (! $hasAnnee && ! $hasDob) {
     echo "⚠️  ATTENTION: Les champs n'existent pas encore.\n";
     echo "   Action: Les migrations vont les créer.\n\n";
 } elseif ($needsNormalization > 0) {

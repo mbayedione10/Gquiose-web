@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\StructureResource\Pages;
 
-use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\StructureResource;
+use Filament\Resources\Pages\EditRecord;
 
 class EditStructure extends EditRecord
 {

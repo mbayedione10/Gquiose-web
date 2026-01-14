@@ -1,9 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -16,7 +13,7 @@ return new class extends Migration
     {
         // Migration désactivée - le nettoyage est géré par la migration
         // 2026_01_07_150000_update_dob_to_standard_age_ranges_in_utilisateurs_table.php
-        
+
         // Ne rien faire pour préserver les données existantes
     }
 

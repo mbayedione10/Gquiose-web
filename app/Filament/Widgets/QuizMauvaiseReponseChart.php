@@ -11,10 +11,8 @@ class QuizMauvaiseReponseChart extends DoughnutChartWidget
     protected static ?string $heading = 'Mauvaises réponses au Quiz - Par thématique';
 
     protected static ?int $sort = 9;
-    
-    protected int | string | array $columnSpan = 'full';
 
-
+    protected int|string|array $columnSpan = 'full';
 
     protected function getData(): array
     {
@@ -28,13 +26,12 @@ class QuizMauvaiseReponseChart extends DoughnutChartWidget
         $labels = $query->pluck('name')->toArray();
         $data = $query->pluck('data')->toArray();
 
-
         return [
             'datasets' => [
                 [
                     'label' => 'Thématique',
                     'data' => $data,
-                    'backgroundColor' => chartColors()
+                    'backgroundColor' => chartColors(),
                 ],
             ],
             'labels' => $labels,

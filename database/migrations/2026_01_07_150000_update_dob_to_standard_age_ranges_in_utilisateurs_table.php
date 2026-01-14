@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 return new class extends Migration
 {
@@ -65,7 +64,7 @@ return new class extends Migration
      */
     private function getAgeRange(int $age): string
     {
-        return match(true) {
+        return match (true) {
             $age < 15 => '-15 ans',
             $age >= 15 && $age <= 17 => '15-17 ans',
             $age >= 18 && $age <= 24 => '18-24 ans',
@@ -81,19 +80,21 @@ return new class extends Migration
      */
     private function extractYearFromDate(?string $date): ?int
     {
-        if (!$date) {
+        if (! $date) {
             return null;
         }
 
         // Format dd/mm/yyyy
         if (preg_match('#^(\d{1,2})/(\d{1,2})/(\d{4})$#', $date, $matches)) {
             $year = (int) $matches[3];
+
             return ($year > 1900 && $year <= now()->year) ? $year : null;
         }
 
         // Format yyyy-mm-dd
         if (preg_match('#^(\d{4})-(\d{1,2})-(\d{1,2})$#', $date, $matches)) {
             $year = (int) $matches[1];
+
             return ($year > 1900 && $year <= now()->year) ? $year : null;
         }
 

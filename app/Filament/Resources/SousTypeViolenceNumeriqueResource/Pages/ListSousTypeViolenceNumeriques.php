@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\SousTypeViolenceNumeriqueResource\Pages;
 
-use Filament\Resources\Pages\ListRecords;
 use App\Filament\Resources\SousTypeViolenceNumeriqueResource;
+use Filament\Resources\Pages\ListRecords;
 
 class ListSousTypeViolenceNumeriques extends ListRecords
 {

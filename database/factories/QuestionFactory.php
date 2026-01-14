@@ -16,7 +16,7 @@ class QuestionFactory extends Factory
         $thematique = Thematique::inRandomOrder()->first();
 
         return [
-            'name' => $this->faker->unique()->sentence(6) . ' ?',
+            'name' => $this->faker->unique()->sentence(6).' ?',
             'reponse' => $this->faker->sentence(4),
             'option1' => $this->faker->sentence(4),
             'option2' => $this->faker->sentence(4),

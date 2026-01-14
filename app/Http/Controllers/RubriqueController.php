@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Rubrique;
-use Illuminate\View\View;
-use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\RubriqueStoreRequest;
 use App\Http\Requests\RubriqueUpdateRequest;
+use App\Models\Rubrique;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class RubriqueController extends Controller
 {

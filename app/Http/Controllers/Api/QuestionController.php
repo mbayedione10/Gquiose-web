@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\QuestionStoreRequest;
+use App\Http\Requests\QuestionUpdateRequest;
+use App\Http\Resources\QuestionCollection;
+use App\Http\Resources\QuestionResource;
 use App\Models\Question;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\QuestionResource;
-use App\Http\Resources\QuestionCollection;
-use App\Http\Requests\QuestionStoreRequest;
-use App\Http\Requests\QuestionUpdateRequest;
 
 class QuestionController extends Controller
 {

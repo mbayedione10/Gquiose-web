@@ -2,25 +2,28 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\PlateformeResource\Pages;
 use App\Models\Plateforme;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
-use App\Filament\Resources\PlateformeResource\Pages;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 class PlateformeResource extends Resource
 {
     protected static ?string $model = Plateforme::class;
 
-    protected static ?string $navigationLabel = "Plateformes";
-    protected static ?string $navigationGroup = "VBG";
+    protected static ?string $navigationLabel = 'Plateformes';
+
+    protected static ?string $navigationGroup = 'VBG';
+
     protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
+
     protected static ?int $navigationSort = 13;
 
     public static function form(Form $form): Form

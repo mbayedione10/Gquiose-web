@@ -6,18 +6,23 @@ namespace App\Exports;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class EvaluationStatsExport implements WithMultipleSheets
 {
     protected $evaluations;
+
     protected $stats;
+
     protected $dateDebut;
+
     protected $dateFin;
+
     protected $contexte;
+
     protected $ageRangeStats;
 
     public function __construct($evaluations, $stats, $dateDebut, $dateFin, $contexte, $ageRangeStats = null)
@@ -48,9 +53,13 @@ class EvaluationStatsExport implements WithMultipleSheets
 class EvaluationStatsSheet implements FromCollection, WithHeadings, WithStyles, WithTitle
 {
     protected $evaluations;
+
     protected $stats;
+
     protected $dateDebut;
+
     protected $dateFin;
+
     protected $contexte;
 
     public function __construct($evaluations, $stats, $dateDebut, $dateFin, $contexte)
@@ -67,14 +76,14 @@ class EvaluationStatsSheet implements FromCollection, WithHeadings, WithStyles, 
         $data = new Collection();
 
         $data->push(['RAPPORT STATISTIQUES DES ÉVALUATIONS', '', '', '']);
-        $data->push(['Période', \Carbon\Carbon::parse($this->dateDebut)->format('d/m/Y') . ' - ' . \Carbon\Carbon::parse($this->dateFin)->format('d/m/Y'), '', '']);
+        $data->push(['Période', \Carbon\Carbon::parse($this->dateDebut)->format('d/m/Y').' - '.\Carbon\Carbon::parse($this->dateFin)->format('d/m/Y'), '', '']);
         $data->push(['Filtre Contexte', $this->contexte !== 'all' ? ucfirst($this->contexte) : 'Tous', '', '']);
         $data->push(['Généré le', now()->format('d/m/Y à H:i'), '', '']);
         $data->push(['', '', '', '']);
 
         $data->push(['STATISTIQUES GLOBALES', '', '', '']);
         $data->push(['Total Évaluations', $this->stats['total'], '', '']);
-        $data->push(['Score Moyen Global', $this->stats['score_moyen'] . '/5', '', '']);
+        $data->push(['Score Moyen Global', $this->stats['score_moyen'].'/5', '', '']);
         $data->push(['Types de Formulaires', count($this->stats['par_contexte']), '', '']);
         $data->push(['', '', '', '']);
 
@@ -86,8 +95,8 @@ class EvaluationStatsSheet implements FromCollection, WithHeadings, WithStyles, 
             $data->push([
                 ucfirst($contexte),
                 $count,
-                $percentage . '%',
-                $scoreMoyen ? number_format($scoreMoyen, 2) : 'N/A'
+                $percentage.'%',
+                $scoreMoyen ? number_format($scoreMoyen, 2) : 'N/A',
             ]);
         }
 
@@ -133,7 +142,7 @@ class EvaluationDetailsSheet implements FromCollection, WithHeadings, WithStyles
                 $evaluation->id,
                 $evaluation->utilisateur ? $evaluation->utilisateur->name : 'N/A',
                 ucfirst($evaluation->contexte),
-                $evaluation->score_global ? $evaluation->score_global . '/5' : 'N/A',
+                $evaluation->score_global ? $evaluation->score_global.'/5' : 'N/A',
                 $evaluation->commentaire ?? '',
                 $evaluation->created_at->format('d/m/Y H:i'),
             ]);
@@ -193,7 +202,7 @@ class AgeRangeStatsSheet implements FromCollection, WithHeadings, WithStyles, Wi
             $data->push([
                 $tranche['label'],
                 $tranche['count'],
-                $percentage . '%',
+                $percentage.'%',
             ]);
         }
 

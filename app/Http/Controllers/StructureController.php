@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ville;
-use App\Models\Structure;
-use Illuminate\View\View;
-use Illuminate\Http\Request;
-use App\Models\TypeStructure;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\StructureStoreRequest;
 use App\Http\Requests\StructureUpdateRequest;
+use App\Models\Structure;
+use App\Models\TypeStructure;
+use App\Models\Ville;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class StructureController extends Controller
 {

@@ -11,8 +11,8 @@ class AlerteTypeChart extends BarChartWidget
     protected static ?string $heading = 'Alertes par type de violence';
 
     protected static ?int $sort = 10;
-    
-    protected int | string | array $columnSpan = 'full';
+
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?string $maxHeight = '300px';
 

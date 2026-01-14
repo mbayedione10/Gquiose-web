@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\SuiviResource\Pages;
 
-use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\SuiviResource;
+use Filament\Resources\Pages\EditRecord;
 
 class EditSuivi extends EditRecord
 {

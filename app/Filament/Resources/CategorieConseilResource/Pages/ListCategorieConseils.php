@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\CategorieConseilResource\Pages;
 
-use Filament\Resources\Pages\ListRecords;
 use App\Filament\Resources\CategorieConseilResource;
+use Filament\Resources\Pages\ListRecords;
 
 class ListCategorieConseils extends ListRecords
 {

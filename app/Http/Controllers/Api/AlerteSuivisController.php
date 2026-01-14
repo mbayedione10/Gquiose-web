@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Resources\SuiviCollection;
+use App\Http\Resources\SuiviResource;
 use App\Models\Alerte;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\SuiviResource;
-use App\Http\Resources\SuiviCollection;
 
 class AlerteSuivisController extends Controller
 {

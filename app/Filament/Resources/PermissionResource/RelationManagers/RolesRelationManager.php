@@ -3,15 +3,15 @@
 namespace App\Filament\Resources\PermissionResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Toggle;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class RolesRelationManager extends RelationManager
 {
@@ -25,7 +25,7 @@ class RolesRelationManager extends RelationManager
             Grid::make(['default' => 0])->schema([
                 TextInput::make('name')
                     ->rules(['max:255', 'string'])
-                    ->unique('roles', 'name', fn(?Model $record) => $record)
+                    ->unique('roles', 'name', fn (?Model $record) => $record)
                     ->placeholder('Name')
                     ->columnSpan([
                         'default' => 12,
@@ -61,7 +61,7 @@ class RolesRelationManager extends RelationManager
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(
+                                fn (
                                     Builder $query,
                                     $date
                                 ): Builder => $query->whereDate(
@@ -72,7 +72,7 @@ class RolesRelationManager extends RelationManager
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(
+                                fn (
                                     Builder $query,
                                     $date
                                 ): Builder => $query->whereDate(

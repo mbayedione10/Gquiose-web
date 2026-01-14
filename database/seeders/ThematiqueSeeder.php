@@ -18,14 +18,14 @@ class ThematiqueSeeder extends Seeder
             ['name' => 'Cycle Menstruel et Hygiène Menstruelle', 'status' => true],
             ['name' => 'Santé Reproductive des Jeunes', 'status' => true],
             ['name' => 'Éducation Sexuelle Complète', 'status' => true],
-            
+
             // VBG - Violences Basées sur le Genre
             ['name' => 'Violences Conjugales et Domestiques', 'status' => true],
             ['name' => 'Harcèlement et Abus Sexuels', 'status' => true],
             ['name' => 'Mariages Précoces et Forcés', 'status' => true],
             ['name' => 'Mutilations Génitales Féminines (MGF)', 'status' => true],
             ['name' => 'Cyberharcèlement et Violences en Ligne', 'status' => true],
-            
+
             // Droits et Autonomisation
             ['name' => 'Droits Sexuels et Reproductifs', 'status' => true],
             ['name' => 'Égalité des Genres', 'status' => true],
@@ -39,6 +39,6 @@ class ThematiqueSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ ' . count($thematiques) . ' thématiques SSR/VBG créées');
+        $this->command->info('✅ '.count($thematiques).' thématiques SSR/VBG créées');
     }
 }

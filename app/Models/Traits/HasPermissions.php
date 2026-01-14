@@ -15,7 +15,7 @@ trait HasPermissions
         }
 
         // Vérifier si l'utilisateur a un rôle
-        if (!$this->role) {
+        if (! $this->role) {
             return false;
         }
 
@@ -34,7 +34,7 @@ trait HasPermissions
             return true;
         }
 
-        if (!$this->role) {
+        if (! $this->role) {
             return false;
         }
 
@@ -52,7 +52,7 @@ trait HasPermissions
             return true;
         }
 
-        if (!$this->role) {
+        if (! $this->role) {
             return false;
         }
 
@@ -72,7 +72,7 @@ trait HasPermissions
             return \App\Models\Permission::all();
         }
 
-        if (!$this->role) {
+        if (! $this->role) {
             return collect([]);
         }
 

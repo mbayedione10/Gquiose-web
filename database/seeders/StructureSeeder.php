@@ -258,6 +258,6 @@ class StructureSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ ' . count($structures) . ' structures SSR/VBG pour jeunes créées');
+        $this->command->info('✅ '.count($structures).' structures SSR/VBG pour jeunes créées');
     }
 }

@@ -6,13 +6,14 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-
 class SendCodeEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $title;
+
     public $content;
+
     public $code;
 
     /**
@@ -39,5 +40,4 @@ class SendCodeEmail extends Mailable
             ->subject($this->title)
             ->markdown('email.send-code-email');
     }
-
 }

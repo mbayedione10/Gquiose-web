@@ -15,7 +15,6 @@ return new class extends Migration
 
             $table->text('offre');
 
-
             $table->unsignedBigInteger('type_structure_id')->nullable()->change();
         });
     }

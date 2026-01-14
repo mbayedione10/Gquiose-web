@@ -1,11 +1,12 @@
 
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         // Table des questions d'évaluation
@@ -18,15 +19,15 @@ return new class extends Migration {
             $table->integer('ordre')->default(0);
             $table->boolean('obligatoire')->default(false);
             $table->boolean('status')->default(true);
-            
+
             // Logique conditionnelle
             $table->unsignedBigInteger('condition_question_id')->nullable();
             $table->string('condition_operator')->nullable(); // equals, not_equals, greater_than, etc.
             $table->text('condition_value')->nullable();
             $table->boolean('show_if_condition_met')->default(true);
-            
+
             $table->timestamps();
-            
+
             $table->foreign('condition_question_id')
                 ->references('id')
                 ->on('question_evaluations')
@@ -63,7 +64,7 @@ return new class extends Migration {
                 ->references('id')
                 ->on('evaluations')
                 ->onDelete('cascade');
-            
+
             $table->foreign('question_evaluation_id')
                 ->references('id')
                 ->on('question_evaluations')

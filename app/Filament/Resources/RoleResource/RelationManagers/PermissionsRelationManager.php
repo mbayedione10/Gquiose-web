@@ -3,14 +3,14 @@
 namespace App\Filament\Resources\RoleResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Forms\Components\Grid;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
-use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class PermissionsRelationManager extends RelationManager
 {
@@ -27,7 +27,7 @@ class PermissionsRelationManager extends RelationManager
                     ->unique(
                         'permissions',
                         'name',
-                        fn(?Model $record) => $record
+                        fn (?Model $record) => $record
                     )
                     ->placeholder('Name')
                     ->columnSpan([
@@ -41,7 +41,7 @@ class PermissionsRelationManager extends RelationManager
                     ->unique(
                         'permissions',
                         'label',
-                        fn(?Model $record) => $record
+                        fn (?Model $record) => $record
                     )
                     ->placeholder('Label')
                     ->columnSpan([
@@ -80,7 +80,7 @@ class PermissionsRelationManager extends RelationManager
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(
+                                fn (
                                     Builder $query,
                                     $date
                                 ): Builder => $query->whereDate(
@@ -91,7 +91,7 @@ class PermissionsRelationManager extends RelationManager
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(
+                                fn (
                                     Builder $query,
                                     $date
                                 ): Builder => $query->whereDate(

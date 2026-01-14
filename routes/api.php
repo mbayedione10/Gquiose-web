@@ -3,17 +3,15 @@
 use App\Http\Controllers\APIAlertController;
 use App\Http\Controllers\APIArticleController;
 use App\Http\Controllers\APIAuthController;
+use App\Http\Controllers\APICycleController;
+use App\Http\Controllers\APIEvaluationController;
+use App\Http\Controllers\APIEvaluationStatsController;
 use App\Http\Controllers\APIForumController;
 use App\Http\Controllers\APIQuizController;
-use App\Http\Controllers\APIStructureController;
 use App\Http\Controllers\APIVideoController;
-use App\Http\Controllers\NotificationTrackingController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\APIEvaluationController; // Added for evaluation routes
-use App\Http\Controllers\APICycleController; // Added for cycle routes
-use App\Http\Controllers\APIEvaluationStatsController; // Added for evaluation stats routes
-
+use App\Http\Controllers\NotificationTrackingController; // Added for evaluation routes
+use Illuminate\Http\Request; // Added for cycle routes
+use Illuminate\Support\Facades\Route; // Added for evaluation stats routes
 
 /*
 |--------------------------------------------------------------------------
@@ -27,7 +25,7 @@ use App\Http\Controllers\APIEvaluationStatsController; // Added for evaluation s
 */
 
 Route::prefix('v1')
-    ->group(function(){
+    ->group(function () {
 
         /*************************  AUTH    ***************************/
 
@@ -175,7 +173,7 @@ Route::prefix('v1')
             Route::post('/reminders', [APICycleController::class, 'configureReminders']);
         });
 
-});
+    });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

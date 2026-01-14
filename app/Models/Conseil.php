@@ -9,5 +9,5 @@ class Conseil extends Model
 {
     use HasFactory;
 
-    protected $fillable = ["message", "categorie"];
+    protected $fillable = ['message', 'categorie'];
 }

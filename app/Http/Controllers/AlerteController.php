@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ville;
-use App\Models\Alerte;
-use Illuminate\View\View;
-use App\Models\TypeAlerte;
-use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\AlerteStoreRequest;
 use App\Http\Requests\AlerteUpdateRequest;
+use App\Models\Alerte;
+use App\Models\TypeAlerte;
+use App\Models\Ville;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class AlerteController extends Controller
 {

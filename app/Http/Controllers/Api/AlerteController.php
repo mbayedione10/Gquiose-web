@@ -26,37 +26,37 @@ class AlerteController extends Controller
     {
         // Vérifier que l'utilisateur a le droit d'accéder à cette preuve
         $user = $request->user();
-        
-        if (!$user) {
+
+        if (! $user) {
             return response()->json(['error' => 'Non autorisé'], 401);
         }
 
         // Autoriser uniquement : propriétaire de l'alerte ou admin
-        if ($alerte->utilisateur_id !== $user->id && !$user->hasRole('super-admin')) {
+        if ($alerte->utilisateur_id !== $user->id && ! $user->hasRole('super-admin')) {
             return response()->json(['error' => 'Accès refusé'], 403);
         }
 
         // Vérifier que l'index existe
         $preuves = $alerte->preuves ?? [];
-        
-        if (!isset($preuves[$index])) {
+
+        if (! isset($preuves[$index])) {
             return response()->json(['error' => 'Preuve introuvable'], 404);
         }
 
         $preuve = $preuves[$index];
-        
+
         // Enregistrer l'accès dans les logs (audit trail)
         \Log::info('Accès preuve', [
             'alerte_id' => $alerte->id,
             'user_id' => $user->id,
             'evidence_index' => $index,
-            'timestamp' => now()->toDateTimeString()
+            'timestamp' => now()->toDateTimeString(),
         ]);
 
         // Déchiffrer et retourner le fichier
         $decryptedContent = $this->evidenceService->retrieveEvidence($preuve['path']);
-        
-        if (!$decryptedContent) {
+
+        if (! $decryptedContent) {
             return response()->json(['error' => 'Erreur de déchiffrement'], 500);
         }
 
@@ -76,7 +76,7 @@ class AlerteController extends Controller
     {
         $user = $request->user();
 
-        if (!$user || $alerte->utilisateur_id !== $user->id) {
+        if (! $user || $alerte->utilisateur_id !== $user->id) {
             return response()->json(['error' => 'Non autorisé'], 403);
         }
 
@@ -85,7 +85,7 @@ class AlerteController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Conseils marqués comme lus'
+            'message' => 'Conseils marqués comme lus',
         ]);
     }
 }

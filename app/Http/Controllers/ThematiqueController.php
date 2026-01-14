@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\View\View;
-use App\Models\Thematique;
-use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\ThematiqueStoreRequest;
 use App\Http\Requests\ThematiqueUpdateRequest;
+use App\Models\Thematique;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class ThematiqueController extends Controller
 {

@@ -2,8 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\Alerte;
-use App\Observers\AlerteObserver;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 

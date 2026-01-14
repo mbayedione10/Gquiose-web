@@ -2,20 +2,18 @@
 
 namespace App\Filament\Resources\RoleResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Livewire\Component;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Select;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Forms\Components\TextInput;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\BelongsToSelect;
-use Filament\Tables\Filters\MultiSelectFilter;
 use App\Filament\Resources\RoleResource\Pages;
+use Filament\Forms;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Filament\Tables\Filters\MultiSelectFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Livewire\Component;
 
 class UsersRelationManager extends RelationManager
 {
@@ -38,7 +36,7 @@ class UsersRelationManager extends RelationManager
 
                 TextInput::make('phone')
                     ->rules(['max:255', 'string'])
-                    ->unique('users', 'phone', fn(?Model $record) => $record)
+                    ->unique('users', 'phone', fn (?Model $record) => $record)
                     ->placeholder('Phone')
                     ->columnSpan([
                         'default' => 12,
@@ -48,7 +46,7 @@ class UsersRelationManager extends RelationManager
 
                 TextInput::make('email')
                     ->rules(['email'])
-                    ->unique('users', 'email', fn(?Model $record) => $record)
+                    ->unique('users', 'email', fn (?Model $record) => $record)
                     ->email()
                     ->placeholder('Email')
                     ->columnSpan([
@@ -59,10 +57,9 @@ class UsersRelationManager extends RelationManager
 
                 TextInput::make('password')
                     ->password()
-                    ->dehydrateStateUsing(fn($state) => \Hash::make($state))
+                    ->dehydrateStateUsing(fn ($state) => \Hash::make($state))
                     ->required(
-                        fn(Component $livewire) => $livewire instanceof
-                            Pages\CreateUser
+                        fn (Component $livewire) => $livewire instanceof Pages\CreateUser
                     )
                     ->placeholder('Password')
                     ->columnSpan([
@@ -93,7 +90,7 @@ class UsersRelationManager extends RelationManager
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(
+                                fn (
                                     Builder $query,
                                     $date
                                 ): Builder => $query->whereDate(
@@ -104,7 +101,7 @@ class UsersRelationManager extends RelationManager
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(
+                                fn (
                                     Builder $query,
                                     $date
                                 ): Builder => $query->whereDate(

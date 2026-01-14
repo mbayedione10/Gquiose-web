@@ -11,7 +11,6 @@ use App\Models\Message;
 use App\Models\Theme;
 use App\Models\Utilisateur;
 use App\Services\MentionDetector;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -23,16 +22,21 @@ class APIForumController extends Controller
         $utilisateurId = $request['utilisateur_id'];
         $question = $request['question'];
 
-        if (!isset($themeId) || !isset($utilisateurId) || !isset($question))
-            return ApiResponse::error("Les champs theme, utilisateur et questions sont obligatoires");
+        if (! isset($themeId) || ! isset($utilisateurId) || ! isset($question)) {
+            return ApiResponse::error('Les champs theme, utilisateur et questions sont obligatoires');
+        }
 
         $theme = Theme::where('id', $themeId)->first();
 
-        if ($theme == null) return  ApiResponse::error("Aucun thème avec cet ID");
+        if ($theme == null) {
+            return ApiResponse::error('Aucun thème avec cet ID');
+        }
 
         $utilisateur = Utilisateur::where('id', $utilisateurId)->first();
 
-        if ($utilisateur == null) return  ApiResponse::error("Aucun utilisteur avec cet ID");
+        if ($utilisateur == null) {
+            return ApiResponse::error('Aucun utilisteur avec cet ID');
+        }
 
         $message = new Message();
         $message->utilisateur_id = $utilisateur->id;
@@ -61,9 +65,8 @@ class APIForumController extends Controller
             ));
         }
 
-        return  ApiResponse::success($message);
+        return ApiResponse::success($message);
     }
-
 
     public function syncChat(Request $request)
     {
@@ -72,21 +75,27 @@ class APIForumController extends Controller
         $msg = $request['message'];
         $anonyme = $request['anomyme'];
 
-        if (!isset($messageId) || !isset($utilisateurId) || !isset($msg) || !isset($anonyme))
-            return ApiResponse::error("Les champs messageId, utilisateur et message sont obligatoires");
+        if (! isset($messageId) || ! isset($utilisateurId) || ! isset($msg) || ! isset($anonyme)) {
+            return ApiResponse::error('Les champs messageId, utilisateur et message sont obligatoires');
+        }
 
         $censures = Censure::pluck('name')->toArray();
 
-        if ($this->containsWord($censures, $msg))
-            return ApiResponse::error("Ton message contient un ou plusieurs mots censuré");
+        if ($this->containsWord($censures, $msg)) {
+            return ApiResponse::error('Ton message contient un ou plusieurs mots censuré');
+        }
 
         $message = Message::where('id', $messageId)->first();
 
-        if ($message == null) return  ApiResponse::error("Aucun message avec cet ID");
+        if ($message == null) {
+            return ApiResponse::error('Aucun message avec cet ID');
+        }
 
         $utilisateur = Utilisateur::where('id', $utilisateurId)->first();
 
-        if ($utilisateur == null) return  ApiResponse::error("Aucun utilisteur avec cet ID");
+        if ($utilisateur == null) {
+            return ApiResponse::error('Aucun utilisteur avec cet ID');
+        }
 
         $chat = new Chat();
         $chat->message_id = $messageId;
@@ -98,12 +107,12 @@ class APIForumController extends Controller
         $chat->save();
 
         // Trigger reply notification (only for non-anonymous replies)
-        if (!$anonyme) {
+        if (! $anonyme) {
             event(new MessageReplied($chat, $message));
         }
 
         // Detect and notify mentions (only for non-anonymous chats)
-        if (!$anonyme) {
+        if (! $anonyme) {
             $mentions = app(MentionDetector::class)->extractMentions($msg);
             foreach ($mentions as $mentionedUser) {
                 event(new UserMentioned(
@@ -116,21 +125,21 @@ class APIForumController extends Controller
             }
         }
 
-        return  ApiResponse::success($chat);
+        return ApiResponse::success($chat);
     }
 
     public function delete($id)
     {
         $chat = Chat::where('id', $id)->first();
 
-        if($chat == null)
+        if ($chat == null) {
             return ApiResponse::error("Ce message n'existe pas");
+        }
 
         $chat->delete();
 
-        return  ApiResponse::success($chat);
+        return ApiResponse::success($chat);
     }
-
 
     public function forum()
     {
@@ -138,9 +147,8 @@ class APIForumController extends Controller
             ->join('themes', 'messages.theme_id', 'themes.id')
             ->join('utilisateurs', 'messages.utilisateur_id', 'utilisateurs.id')
             ->select('messages.id as id', 'messages.question', 'utilisateurs.id as utilisateurId',
-            'utilisateurs.prenom as utilisateur', 'themes.id as themeId', 'themes.name as theme', 'messages.created_at as date', 'messages.status as status')
+                'utilisateurs.prenom as utilisateur', 'themes.id as themeId', 'themes.name as theme', 'messages.created_at as date', 'messages.status as status')
             ->get();
-
 
         $chats = DB::table('chats')
             ->join('utilisateurs', 'chats.utilisateur_id', 'utilisateurs.id')
@@ -155,7 +163,6 @@ class APIForumController extends Controller
             )
             ->get();
 
-
         $data = [
             'messages' => $messages,
             'chats' => $chats,
@@ -164,19 +171,19 @@ class APIForumController extends Controller
         return ApiResponse::success($data);
     }
 
-    function containsWord($list, $word) {
-        $cleanedWord = preg_replace("/[^a-zA-Z0-9]/", '', $word);
+    public function containsWord($list, $word)
+    {
+        $cleanedWord = preg_replace('/[^a-zA-Z0-9]/', '', $word);
         $cleanedWord = strtolower($cleanedWord);
 
         foreach ($list as $item) {
-            $cleanedItem = preg_replace("/[^a-zA-Z0-9]/", '', $item);
+            $cleanedItem = preg_replace('/[^a-zA-Z0-9]/', '', $item);
             $cleanedItem = strtolower($cleanedItem);
             if ($cleanedItem === $cleanedWord) {
                 return true;
             }
         }
+
         return false;
     }
-
-
 }

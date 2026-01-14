@@ -3,18 +3,17 @@
 namespace App\Filament\Resources\VilleResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Select;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\RichEditor;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\BelongsToSelect;
-use Filament\Tables\Filters\MultiSelectFilter;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Filament\Tables\Filters\MultiSelectFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class AlertesRelationManager extends RelationManager
 {
@@ -28,7 +27,7 @@ class AlertesRelationManager extends RelationManager
             Grid::make(['default' => 0])->schema([
                 TextInput::make('ref')
                     ->rules(['max:255', 'string'])
-                    ->unique('alertes', 'ref', fn(?Model $record) => $record)
+                    ->unique('alertes', 'ref', fn (?Model $record) => $record)
                     ->placeholder('Ref')
                     ->columnSpan([
                         'default' => 12,
@@ -110,7 +109,7 @@ class AlertesRelationManager extends RelationManager
                         return $query
                             ->when(
                                 $data['created_from'],
-                                fn(
+                                fn (
                                     Builder $query,
                                     $date
                                 ): Builder => $query->whereDate(
@@ -121,7 +120,7 @@ class AlertesRelationManager extends RelationManager
                             )
                             ->when(
                                 $data['created_until'],
-                                fn(
+                                fn (
                                     Builder $query,
                                     $date
                                 ): Builder => $query->whereDate(

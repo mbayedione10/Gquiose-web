@@ -7,8 +7,8 @@ use App\Models\Video;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
+use Filament\Tables\Table;
 
 class VideoResource extends Resource
 {
@@ -16,7 +16,7 @@ class VideoResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-video-camera';
 
-    protected static ?string $navigationLabel = "Vidéos";
+    protected static ?string $navigationLabel = 'Vidéos';
 
     protected static ?int $navigationSort = 14;
 
@@ -26,22 +26,22 @@ class VideoResource extends Resource
             ->schema([
                 Forms\Components\Section::make('Informations générales')
                     ->schema([
-                        Forms\Components\TextInput::make("name")
-                            ->label("Titre")
-                            ->placeholder("Titre de la vidéo")
+                        Forms\Components\TextInput::make('name')
+                            ->label('Titre')
+                            ->placeholder('Titre de la vidéo')
                             ->rules(['max:255', 'string'])
                             ->required()
                             ->helperText(fn ($get) => $get('type') === 'youtube' ? 'Récupéré automatiquement depuis YouTube (modifiable)' : null)
                             ->columnSpan(2),
 
-                        Forms\Components\Textarea::make("description")
-                            ->label("Description")
-                            ->placeholder("Description de la vidéo")
+                        Forms\Components\Textarea::make('description')
+                            ->label('Description')
+                            ->placeholder('Description de la vidéo')
                             ->rows(3)
                             ->columnSpan(2),
 
-                        Forms\Components\Select::make("type")
-                            ->label("Type de vidéo")
+                        Forms\Components\Select::make('type')
+                            ->label('Type de vidéo')
                             ->options([
                                 'youtube' => 'Lien YouTube',
                                 'file' => 'Fichier uploadé',
@@ -51,17 +51,17 @@ class VideoResource extends Resource
                             ->live()
                             ->columnSpan(1),
 
-                        Forms\Components\Toggle::make("status")
-                            ->label("Active")
+                        Forms\Components\Toggle::make('status')
+                            ->label('Active')
                             ->default(true)
                             ->columnSpan(1),
                     ])->columns(2),
 
                 Forms\Components\Section::make('Vidéo YouTube')
                     ->schema([
-                        Forms\Components\TextInput::make("url")
-                            ->label("Lien YouTube")
-                            ->placeholder("https://www.youtube.com/watch?v=...")
+                        Forms\Components\TextInput::make('url')
+                            ->label('Lien YouTube')
+                            ->placeholder('https://www.youtube.com/watch?v=...')
                             ->url()
                             ->rules(['max:255', 'string'])
                             ->required(fn ($get) => $get('type') === 'youtube'),
@@ -71,8 +71,8 @@ class VideoResource extends Resource
                 Forms\Components\Section::make('Fichier vidéo')
                     ->description('Formats acceptés: MP4 (H.264), résolution min 720p, max 500 Mo')
                     ->schema([
-                        Forms\Components\FileUpload::make("video_file")
-                            ->label("Fichier vidéo")
+                        Forms\Components\FileUpload::make('video_file')
+                            ->label('Fichier vidéo')
                             ->disk('public')
                             ->directory('videos')
                             ->acceptedFileTypes(['video/mp4', 'video/quicktime', 'video/x-msvideo'])
@@ -84,14 +84,14 @@ class VideoResource extends Resource
                 Forms\Components\Section::make('Métadonnées')
                     ->schema([
                         Forms\Components\Grid::make(3)->schema([
-                            Forms\Components\TextInput::make("duration")
-                                ->label("Durée")
-                                ->placeholder("Ex: 10:30")
+                            Forms\Components\TextInput::make('duration')
+                                ->label('Durée')
+                                ->placeholder('Ex: 10:30')
                                 ->disabled(fn ($get) => $get('type') === 'youtube')
                                 ->helperText(fn ($get) => $get('type') === 'youtube' ? 'Récupérée automatiquement depuis YouTube' : null),
 
-                            Forms\Components\Select::make("resolution")
-                                ->label("Résolution")
+                            Forms\Components\Select::make('resolution')
+                                ->label('Résolution')
                                 ->options([
                                     '720p' => '720p (HD)',
                                     '1080p' => '1080p (Full HD)',
@@ -100,8 +100,8 @@ class VideoResource extends Resource
                                 ])
                                 ->visible(fn ($get) => $get('type') === 'file'),
 
-                            Forms\Components\TextInput::make("file_size")
-                                ->label("Taille (octets)")
+                            Forms\Components\TextInput::make('file_size')
+                                ->label('Taille (octets)')
                                 ->numeric()
                                 ->disabled()
                                 ->visible(fn ($get) => $get('type') === 'file'),
@@ -117,34 +117,34 @@ class VideoResource extends Resource
                                 : 'Sera récupérée automatiquement après enregistrement')
                             ->visible(fn ($get) => $get('type') === 'youtube'),
 
-                        Forms\Components\FileUpload::make("thumbnail")
-                            ->label("Miniature personnalisée (optionnel)")
+                        Forms\Components\FileUpload::make('thumbnail')
+                            ->label('Miniature personnalisée (optionnel)')
                             ->disk('public')
                             ->directory('videos/thumbnails')
                             ->image()
                             ->imageResizeMode('cover')
                             ->imageCropAspectRatio('16:9')
                             ->helperText(fn ($get) => $get('type') === 'youtube'
-                                ? "Uploadez une image pour remplacer la miniature YouTube"
-                                : "Ratio 16:9 recommandé"),
+                                ? 'Uploadez une image pour remplacer la miniature YouTube'
+                                : 'Ratio 16:9 recommandé'),
                     ]),
 
                 Forms\Components\Section::make('Accessibilité')
                     ->description('Sous-titres et audiodescription pour l\'accessibilité')
                     ->schema([
-                        Forms\Components\FileUpload::make("subtitle_file")
-                            ->label("Fichier sous-titres (SRT)")
+                        Forms\Components\FileUpload::make('subtitle_file')
+                            ->label('Fichier sous-titres (SRT)')
                             ->disk('public')
                             ->directory('videos/subtitles')
                             ->acceptedFileTypes(['.srt', 'text/plain', 'application/x-subrip'])
-                            ->helperText("Format SRT, encodage UTF-8, max 42 caractères par ligne"),
+                            ->helperText('Format SRT, encodage UTF-8, max 42 caractères par ligne'),
 
-                        Forms\Components\FileUpload::make("audiodescription_file")
-                            ->label("Audiodescription (MP3/WAV)")
+                        Forms\Components\FileUpload::make('audiodescription_file')
+                            ->label('Audiodescription (MP3/WAV)')
                             ->disk('public')
                             ->directory('videos/audiodescriptions')
                             ->acceptedFileTypes(['audio/mpeg', 'audio/wav', 'audio/x-wav'])
-                            ->helperText("Format MP3 ou WAV, bitrate min 128 kbps, synchronisé avec la vidéo"),
+                            ->helperText('Format MP3 ou WAV, bitrate min 128 kbps, synchronisé avec la vidéo'),
                     ])->columns(2),
             ]);
     }
@@ -154,19 +154,19 @@ class VideoResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('thumbnail_url')
-                    ->label("Miniature")
+                    ->label('Miniature')
                     ->circular(false)
                     ->width(80)
                     ->height(45),
 
                 Tables\Columns\TextColumn::make('name')
-                    ->label("Titre")
+                    ->label('Titre')
                     ->searchable()
                     ->sortable()
                     ->limit(40),
 
                 Tables\Columns\BadgeColumn::make('type')
-                    ->label("Type")
+                    ->label('Type')
                     ->colors([
                         'danger' => 'youtube',
                         'success' => 'file',
@@ -174,32 +174,32 @@ class VideoResource extends Resource
                     ->formatStateUsing(fn ($state) => $state === 'youtube' ? 'YouTube' : 'Fichier'),
 
                 Tables\Columns\TextColumn::make('duration')
-                    ->label("Durée")
+                    ->label('Durée')
                     ->placeholder('-'),
 
                 Tables\Columns\TextColumn::make('resolution')
-                    ->label("Résolution")
+                    ->label('Résolution')
                     ->placeholder('-'),
 
                 Tables\Columns\IconColumn::make('subtitle_file')
-                    ->label("Sous-titres")
+                    ->label('Sous-titres')
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
-                    ->getStateUsing(fn ($record) => !empty($record->subtitle_file)),
+                    ->getStateUsing(fn ($record) => ! empty($record->subtitle_file)),
 
                 Tables\Columns\IconColumn::make('audiodescription_file')
-                    ->label("Audio-desc")
+                    ->label('Audio-desc')
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
-                    ->getStateUsing(fn ($record) => !empty($record->audiodescription_file)),
+                    ->getStateUsing(fn ($record) => ! empty($record->audiodescription_file)),
 
                 Tables\Columns\ToggleColumn::make('status')
-                    ->label("Active"),
+                    ->label('Active'),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label("Créée le")
+                    ->label('Créée le')
                     ->date('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

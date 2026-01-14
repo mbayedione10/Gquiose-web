@@ -1,25 +1,30 @@
 <?php
+
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\EvaluationResource\Pages;
 use App\Models\Evaluation;
 use Filament\Forms;
-use Filament\Tables;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
-use Filament\Forms\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use App\Filament\Resources\EvaluationResource\Pages;
 
 class EvaluationResource extends Resource
 {
     protected static ?string $model = Evaluation::class;
+
     protected static ?string $recordTitleAttribute = 'id';
+
     protected static ?string $navigationLabel = 'Évaluations reçues';
+
     protected static ?string $navigationGroup = 'Évaluations';
+
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
+
     protected static ?int $navigationSort = 2;
 
     public static function canCreate(): bool
@@ -38,7 +43,7 @@ class EvaluationResource extends Resource
             Section::make()->schema([
                 Forms\Components\Placeholder::make('utilisateur_info')
                     ->label('Utilisateur')
-                    ->content(fn (Evaluation $record): string => $record->utilisateur ? $record->utilisateur->nom . ' ' . $record->utilisateur->prenom : 'N/A'),
+                    ->content(fn (Evaluation $record): string => $record->utilisateur ? $record->utilisateur->nom.' '.$record->utilisateur->prenom : 'N/A'),
 
                 Forms\Components\Placeholder::make('contexte_info')
                     ->label('Contexte')
@@ -46,7 +51,7 @@ class EvaluationResource extends Resource
 
                 Forms\Components\Placeholder::make('score_info')
                     ->label('Score Global')
-                    ->content(fn (Evaluation $record): string => $record->score_global ? number_format($record->score_global, 2) . '/5' : 'N/A'),
+                    ->content(fn (Evaluation $record): string => $record->score_global ? number_format($record->score_global, 2).'/5' : 'N/A'),
 
                 Forms\Components\Placeholder::make('commentaire_info')
                     ->label('Commentaire')
@@ -75,7 +80,7 @@ class EvaluationResource extends Resource
                 TextColumn::make('contexte')
                     ->label('Contexte')
                     ->badge()
-                    ->formatStateUsing(fn ($state) => match($state) {
+                    ->formatStateUsing(fn ($state) => match ($state) {
                         'quiz' => 'Quiz',
                         'article' => 'Article',
                         'structure' => 'Structure',
@@ -86,7 +91,7 @@ class EvaluationResource extends Resource
 
                 TextColumn::make('score_global')
                     ->label('Score')
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state, 1) . '/5' : 'N/A')
+                    ->formatStateUsing(fn ($state) => $state ? number_format($state, 1).'/5' : 'N/A')
                     ->sortable(),
 
                 TextColumn::make('commentaire')
@@ -121,6 +126,7 @@ class EvaluationResource extends Resource
                                 $q->where('question_evaluation_id', $data['value']);
                             });
                         }
+
                         return $query;
                     }),
             ]);
@@ -135,7 +141,7 @@ class EvaluationResource extends Resource
     {
         return [
             'index' => Pages\ListEvaluations::route('/'),
-            'view'  => Pages\ViewEvaluation::route('/{record}'),
+            'view' => Pages\ViewEvaluation::route('/{record}'),
         ];
     }
 }

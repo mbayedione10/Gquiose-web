@@ -37,7 +37,7 @@ class SendVideoNotification implements ShouldQueue
             'title' => '🎥 Nouvelle vidéo disponible !',
             'message' => substr($video->titre, 0, 100),
             'icon' => '🎥',
-            'action' => 'video/' . $video->id,
+            'action' => 'video/'.$video->id,
             'image' => $video->image,
             'type' => 'automatic',
             'target_audience' => 'all',

@@ -12,9 +12,8 @@ class Message extends Model
     protected $fillable = ['theme_id', 'utilisateur_id', 'status', 'question'];
 
     protected $casts = [
-        'status' => 'boolean'
+        'status' => 'boolean',
     ];
-
 
     public function theme()
     {

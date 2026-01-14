@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -21,9 +20,6 @@ class NotificationEmail extends Mailable
 
     /**
      * NotificationEmail constructor.
-     * @param $greeting
-     * @param $object
-     * @param $content
      */
     public function __construct($greeting, $object, $content)
     {
@@ -31,7 +27,6 @@ class NotificationEmail extends Mailable
         $this->object = $object;
         $this->content = $content;
     }
-
 
     /**
      * Get the message envelope.

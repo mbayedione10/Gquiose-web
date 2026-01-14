@@ -11,8 +11,8 @@ class AlerteVilleChart extends DoughnutChartWidget
     protected static ?string $heading = 'Répartition géographique des alertes';
 
     protected static ?int $sort = 11;
-    
-    protected int | string | array $columnSpan = 'full';
+
+    protected int|string|array $columnSpan = 'full';
 
     protected function getData(): array
     {

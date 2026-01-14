@@ -2,18 +2,15 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Rubrique;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Toggle;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Forms\Components\TextInput;
-use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\RubriqueResource\Pages;
+use App\Models\Rubrique;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 class RubriqueResource extends Resource
 {
@@ -23,8 +20,10 @@ class RubriqueResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationLabel = "Rubriques";
-    protected static ?string $navigationGroup = "Blog";
+    protected static ?string $navigationLabel = 'Rubriques';
+
+    protected static ?string $navigationGroup = 'Blog';
+
     //protected static ?string $navigationIcon = 'heroicon-o-newspaper';
     protected static ?int $navigationSort = 31;
 
@@ -34,13 +33,13 @@ class RubriqueResource extends Resource
             Section::make()->schema([
 
                 TextInput::make('name')
-                    ->label("Nom")
+                    ->label('Nom')
                     ->rules(['max:255', 'string'])
                     ->required()
                     ->unique(
                         'rubriques',
                         'name',
-                        fn(?Rubrique $record) => $record
+                        fn (?Rubrique $record) => $record
                     )
                     ->placeholder('Nom de la rubrique')
                     ->columnSpan([
@@ -50,7 +49,7 @@ class RubriqueResource extends Resource
                     ]),
 
                 Toggle::make('status')
-                    ->label("Statut")
+                    ->label('Statut')
                     ->rules(['boolean'])
                     ->required()
                     ->columnSpan([
@@ -68,17 +67,16 @@ class RubriqueResource extends Resource
             ->poll('60s')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label("Nom")
+                    ->label('Nom')
                     ->searchable()
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('articles_count')
-                    ->label("Articles")
+                    ->label('Articles')
                     ->counts('articles'),
 
-
                 Tables\Columns\ToggleColumn::make('status')
-                    ->label("Statut"),
+                    ->label('Statut'),
             ]);
     }
 

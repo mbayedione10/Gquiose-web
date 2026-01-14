@@ -3,20 +3,11 @@
 namespace App\Filament\Resources\QuestionResource\RelationManagers;
 
 use App\Filament\Resources\ThematiqueResource;
-use App\Models\Question;
 use App\Models\Response;
-use Filament\Forms;
-use Filament\Tables;
 use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\TextInput;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\BelongsToSelect;
-use Filament\Tables\Filters\MultiSelectFilter;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
 class ResponsesRelationManager extends RelationManager
@@ -52,33 +43,33 @@ class ResponsesRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('question.thematique.name')
-                    ->label("Thématique")
-                    ->url(function (?Response  $record){
+                    ->label('Thématique')
+                    ->url(function (?Response $record) {
                         return ThematiqueResource::getUrl('view', ['record' => $record->question->thematique_id]);
                     })
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('question.name')
-                    ->label("Question")
+                    ->label('Question')
                     ->searchable()
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('reponse')
-                    ->label("Réponse")
+                    ->label('Réponse')
                     ->searchable()
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('option1')
-                    ->label("Option 1")
+                    ->label('Option 1')
                     ->searchable()
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('option2')
-                    ->label("Option 2")
+                    ->label('Option 2')
                     ->limit(50),
 
                 Tables\Columns\ToggleColumn::make('status')
-                    ->label("Statut"),
+                    ->label('Statut'),
             ]);
     }
 }

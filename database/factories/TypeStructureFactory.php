@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use Illuminate\Support\Str;
 use App\Models\TypeStructure;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\SectionConseilResource\Pages;
 
-use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\SectionConseilResource;
+use Filament\Resources\Pages\EditRecord;
 
 class EditSectionConseil extends EditRecord
 {

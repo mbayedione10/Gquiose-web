@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\ThematiqueResource\Pages;
 
-use Filament\Resources\Pages\ViewRecord;
 use App\Filament\Resources\ThematiqueResource;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewThematique extends ViewRecord
 {

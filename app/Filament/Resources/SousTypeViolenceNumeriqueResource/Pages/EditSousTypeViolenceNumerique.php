@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\SousTypeViolenceNumeriqueResource\Pages;
 
-use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\SousTypeViolenceNumeriqueResource;
+use Filament\Resources\Pages\EditRecord;
 
 class EditSousTypeViolenceNumerique extends EditRecord
 {

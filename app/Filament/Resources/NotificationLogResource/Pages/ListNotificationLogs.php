@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\NotificationLogResource\Pages;
 
 use App\Filament\Resources\NotificationLogResource;
-use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListNotificationLogs extends ListRecords

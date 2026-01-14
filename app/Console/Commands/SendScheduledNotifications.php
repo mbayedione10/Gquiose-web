@@ -9,6 +9,7 @@ use Illuminate\Console\Command;
 class SendScheduledNotifications extends Command
 {
     protected $signature = 'notifications:send-scheduled';
+
     protected $description = 'Envoie les notifications programmées qui sont dues';
 
     public function handle()
@@ -23,6 +24,7 @@ class SendScheduledNotifications extends Command
 
         if ($notifications->isEmpty()) {
             $this->info('No scheduled notifications to send.');
+
             return 0;
         }
 

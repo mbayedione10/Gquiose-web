@@ -87,7 +87,7 @@ class NotificationLog extends Model
      */
     public function markAsOpened()
     {
-        if (!$this->opened_at) {
+        if (! $this->opened_at) {
             $this->update([
                 'status' => 'opened',
                 'opened_at' => now(),
@@ -106,7 +106,7 @@ class NotificationLog extends Model
         ]);
 
         // Si elle n'était pas encore marquée comme ouverte, le faire aussi
-        if (!$this->opened_at) {
+        if (! $this->opened_at) {
             $this->opened_at = now();
             $this->save();
         }

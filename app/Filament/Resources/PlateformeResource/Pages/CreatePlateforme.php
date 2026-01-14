@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\PlateformeResource\Pages;
 
-use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\PlateformeResource;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreatePlateforme extends CreateRecord
 {

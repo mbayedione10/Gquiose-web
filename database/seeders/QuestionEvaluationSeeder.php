@@ -48,7 +48,7 @@ class QuestionEvaluationSeeder extends Seeder
                     'Structures de santé',
                     'Alertes VBG',
                     'Suivi menstruel',
-                    'Forum'
+                    'Forum',
                 ]),
                 'ordre' => 4,
                 'obligatoire' => false,
@@ -156,7 +156,7 @@ class QuestionEvaluationSeeder extends Seeder
                     'Conseils pratiques',
                     'Exemples concrets',
                     'Images/illustrations',
-                    'Longueur appropriée'
+                    'Longueur appropriée',
                 ]),
                 'ordre' => 4,
                 'obligatoire' => false,
@@ -297,7 +297,7 @@ class QuestionEvaluationSeeder extends Seeder
             $question = QuestionEvaluation::firstOrCreate(
                 [
                     'question' => $questionData['question'],
-                    'formulaire_type' => $questionData['formulaire_type']
+                    'formulaire_type' => $questionData['formulaire_type'],
                 ],
                 $questionData
             );
@@ -311,7 +311,7 @@ class QuestionEvaluationSeeder extends Seeder
         $quizQ3Condition = QuestionEvaluation::where('formulaire_type', 'satisfaction_quiz')
             ->where('ordre', 3)
             ->first();
-        
+
         if ($quizQ3 && $quizQ3Condition) {
             $quizQ3->update(['condition_question_id' => $quizQ3Condition->id]);
         }
@@ -320,18 +320,18 @@ class QuestionEvaluationSeeder extends Seeder
         $structureQ1 = QuestionEvaluation::where('formulaire_type', 'satisfaction_structure')
             ->where('ordre', 1)
             ->first();
-        
+
         if ($structureQ1) {
             QuestionEvaluation::where('formulaire_type', 'satisfaction_structure')
                 ->whereIn('ordre', [2, 3, 4])
                 ->update(['condition_question_id' => $structureQ1->id]);
         }
 
-        $this->command->info('✅ ' . count($createdQuestions) . ' questions d\'évaluation créées avec logique conditionnelle');
-        $this->command->info('   - ' . count($questionsGenerales) . ' questions générales');
-        $this->command->info('   - ' . count($questionsQuiz) . ' questions quiz');
-        $this->command->info('   - ' . count($questionsArticle) . ' questions article');
-        $this->command->info('   - ' . count($questionsAlerte) . ' questions alerte');
-        $this->command->info('   - ' . count($questionsStructure) . ' questions structure');
+        $this->command->info('✅ '.count($createdQuestions).' questions d\'évaluation créées avec logique conditionnelle');
+        $this->command->info('   - '.count($questionsGenerales).' questions générales');
+        $this->command->info('   - '.count($questionsQuiz).' questions quiz');
+        $this->command->info('   - '.count($questionsArticle).' questions article');
+        $this->command->info('   - '.count($questionsAlerte).' questions alerte');
+        $this->command->info('   - '.count($questionsStructure).' questions structure');
     }
 }

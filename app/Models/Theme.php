@@ -16,5 +16,4 @@ class Theme extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
-
 }

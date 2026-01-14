@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Utilisateur;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
-            $table->text("question");
+            $table->text('question');
 
             $table->unsignedBigInteger('utilisateur_id');
             $table->foreign('utilisateur_id')

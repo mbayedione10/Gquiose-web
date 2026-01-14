@@ -3,10 +3,8 @@
 namespace App\Services;
 
 use App\Models\Evaluation;
-use App\Models\QuestionEvaluation;
 use App\Models\NotificationSchedule;
 use App\Models\Utilisateur;
-use Carbon\Carbon;
 
 class EvaluationTriggerService
 {
@@ -30,7 +28,7 @@ class EvaluationTriggerService
                 ->where('created_at', '>', now()->subDays(30))
                 ->exists();
 
-            if (!$existingEvaluation) {
+            if (! $existingEvaluation) {
                 NotificationSchedule::create([
                     'template_id' => $this->getEvaluationTemplateId($evaluationType),
                     'utilisateur_id' => $userId,
@@ -42,8 +40,8 @@ class EvaluationTriggerService
                     'metadata' => [
                         'auto_triggered' => true,
                         'evaluation_type' => $evaluationType,
-                        'trigger_context' => $contexte
-                    ]
+                        'trigger_context' => $contexte,
+                    ],
                 ]);
             }
         }
@@ -57,7 +55,7 @@ class EvaluationTriggerService
         $this->triggerAutoEvaluation('quiz', $quizId, [
             'delay_days' => 7,
             'target_users' => [$userId],
-            'evaluation_type' => 'satisfaction_quiz'
+            'evaluation_type' => 'satisfaction_quiz',
         ]);
     }
 
@@ -69,7 +67,7 @@ class EvaluationTriggerService
         $this->triggerAutoEvaluation('article', $articleId, [
             'delay_days' => 1,
             'target_users' => [$userId],
-            'evaluation_type' => 'satisfaction_article'
+            'evaluation_type' => 'satisfaction_article',
         ]);
     }
 
@@ -81,7 +79,7 @@ class EvaluationTriggerService
         $this->triggerAutoEvaluation('structure', $structureId, [
             'delay_days' => 3,
             'target_users' => [$userId],
-            'evaluation_type' => 'satisfaction_structure'
+            'evaluation_type' => 'satisfaction_structure',
         ]);
     }
 
@@ -91,7 +89,7 @@ class EvaluationTriggerService
     public function triggerPeriodicEvaluation()
     {
         $users = Utilisateur::where('status', true)->pluck('id');
-        
+
         foreach ($users as $userId) {
             // Évaluation générale tous les 30 jours
             $lastEvaluation = Evaluation::where('utilisateur_id', $userId)
@@ -99,7 +97,7 @@ class EvaluationTriggerService
                 ->latest()
                 ->first();
 
-            if (!$lastEvaluation || $lastEvaluation->created_at->lt(now()->subDays(30))) {
+            if (! $lastEvaluation || $lastEvaluation->created_at->lt(now()->subDays(30))) {
                 NotificationSchedule::create([
                     'template_id' => $this->getEvaluationTemplateId('generale'),
                     'utilisateur_id' => $userId,
@@ -110,8 +108,8 @@ class EvaluationTriggerService
                     'status' => 'pending',
                     'metadata' => [
                         'auto_triggered' => true,
-                        'evaluation_type' => 'periodic'
-                    ]
+                        'evaluation_type' => 'periodic',
+                    ],
                 ]);
             }
         }

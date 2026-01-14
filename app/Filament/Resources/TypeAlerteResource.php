@@ -2,18 +2,18 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\TypeAlerte;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Toggle;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Forms\Components\TextInput;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\TypeAlerteResource\Pages;
+use App\Models\TypeAlerte;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class TypeAlerteResource extends Resource
 {
@@ -22,8 +22,11 @@ class TypeAlerteResource extends Resource
     protected static ?string $recordTitleAttribute = 'name';
 
     protected static ?string $navigationLabel = "Type d'alertes";
-    protected static ?string $navigationGroup = "VBG";
+
+    protected static ?string $navigationGroup = 'VBG';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
     protected static ?int $navigationSort = 11;
 
     public static function form(Form $form): Form
@@ -37,7 +40,7 @@ class TypeAlerteResource extends Resource
                         ->unique(
                             'type_alertes',
                             'name',
-                            fn(?Model $record) => $record
+                            fn (?Model $record) => $record
                         )
                         ->placeholder('Name')
                         ->columnSpan([

@@ -12,6 +12,7 @@ class AdminInvitationMail extends Mailable
     use Queueable, SerializesModels;
 
     public AdminInvitation $invitation;
+
     public string $activationUrl;
 
     public function __construct(AdminInvitation $invitation)

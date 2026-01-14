@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\SuiviResource\Pages;
 
-use Filament\Resources\Pages\ViewRecord;
 use App\Filament\Resources\SuiviResource;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewSuivi extends ViewRecord
 {

@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources\ArticleResource\Pages;
 
-use App\Filament\Resources\ArticleResource;
 use App\Events\NewArticlePublished;
-use Filament\Actions;
+use App\Filament\Resources\ArticleResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,8 +11,7 @@ class CreateArticle extends CreateRecord
 {
     protected static string $resource = ArticleResource::class;
 
-    protected static ?string $title = "Nouvel article";
-
+    protected static ?string $title = 'Nouvel article';
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {

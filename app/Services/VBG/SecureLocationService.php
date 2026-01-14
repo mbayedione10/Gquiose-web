@@ -14,10 +14,8 @@ class SecureLocationService
     /**
      * Anonymise des coordonnées GPS en appliquant un flou géographique
      * Retourne des coordonnées approximatives au lieu des coordonnées exactes
-     * 
-     * @param float $latitude
-     * @param float $longitude
-     * @param float $radiusKm Rayon d'anonymisation en km (défaut: 0.5km)
+     *
+     * @param  float  $radiusKm  Rayon d'anonymisation en km (défaut: 0.5km)
      * @return array ['latitude' => float, 'longitude' => float, 'precision' => string]
      */
     public function anonymizeCoordinates(float $latitude, float $longitude, float $radiusKm = self::ANONYMIZATION_RADIUS_KM): array
@@ -47,9 +45,7 @@ class SecureLocationService
     /**
      * Obtient le quartier/commune à partir de coordonnées GPS
      * Utilise l'API de géocodage inverse (Nominatim OpenStreetMap)
-     * 
-     * @param float $latitude
-     * @param float $longitude
+     *
      * @return array ['quartier' => string, 'commune' => string, 'ville' => string]
      */
     public function getLocationArea(float $latitude, float $longitude): array
@@ -93,16 +89,12 @@ class SecureLocationService
     /**
      * Prépare des coordonnées pour stockage sécurisé
      * Combine anonymisation + identification de zone
-     * 
-     * @param float $latitude
-     * @param float $longitude
-     * @param int|null $villeId
-     * @param bool $anonymize Si true, applique l'anonymisation
-     * @return array
+     *
+     * @param  bool  $anonymize  Si true, applique l'anonymisation
      */
     public function prepareSecureLocation(
-        float $latitude, 
-        float $longitude, 
+        float $latitude,
+        float $longitude,
         ?int $villeId = null,
         bool $anonymize = true
     ): array {
@@ -122,8 +114,8 @@ class SecureLocationService
         }
 
         // Détecter automatiquement la ville si non fournie
-        if (!$villeId && $locationArea['ville'] !== 'Non identifiée') {
-            $ville = Ville::where('name', 'LIKE', '%' . $locationArea['ville'] . '%')->first();
+        if (! $villeId && $locationArea['ville'] !== 'Non identifiée') {
+            $ville = Ville::where('name', 'LIKE', '%'.$locationArea['ville'].'%')->first();
             $villeId = $ville?->id;
         }
 
@@ -142,11 +134,7 @@ class SecureLocationService
 
     /**
      * Calcule la distance entre deux points GPS (formule de Haversine)
-     * 
-     * @param float $lat1
-     * @param float $lng1
-     * @param float $lat2
-     * @param float $lng2
+     *
      * @return float Distance en kilomètres
      */
     public function calculateDistance(float $lat1, float $lng1, float $lat2, float $lng2): float
@@ -167,26 +155,20 @@ class SecureLocationService
 
     /**
      * Vérifie si des coordonnées sont dans les limites de la Guinée
-     * 
-     * @param float $latitude
-     * @param float $longitude
-     * @return bool
      */
     public function isInGuinea(float $latitude, float $longitude): bool
     {
         // Limites approximatives de la Guinée
         // Latitude: 7.19° N à 12.68° N
         // Longitude: -15.08° W à -7.65° W
-        
+
         return $latitude >= 7.19 && $latitude <= 12.68 &&
                $longitude >= -15.08 && $longitude <= -7.65;
     }
 
     /**
      * Valide des coordonnées GPS
-     * 
-     * @param float $latitude
-     * @param float $longitude
+     *
      * @return array ['valid' => bool, 'errors' => array]
      */
     public function validateCoordinates(float $latitude, float $longitude): array
@@ -203,7 +185,7 @@ class SecureLocationService
         }
 
         // Avertissement si hors de Guinée
-        if (!$this->isInGuinea($latitude, $longitude)) {
+        if (! $this->isInGuinea($latitude, $longitude)) {
             $errors[] = 'Coordonnées hors du territoire guinéen';
         }
 

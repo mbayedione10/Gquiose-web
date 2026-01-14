@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\VilleResource\Pages;
 
-use Filament\Resources\Pages\ListRecords;
 use App\Filament\Resources\VilleResource;
 use App\Filament\Traits\HasDescendingOrder;
+use Filament\Resources\Pages\ListRecords;
 
 class ListVilles extends ListRecords
 {

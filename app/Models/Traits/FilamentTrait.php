@@ -15,7 +15,7 @@ trait FilamentTrait
             'Admin',
             'Super Admin',
             'Éditeur',
-            'Modérateur'
+            'Modérateur',
         ]);
     }
 }

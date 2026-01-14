@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\QuestionResource\Pages;
 
-use Filament\Resources\Pages\ViewRecord;
 use App\Filament\Resources\QuestionResource;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewQuestion extends ViewRecord
 {

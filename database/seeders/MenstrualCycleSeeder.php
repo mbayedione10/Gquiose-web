@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Models\Utilisateur;
-use App\Models\MenstrualCycle;
-use App\Models\CycleSymptom;
-use App\Models\CycleSetting;
 use App\Models\CycleReminder;
+use App\Models\CycleSetting;
+use App\Models\CycleSymptom;
+use App\Models\MenstrualCycle;
+use App\Models\Utilisateur;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
@@ -22,6 +22,7 @@ class MenstrualCycleSeeder extends Seeder
 
         if ($utilisatrices->isEmpty()) {
             $this->command->warn('Aucune utilisatrice trouvée. Créez d\'abord des utilisatrices.');
+
             return;
         }
 
@@ -102,7 +103,7 @@ class MenstrualCycleSeeder extends Seeder
     {
         $startDate = Carbon::parse($cycle->period_start_date);
         $endDate = $isActive ? Carbon::now() : Carbon::parse($cycle->period_end_date ?? $startDate->copy()->addDays(5));
-        
+
         $physicalSymptoms = ['crampes', 'fatigue', 'maux_tete', 'nausee', 'sensibilite_seins', 'ballonnements', 'douleurs_dos', 'acne'];
         $moods = ['joyeuse', 'triste', 'irritable', 'anxieuse', 'calme', 'energique', 'stresse'];
         $dischargeTypes = ['aucune', 'creamy', 'sticky', 'watery', 'egg_white'];
@@ -113,7 +114,7 @@ class MenstrualCycleSeeder extends Seeder
             if (rand(1, 10) <= 7) {
                 $selectedSymptoms = [];
                 $selectedMoods = [];
-                
+
                 // Sélectionner 2-4 symptômes physiques aléatoires
                 $numSymptoms = rand(2, 4);
                 for ($i = 0; $i < $numSymptoms; $i++) {

@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\QuestionResource\Pages;
 
+use App\Filament\Resources\QuestionResource;
+use App\Filament\Traits\HasDescendingOrder;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use App\Filament\Traits\HasDescendingOrder;
-use App\Filament\Resources\QuestionResource;
 
 class ListQuestions extends ListRecords
 {
@@ -13,14 +13,14 @@ class ListQuestions extends ListRecords
 
     protected static string $resource = QuestionResource::class;
 
-    protected static ?string $title = "Liste des questions";
+    protected static ?string $title = 'Liste des questions';
 
     protected function getHeaderActions(): array
     {
         return [
             CreateAction::make()
-                ->label("Nouvelle question")
-                ->icon('heroicon-o-plus-circle')
+                ->label('Nouvelle question')
+                ->icon('heroicon-o-plus-circle'),
         ];
     }
 

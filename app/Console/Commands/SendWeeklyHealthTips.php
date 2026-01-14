@@ -31,8 +31,9 @@ class SendWeeklyHealthTips extends Command
         // Récupérer un conseil aléatoire
         $conseil = Conseil::inRandomOrder()->first();
 
-        if (!$conseil) {
+        if (! $conseil) {
             $this->error('Aucun conseil santé disponible dans la base de données');
+
             return Command::FAILURE;
         }
 
@@ -52,6 +53,7 @@ class SendWeeklyHealthTips extends Command
         $service->sendNotification($notification);
 
         $this->info("Conseil santé envoyé avec succès : {$conseil->message}");
+
         return Command::SUCCESS;
     }
 }

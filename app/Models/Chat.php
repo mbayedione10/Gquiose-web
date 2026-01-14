@@ -11,9 +11,8 @@ class Chat extends Model
 
     protected $fillable = ['message', 'utilisateur_id', 'message_id', 'status', 'censure', 'anonyme'];
 
-
     protected $casts = [
-        'status' => 'boolean'
+        'status' => 'boolean',
     ];
 
     public function message()

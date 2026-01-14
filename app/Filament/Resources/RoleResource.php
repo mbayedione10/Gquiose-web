@@ -2,33 +2,36 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Role;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Toggle;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Forms\Components\TextInput;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\RoleResource\Pages;
 use App\Filament\Traits\HasResourcePermissions;
+use App\Models\Role;
+use Filament\Forms;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class RoleResource extends Resource
 {
     use HasResourcePermissions;
-    protected static ?string $model = Role::class;
 
+    protected static ?string $model = Role::class;
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationLabel = "Rôles";
-    protected static ?string $navigationGroup = "Gestion des utilisateurs";
-    protected static ?string $navigationIcon = 'heroicon-o-shield-check';
-    protected static ?int $navigationSort = 102;
+    protected static ?string $navigationLabel = 'Rôles';
 
+    protected static ?string $navigationGroup = 'Gestion des utilisateurs';
+
+    protected static ?string $navigationIcon = 'heroicon-o-shield-check';
+
+    protected static ?int $navigationSort = 102;
 
     public static function form(Form $form): Form
     {
@@ -39,7 +42,7 @@ class RoleResource extends Resource
                         ->label('Nom du rôle')
                         ->rules(['max:255', 'string'])
                         ->required()
-                        ->unique('roles', 'name', fn(?Model $record) => $record)
+                        ->unique('roles', 'name', fn (?Model $record) => $record)
                         ->placeholder('Ex: Super Admin')
                         ->columnSpan([
                             'default' => 12,

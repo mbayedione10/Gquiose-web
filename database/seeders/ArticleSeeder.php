@@ -13,7 +13,7 @@ class ArticleSeeder extends Seeder
     public function run(): void
     {
         $admin = User::where('email', 'admin@admin.com')->first();
-        
+
         // Rubriques
         $jeDécouvreMonCorps = Rubrique::where('name', 'Je Découvre Mon Corps')->first();
         $sexualiteRelations = Rubrique::where('name', 'Sexualité et Relations')->first();
@@ -40,7 +40,7 @@ class ArticleSeeder extends Seeder
                 'user_id' => $admin?->id,
                 'status' => true,
             ],
-            
+
             // SSR - Cycle et Règles
             [
                 'title' => 'Tout sur les règles : c\'est quoi, comment ça marche ?',
@@ -49,7 +49,7 @@ class ArticleSeeder extends Seeder
                 'user_id' => $admin?->id,
                 'status' => true,
             ],
-            
+
             // SSR - Contraception
             [
                 'title' => 'Les méthodes de contraception adaptées aux jeunes',
@@ -65,7 +65,7 @@ class ArticleSeeder extends Seeder
                 'user_id' => $admin?->id,
                 'status' => true,
             ],
-            
+
             // SSR - IST et VIH
             [
                 'title' => 'IST et VIH : comment se protéger ?',
@@ -74,7 +74,7 @@ class ArticleSeeder extends Seeder
                 'user_id' => $admin?->id,
                 'status' => true,
             ],
-            
+
             // VBG - Consentement
             [
                 'title' => 'C\'est quoi le consentement ? Apprends à dire NON',
@@ -83,7 +83,7 @@ class ArticleSeeder extends Seeder
                 'user_id' => $admin?->id,
                 'status' => true,
             ],
-            
+
             // VBG - Violences
             [
                 'title' => 'Reconnaître les signes de violence dans une relation',
@@ -99,7 +99,7 @@ class ArticleSeeder extends Seeder
                 'user_id' => $admin?->id,
                 'status' => true,
             ],
-            
+
             // Droits et Soutien
             [
                 'title' => 'Tes droits sexuels et reproductifs en tant que jeune',
@@ -125,6 +125,6 @@ class ArticleSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ ' . count($articles) . ' articles SSR/VBG pour jeunes créés');
+        $this->command->info('✅ '.count($articles).' articles SSR/VBG pour jeunes créés');
     }
 }

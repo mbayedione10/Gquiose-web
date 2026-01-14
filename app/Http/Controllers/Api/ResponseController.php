@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\ResponseStoreRequest;
+use App\Http\Requests\ResponseUpdateRequest;
+use App\Http\Resources\ResponseCollection;
+use App\Http\Resources\ResponseResource;
 use App\Models\Response;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\ResponseResource;
-use App\Http\Resources\ResponseCollection;
-use App\Http\Requests\ResponseStoreRequest;
-use App\Http\Requests\ResponseUpdateRequest;
 
 class ResponseController extends Controller
 {

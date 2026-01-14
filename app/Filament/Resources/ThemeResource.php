@@ -3,28 +3,25 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ThemeResource\Pages;
-use App\Filament\Resources\ThemeResource\RelationManagers;
-use App\Models\Thematique;
 use App\Models\Theme;
-use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Tables\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Table;
 
 class ThemeResource extends Resource
 {
     protected static ?string $model = Theme::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationLabel = "Thèmes";
-    protected static ?string $navigationGroup = "Forum";
+
+    protected static ?string $navigationLabel = 'Thèmes';
+
+    protected static ?string $navigationGroup = 'Forum';
+
     protected static ?int $navigationSort = 75;
 
     public static function form(Form $form): Form
@@ -33,10 +30,10 @@ class ThemeResource extends Resource
             ->schema([
                 Section::make()->schema([
                     TextInput::make('name')
-                        ->label("Thématique")
+                        ->label('Thématique')
                         ->rules(['max:255', 'string'])
                         ->required()
-                        ->unique(ignorable: fn(?Theme $record): ?Theme => $record)
+                        ->unique(ignorable: fn (?Theme $record): ?Theme => $record)
                         ->placeholder('Nom de la thématique')
                         ->columnSpan([
                             'default' => 12,
@@ -45,7 +42,7 @@ class ThemeResource extends Resource
                         ]),
 
                     Toggle::make('status')
-                        ->label("Activée")
+                        ->label('Activée')
                         ->rules(['boolean'])
                         ->required()
                         ->columnSpan([
@@ -63,7 +60,7 @@ class ThemeResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label("Nom")
+                    ->label('Nom')
                     ->searchable()
                     ->limit(50),
 
@@ -73,7 +70,7 @@ class ThemeResource extends Resource
                     ->counts('questions'),*/
 
                 Tables\Columns\IconColumn::make('status')
-                    ->label("Statut")
+                    ->label('Statut')
                     ->boolean(),
             ])
             ->filters([

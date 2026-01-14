@@ -91,6 +91,6 @@ class NotificationTemplateSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ ' . count($templates) . ' templates de notifications créés');
+        $this->command->info('✅ '.count($templates).' templates de notifications créés');
     }
 }

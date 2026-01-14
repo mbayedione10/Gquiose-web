@@ -2,19 +2,21 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Utilisateur;
 use App\Models\Alerte;
+use App\Models\Article;
 use App\Models\Evaluation;
 use App\Models\Response;
-use App\Models\Article;
+use App\Models\Utilisateur;
 use Filament\Widgets\LineChartWidget;
 use Illuminate\Support\Carbon;
 
 class ActivityChartWidget extends LineChartWidget
 {
     protected static ?string $heading = 'Tendances d\'activité - 7 derniers jours';
+
     protected static ?int $sort = 2;
-    protected int | string | array $columnSpan = 'full';
+
+    protected int|string|array $columnSpan = 'full';
 
     protected static ?string $maxHeight = '300px';
 

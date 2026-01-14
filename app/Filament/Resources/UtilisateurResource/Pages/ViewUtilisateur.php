@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\UtilisateurResource\Pages;
 
-use Filament\Resources\Pages\ViewRecord;
 use App\Filament\Resources\UtilisateurResource;
+use Filament\Resources\Pages\ViewRecord;
 
 class ViewUtilisateur extends ViewRecord
 {
@@ -12,7 +12,7 @@ class ViewUtilisateur extends ViewRecord
     protected function getHeaderWidgets(): array
     {
         return [
-            UtilisateurResource\Widgets\ViewUtilisateurOverview::class
+            UtilisateurResource\Widgets\ViewUtilisateurOverview::class,
         ];
     }
 

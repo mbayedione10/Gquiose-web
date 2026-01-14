@@ -31,7 +31,7 @@ class APIPushNotificationController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -43,7 +43,7 @@ class APIPushNotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Token FCM enregistré avec succès'
+            'message' => 'Token FCM enregistré avec succès',
         ]);
     }
 
@@ -54,10 +54,10 @@ class APIPushNotificationController extends Controller
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Non authentifié'
+                'message' => 'Non authentifié',
             ], 401);
         }
 
@@ -76,7 +76,7 @@ class APIPushNotificationController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -98,7 +98,7 @@ class APIPushNotificationController extends Controller
         return response()->json([
             'success' => true,
             'preferences' => $preferences,
-            'message' => 'Préférences mises à jour avec succès'
+            'message' => 'Préférences mises à jour avec succès',
         ]);
     }
 
@@ -109,17 +109,17 @@ class APIPushNotificationController extends Controller
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Non authentifié'
+                'message' => 'Non authentifié',
             ], 401);
         }
 
         $preferences = $user->notificationPreferences;
 
         // Si pas de préférences, retourner les valeurs par défaut
-        if (!$preferences) {
+        if (! $preferences) {
             $preferences = [
                 'notifications_enabled' => true,
                 'cycle_notifications' => true,
@@ -135,7 +135,7 @@ class APIPushNotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'preferences' => $preferences
+            'preferences' => $preferences,
         ]);
     }
 
@@ -145,18 +145,18 @@ class APIPushNotificationController extends Controller
     public function trackOpened(Request $request, $notificationId)
     {
         $notification = PushNotification::find($notificationId);
-        
-        if (!$notification) {
+
+        if (! $notification) {
             return response()->json([
                 'success' => false,
-                'message' => 'Notification non trouvée'
+                'message' => 'Notification non trouvée',
             ], 404);
         }
 
         $notification->increment('opened_count');
 
         return response()->json([
-            'success' => true
+            'success' => true,
         ]);
     }
 
@@ -166,18 +166,18 @@ class APIPushNotificationController extends Controller
     public function trackClicked(Request $request, $notificationId)
     {
         $notification = PushNotification::find($notificationId);
-        
-        if (!$notification) {
+
+        if (! $notification) {
             return response()->json([
                 'success' => false,
-                'message' => 'Notification non trouvée'
+                'message' => 'Notification non trouvée',
             ], 404);
         }
 
         $notification->increment('clicked_count');
 
         return response()->json([
-            'success' => true
+            'success' => true,
         ]);
     }
 }

@@ -2,11 +2,10 @@
 
 namespace App\Filament\Resources\AlerteResource\Pages;
 
-use App\Models\Alerte;
+use App\Filament\Resources\AlerteResource;
 use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
-use App\Filament\Resources\AlerteResource;
 
 class ViewAlerte extends ViewRecord
 {
@@ -33,7 +32,7 @@ class ViewAlerte extends ViewRecord
                     Notification::make()
                         ->title('Information')
                         ->success()
-                        ->body("L'alerte qui a pour référence **" . $this->record->ref . "** vient d'être confirmée")
+                        ->body("L'alerte qui a pour référence **".$this->record->ref."** vient d'être confirmée")
                         ->send();
                 }),
 
@@ -52,7 +51,7 @@ class ViewAlerte extends ViewRecord
                     Notification::make()
                         ->title('Information')
                         ->success()
-                        ->body("L'alerte qui a pour référence **" . $this->record->ref . "** vient d'être rejetée")
+                        ->body("L'alerte qui a pour référence **".$this->record->ref."** vient d'être rejetée")
                         ->send();
                 }),
 

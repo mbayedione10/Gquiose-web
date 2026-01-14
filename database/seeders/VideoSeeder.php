@@ -82,6 +82,6 @@ class VideoSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ ' . count($videos) . ' vidéos SSR/VBG pour jeunes créées');
+        $this->command->info('✅ '.count($videos).' vidéos SSR/VBG pour jeunes créées');
     }
 }

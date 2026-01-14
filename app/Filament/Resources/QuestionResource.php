@@ -2,30 +2,31 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\QuestionResource\Pages;
 use App\Filament\Resources\QuestionResource\Widgets\QuestionOverview;
 use App\Models\Question;
 use App\Models\Thematique;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\TextInput;
-use App\Filament\Resources\QuestionResource\Pages;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 class QuestionResource extends Resource
 {
     protected static ?string $model = Question::class;
 
-
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationLabel = "Questions";
-    protected static ?string $navigationGroup = "Quiz";
+    protected static ?string $navigationLabel = 'Questions';
+
+    protected static ?string $navigationGroup = 'Quiz';
+
     protected static ?string $navigationIcon = 'heroicon-o-question-mark-circle';
+
     protected static ?int $navigationSort = 20;
 
     public static function form(Form $form): Form
@@ -43,13 +44,13 @@ class QuestionResource extends Resource
                     )
                     ->createOptionForm([
                         TextInput::make('name')
-                            ->label("Thêmatique")
+                            ->label('Thêmatique')
                             ->rules(['max:255', 'string'])
                             ->required()
                             ->unique(
                                 'thematiques',
                                 'name',
-                                fn(?Thematique $record) => $record
+                                fn (?Thematique $record) => $record
                             )
                             ->placeholder('Nom de la thématique')
                             ->columnSpan([
@@ -59,7 +60,7 @@ class QuestionResource extends Resource
                             ]),
 
                         Toggle::make('status')
-                            ->label("Activée")
+                            ->label('Activée')
                             ->rules(['boolean'])
                             ->required()
                             ->columnSpan([
@@ -77,13 +78,13 @@ class QuestionResource extends Resource
                     ]),
 
                 TextInput::make('name')
-                    ->label("Question")
+                    ->label('Question')
                     ->rules(['max:255', 'string'])
                     ->required()
                     ->unique(
                         'questions',
                         'name',
-                        fn(?Question $record) => $record
+                        fn (?Question $record) => $record
                     )
                     ->placeholder('Écrire la question')
                     ->columnSpan([
@@ -94,7 +95,7 @@ class QuestionResource extends Resource
 
                 TextInput::make('reponse')
                     ->rules(['max:255', 'string'])
-                    ->label("Réponse")
+                    ->label('Réponse')
                     ->required()
                     ->placeholder('La bonne réponse')
                     ->columnSpan([
@@ -105,7 +106,7 @@ class QuestionResource extends Resource
 
                 TextInput::make('option1')
                     ->rules(['max:255', 'string'])
-                    ->label("Option 1")
+                    ->label('Option 1')
                     ->required()
                     ->placeholder('Mauvaise réponse 1')
                     ->columnSpan([
@@ -114,10 +115,9 @@ class QuestionResource extends Resource
                         'lg' => 12,
                     ]),
 
-
                 TextInput::make('option2')
                     ->rules(['max:255', 'string'])
-                    ->label("Option 2")
+                    ->label('Option 2')
                     ->required()
                     ->placeholder('Mauvaise réponse 2')
                     ->columnSpan([
@@ -128,7 +128,7 @@ class QuestionResource extends Resource
 
                 TextInput::make('option3')
                     ->rules(['max:255', 'string'])
-                    ->label("Option 3")
+                    ->label('Option 3')
                     ->nullable()
                     ->placeholder('Mauvaise réponse 3 (optionnelle)')
                     ->columnSpan([
@@ -139,7 +139,7 @@ class QuestionResource extends Resource
 
                 TextInput::make('option4')
                     ->rules(['max:255', 'string'])
-                    ->label("Option 4")
+                    ->label('Option 4')
                     ->nullable()
                     ->placeholder('Mauvaise réponse 4 (optionnelle)')
                     ->columnSpan([
@@ -149,7 +149,7 @@ class QuestionResource extends Resource
                     ]),
 
                 Toggle::make('status')
-                    ->label("Activée")
+                    ->label('Activée')
                     ->rules(['boolean'])
                     ->required()
                     ->columnSpan([
@@ -169,44 +169,43 @@ class QuestionResource extends Resource
             ->columns([
 
                 Tables\Columns\TextColumn::make('thematique.name')
-                    ->label("Thématique")
-                    ->url(function (?Question  $record){
+                    ->label('Thématique')
+                    ->url(function (?Question $record) {
                         return ThematiqueResource::getUrl('view', ['record' => $record->thematique_id]);
                     })
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('name')
-                    ->label("Question")
+                    ->label('Question')
                     ->searchable()
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('reponse')
-                    ->label("Réponse")
+                    ->label('Réponse')
                     ->searchable()
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('option1')
-                    ->label("Option 1")
+                    ->label('Option 1')
                     ->searchable()
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('option2')
-                    ->label("Option 2")
+                    ->label('Option 2')
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('option3')
-                    ->label("Option 3")
+                    ->label('Option 3')
                     ->limit(50)
                     ->default('-'),
 
                 Tables\Columns\TextColumn::make('option4')
-                    ->label("Option 4")
+                    ->label('Option 4')
                     ->limit(50)
                     ->default('-'),
 
                 Tables\Columns\ToggleColumn::make('status')
-                    ->label("Statut"),
-
+                    ->label('Statut'),
 
             ]);
     }

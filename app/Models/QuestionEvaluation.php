@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Models\Scopes\Searchable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class QuestionEvaluation extends Model
 {
@@ -46,12 +46,13 @@ class QuestionEvaluation extends Model
         if (is_null($value) || $value === '' || $value === 'null') {
             return [];
         }
-        
+
         if (is_string($value)) {
             $decoded = json_decode($value, true);
+
             return is_array($decoded) ? $decoded : [];
         }
-        
+
         return is_array($value) ? $value : [];
     }
 
@@ -73,25 +74,25 @@ class QuestionEvaluation extends Model
      */
     public function shouldDisplay(array $previousResponses = []): bool
     {
-        if (!$this->condition_question_id) {
+        if (! $this->condition_question_id) {
             return true;
         }
 
         $conditionQuestion = self::find($this->condition_question_id);
-        if (!$conditionQuestion) {
+        if (! $conditionQuestion) {
             return true;
         }
 
         $previousResponse = collect($previousResponses)
             ->firstWhere('question_evaluation_id', $this->condition_question_id);
 
-        if (!$previousResponse) {
-            return !$this->show_if_condition_met;
+        if (! $previousResponse) {
+            return ! $this->show_if_condition_met;
         }
 
         $responseValue = $previousResponse['reponse'] ?? $previousResponse['valeur_numerique'] ?? null;
 
-        $conditionMet = match($this->condition_operator) {
+        $conditionMet = match ($this->condition_operator) {
             'equals' => $responseValue == $this->condition_value,
             'not_equals' => $responseValue != $this->condition_value,
             'greater_than' => $responseValue > $this->condition_value,
@@ -99,7 +100,7 @@ class QuestionEvaluation extends Model
             default => true,
         };
 
-        return $this->show_if_condition_met ? $conditionMet : !$conditionMet;
+        return $this->show_if_condition_met ? $conditionMet : ! $conditionMet;
     }
 
     private function evaluateCondition($answer)

@@ -15,7 +15,7 @@ class TestSmsCommand extends Command
     {
         $phone = $this->argument('phone');
 
-        $this->info("Provider actif: " . config('services.sms.provider'));
+        $this->info('Provider actif: '.config('services.sms.provider'));
         $this->info("Envoi d'un SMS de test à {$phone}...");
 
         try {
@@ -24,13 +24,16 @@ class TestSmsCommand extends Command
 
             if ($result) {
                 $this->info('SMS envoyé avec succès!');
+
                 return Command::SUCCESS;
             }
 
             $this->error('Échec de l\'envoi du SMS. Vérifiez les logs pour plus de détails.');
+
             return Command::FAILURE;
         } catch (\Exception $e) {
-            $this->error("Erreur: " . $e->getMessage());
+            $this->error('Erreur: '.$e->getMessage());
+
             return Command::FAILURE;
         }
     }

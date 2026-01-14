@@ -3,10 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\Alerte;
-use App\Models\TypeAlerte;
-use App\Models\Ville;
-use App\Models\Utilisateur;
 use App\Models\SousTypeViolenceNumerique;
+use App\Models\TypeAlerte;
+use App\Models\Utilisateur;
+use App\Models\Ville;
 use Illuminate\Database\Seeder;
 
 class AlerteSeeder extends Seeder
@@ -21,6 +21,7 @@ class AlerteSeeder extends Seeder
 
         if ($utilisateurs->isEmpty()) {
             $this->command->warn('Assurez-vous que les seeders Utilisateur et Ville ont été exécutés en premier.');
+
             return;
         }
 
@@ -48,17 +49,18 @@ class AlerteSeeder extends Seeder
         // Sous-types de violence numérique
         $sousTypes = SousTypeViolenceNumerique::all();
 
-        if (!$conakry) {
+        if (! $conakry) {
             $this->command->warn('Assurez-vous que les seeders Ville ont été exécutés en premier.');
+
             return;
         }
 
         // Génération du numéro de suivi
-        $numeroSuivi = 'VBG-' . date('Y') . '-' . str_pad(1, 6, '0', STR_PAD_LEFT);
+        $numeroSuivi = 'VBG-'.date('Y').'-'.str_pad(1, 6, '0', STR_PAD_LEFT);
 
         // Alerte 1 : Revenge porn
         Alerte::create([
-            'ref' => 'ALRT-' . date('Y') . '-001',
+            'ref' => 'ALRT-'.date('Y').'-001',
             'numero_suivi' => $numeroSuivi,
             'description' => 'Mon ex-partenaire a publié mes photos intimes sur les réseaux sociaux sans mon consentement. Les images sont partagées sur plusieurs groupes Facebook et WhatsApp.',
             'type_alerte_id' => $revengePorn?->id,
@@ -89,8 +91,8 @@ class AlerteSeeder extends Seeder
 
         // Alerte 2 : Harcèlement sexuel au travail
         Alerte::create([
-            'ref' => 'ALRT-' . date('Y') . '-002',
-            'numero_suivi' => 'VBG-' . date('Y') . '-' . str_pad(2, 6, '0', STR_PAD_LEFT),
+            'ref' => 'ALRT-'.date('Y').'-002',
+            'numero_suivi' => 'VBG-'.date('Y').'-'.str_pad(2, 6, '0', STR_PAD_LEFT),
             'description' => 'Harcèlement sexuel sur mon lieu de travail. Mon supérieur hiérarchique me fait des avances déplacées et menace ma carrière si je refuse.',
             'type_alerte_id' => $harcelementSexuel?->id,
             'ville_id' => $kindia?->id,
@@ -110,8 +112,8 @@ class AlerteSeeder extends Seeder
 
         // Alerte 3 : Cyberharcèlement
         Alerte::create([
-            'ref' => 'ALRT-' . date('Y') . '-003',
-            'numero_suivi' => 'VBG-' . date('Y') . '-' . str_pad(3, 6, '0', STR_PAD_LEFT),
+            'ref' => 'ALRT-'.date('Y').'-003',
+            'numero_suivi' => 'VBG-'.date('Y').'-'.str_pad(3, 6, '0', STR_PAD_LEFT),
             'description' => 'Je reçois quotidiennement des messages d\'insultes et de menaces sur mes réseaux sociaux. L\'agresseur crée de faux comptes pour me harceler.',
             'type_alerte_id' => $violenceNumerique?->id,
             'sous_type_violence_numerique_id' => $sousTypes->where('name', 'Cyberharcèlement')->first()?->id,
@@ -136,8 +138,8 @@ class AlerteSeeder extends Seeder
 
         // Alerte 4 : Violence physique
         Alerte::create([
-            'ref' => 'ALRT-' . date('Y') . '-004',
-            'numero_suivi' => 'VBG-' . date('Y') . '-' . str_pad(4, 6, '0', STR_PAD_LEFT),
+            'ref' => 'ALRT-'.date('Y').'-004',
+            'numero_suivi' => 'VBG-'.date('Y').'-'.str_pad(4, 6, '0', STR_PAD_LEFT),
             'description' => 'Mon conjoint m\'a frappée hier soir lors d\'une dispute. Ce n\'est pas la première fois mais la violence s\'aggrave.',
             'type_alerte_id' => $violencePhysique?->id,
             'ville_id' => $kankan?->id,
@@ -157,8 +159,8 @@ class AlerteSeeder extends Seeder
 
         // Alerte 5 : Mariage forcé
         Alerte::create([
-            'ref' => 'ALRT-' . date('Y') . '-005',
-            'numero_suivi' => 'VBG-' . date('Y') . '-' . str_pad(5, 6, '0', STR_PAD_LEFT),
+            'ref' => 'ALRT-'.date('Y').'-005',
+            'numero_suivi' => 'VBG-'.date('Y').'-'.str_pad(5, 6, '0', STR_PAD_LEFT),
             'description' => 'Ma famille veut me forcer à épouser un homme que je ne connais pas. J\'ai 17 ans et je veux continuer mes études.',
             'type_alerte_id' => $mariageForce?->id,
             'ville_id' => $conakry?->id,
@@ -178,8 +180,8 @@ class AlerteSeeder extends Seeder
 
         // Alerte 6 : Violence conjugale
         Alerte::create([
-            'ref' => 'ALRT-' . date('Y') . '-006',
-            'numero_suivi' => 'VBG-' . date('Y') . '-' . str_pad(6, 6, '0', STR_PAD_LEFT),
+            'ref' => 'ALRT-'.date('Y').'-006',
+            'numero_suivi' => 'VBG-'.date('Y').'-'.str_pad(6, 6, '0', STR_PAD_LEFT),
             'description' => 'Mon mari me violente régulièrement. Il contrôle mes déplacements et mes contacts.',
             'type_alerte_id' => $violenceConjugale?->id,
             'ville_id' => $conakry?->id,
@@ -199,8 +201,8 @@ class AlerteSeeder extends Seeder
 
         // Alerte 7 : MGF (Excision)
         Alerte::create([
-            'ref' => 'ALRT-' . date('Y') . '-007',
-            'numero_suivi' => 'VBG-' . date('Y') . '-' . str_pad(7, 6, '0', STR_PAD_LEFT),
+            'ref' => 'ALRT-'.date('Y').'-007',
+            'numero_suivi' => 'VBG-'.date('Y').'-'.str_pad(7, 6, '0', STR_PAD_LEFT),
             'description' => 'Ma famille veut m\'emmener au village pour l\'excision. J\'ai peur et je ne veux pas.',
             'type_alerte_id' => $mgf?->id,
             'ville_id' => $kankan?->id,
@@ -220,8 +222,8 @@ class AlerteSeeder extends Seeder
 
         // Alerte 8 : Agression sexuelle
         Alerte::create([
-            'ref' => 'ALRT-' . date('Y') . '-008',
-            'numero_suivi' => 'VBG-' . date('Y') . '-' . str_pad(8, 6, '0', STR_PAD_LEFT),
+            'ref' => 'ALRT-'.date('Y').'-008',
+            'numero_suivi' => 'VBG-'.date('Y').'-'.str_pad(8, 6, '0', STR_PAD_LEFT),
             'description' => 'J\'ai été agressée sexuellement par une connaissance lors d\'une soirée.',
             'type_alerte_id' => $agressionSexuelle?->id,
             'ville_id' => $conakry?->id,
@@ -241,8 +243,8 @@ class AlerteSeeder extends Seeder
 
         // Alerte 9 : Cyberstalking
         Alerte::create([
-            'ref' => 'ALRT-' . date('Y') . '-009',
-            'numero_suivi' => 'VBG-' . date('Y') . '-' . str_pad(9, 6, '0', STR_PAD_LEFT),
+            'ref' => 'ALRT-'.date('Y').'-009',
+            'numero_suivi' => 'VBG-'.date('Y').'-'.str_pad(9, 6, '0', STR_PAD_LEFT),
             'description' => 'Quelqu\'un surveille tous mes mouvements en ligne, connaît ma localisation et me menace.',
             'type_alerte_id' => $cyberstalking?->id,
             'sous_type_violence_numerique_id' => $sousTypes->where('nom', 'Surveillance/espionnage via téléphone')->first()?->id,
@@ -266,8 +268,8 @@ class AlerteSeeder extends Seeder
 
         // Alerte 10 : Chantage en ligne
         Alerte::create([
-            'ref' => 'ALRT-' . date('Y') . '-010',
-            'numero_suivi' => 'VBG-' . date('Y') . '-' . str_pad(10, 6, '0', STR_PAD_LEFT),
+            'ref' => 'ALRT-'.date('Y').'-010',
+            'numero_suivi' => 'VBG-'.date('Y').'-'.str_pad(10, 6, '0', STR_PAD_LEFT),
             'description' => 'On me fait chanter avec des vidéos intimes et menace de les envoyer à ma famille si je ne paie pas.',
             'type_alerte_id' => $chantage?->id,
             'sous_type_violence_numerique_id' => $sousTypes->where('nom', 'Chantage avec photos/vidéos intimes (sextorsion)')->first()?->id,

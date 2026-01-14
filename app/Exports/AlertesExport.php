@@ -39,7 +39,7 @@ class AlertesExport implements FromCollection, WithHeadings, WithMapping, WithSt
             $alerte->description,
             $alerte->etat,
             $alerte->ville?->name ?? 'N/A',
-            $alerte->utilisateur?->nom . ' ' . $alerte->utilisateur?->prenom ?? 'N/A',
+            $alerte->utilisateur?->nom.' '.$alerte->utilisateur?->prenom ?? 'N/A',
             $alerte->latitude,
             $alerte->longitude,
             $alerte->created_at->format('d/m/Y H:i'),

@@ -2,23 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\AdminInvitation;
-use App\Models\User;
+use App\Filament\Resources\AdminInvitationResource\Pages;
 use App\Mail\AdminInvitationMail;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
+use App\Models\AdminInvitation;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Actions\Action;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Auth;
-use App\Filament\Resources\AdminInvitationResource\Pages;
 
 class AdminInvitationResource extends Resource
 {
@@ -26,12 +24,16 @@ class AdminInvitationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'email';
 
-    protected static ?string $navigationLabel = "Invitations";
-    protected static ?string $navigationGroup = "Gestion des utilisateurs";
+    protected static ?string $navigationLabel = 'Invitations';
+
+    protected static ?string $navigationGroup = 'Gestion des utilisateurs';
+
     protected static ?string $navigationIcon = 'heroicon-o-envelope';
+
     protected static ?int $navigationSort = 101;
 
     protected static ?string $modelLabel = 'Invitation';
+
     protected static ?string $pluralModelLabel = 'Invitations';
 
     public static function form(Form $form): Form
@@ -114,6 +116,7 @@ class AdminInvitationResource extends Resource
                         if ($record->isExpired()) {
                             return 'Expirée';
                         }
+
                         return 'En attente';
                     })
                     ->color(fn (string $state): string => match ($state) {
@@ -166,7 +169,7 @@ class AdminInvitationResource extends Resource
 
                         Notification::make()
                             ->title('Invitation renvoyée')
-                            ->body('L\'email d\'invitation a été renvoyé à ' . $record->email)
+                            ->body('L\'email d\'invitation a été renvoyé à '.$record->email)
                             ->success()
                             ->send();
                     }),
@@ -177,7 +180,7 @@ class AdminInvitationResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading('Prolonger l\'invitation')
                     ->modalDescription('Prolonger la validité de l\'invitation de 48 heures supplémentaires ?')
-                    ->visible(fn (AdminInvitation $record): bool => !$record->isAccepted())
+                    ->visible(fn (AdminInvitation $record): bool => ! $record->isAccepted())
                     ->action(function (AdminInvitation $record) {
                         $record->update([
                             'expires_at' => now()->addHours(48),

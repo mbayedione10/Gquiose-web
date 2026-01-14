@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ville;
-use Illuminate\View\View;
-use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\VilleStoreRequest;
 use App\Http\Requests\VilleUpdateRequest;
+use App\Models\Ville;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class VilleController extends Controller
 {

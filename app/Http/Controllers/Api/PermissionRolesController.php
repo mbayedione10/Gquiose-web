@@ -1,12 +1,13 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
-use App\Models\Role;
-use App\Models\Permission;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RoleCollection;
+use App\Models\Permission;
+use App\Models\Role;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class PermissionRolesController extends Controller
 {

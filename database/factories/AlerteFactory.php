@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Alerte;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class AlerteFactory extends Factory

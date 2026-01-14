@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\NatureContenuResource\Pages;
 
-use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\NatureContenuResource;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateNatureContenu extends CreateRecord
 {

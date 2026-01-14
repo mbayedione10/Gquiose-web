@@ -23,28 +23,28 @@ class SendCycleReminderNotification implements ShouldQueue
     public function handle(CycleReminderTriggered $event): void
     {
         $user = $event->user;
-        
+
         // Déterminer le message selon le type de rappel
-        [$title, $message, $icon] = match($event->reminderType) {
+        [$title, $message, $icon] = match ($event->reminderType) {
             'period_coming' => [
                 'Rappel de cycle',
                 "Vos règles sont prévues dans {$event->daysUntil} jour(s). Préparez-vous !",
-                '🩸'
+                '🩸',
             ],
             'ovulation' => [
                 'Période d\'ovulation',
                 "Vous êtes en période d\'ovulation. Restez informée !",
-                '🌸'
+                '🌸',
             ],
             'fertile_window' => [
                 'Fenêtre de fertilité',
-                "Vous êtes dans votre fenêtre de fertilité.",
-                '💫'
+                'Vous êtes dans votre fenêtre de fertilité.',
+                '💫',
             ],
             default => [
                 'Rappel de cycle',
                 'Mise à jour concernant votre cycle menstruel',
-                '🩸'
+                '🩸',
             ]
         };
 

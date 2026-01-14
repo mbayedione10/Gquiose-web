@@ -13,27 +13,27 @@ class RoleSeeder extends Seeder
             [
                 'name' => 'Super Admin',
                 'description' => 'Accès complet à toutes les fonctionnalités de l\'application, y compris les configurations sensibles',
-                'status' => true
+                'status' => true,
             ],
             [
                 'name' => 'Admin',
                 'description' => 'Gestion complète de l\'application sauf les configurations sensibles et critiques',
-                'status' => true
+                'status' => true,
             ],
             [
                 'name' => 'Éditeur',
                 'description' => 'Gestion des articles, rubriques, thématiques et contenus éducatifs',
-                'status' => true
+                'status' => true,
             ],
             [
                 'name' => 'Modérateur',
                 'description' => 'Gestion des alertes VBG, modération du forum et des contenus utilisateurs',
-                'status' => true
+                'status' => true,
             ],
             [
                 'name' => 'Structure Sanitaire',
                 'description' => 'Accès limité pour les structures de santé partenaires',
-                'status' => true
+                'status' => true,
             ],
         ];
 
@@ -42,7 +42,7 @@ class RoleSeeder extends Seeder
                 ['name' => $roleData['name']],
                 [
                     'description' => $roleData['description'],
-                    'status' => $roleData['status']
+                    'status' => $roleData['status'],
                 ]
             );
         }
@@ -50,6 +50,6 @@ class RoleSeeder extends Seeder
         // Supprimer les anciens rôles qui ne sont plus utilisés
         Role::whereNotIn('name', array_column($roles, 'name'))->delete();
 
-        $this->command->info('✅ ' . count($roles) . ' rôles configurés');
+        $this->command->info('✅ '.count($roles).' rôles configurés');
     }
 }

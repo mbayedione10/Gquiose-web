@@ -2,33 +2,33 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Response;
-use Illuminate\Database\Eloquent\Model;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\TextInput;
-use Filament\Tables\Filters\SelectFilter;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\ResponseResource\Pages;
+use App\Models\Response;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class ResponseResource extends Resource
 {
     protected static ?string $model = Response::class;
 
-
     protected static ?string $recordTitleAttribute = 'reponse';
 
-    protected static ?string $navigationLabel = "Réponses";
-    protected static ?string $navigationGroup = "Quiz";
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
-    protected static ?int $navigationSort = 21;
+    protected static ?string $navigationLabel = 'Réponses';
 
+    protected static ?string $navigationGroup = 'Quiz';
+
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
+
+    protected static ?int $navigationSort = 21;
 
     public static function canCreate(): bool
     {
@@ -108,25 +108,24 @@ class ResponseResource extends Resource
             ->columns([
 
                 Tables\Columns\TextColumn::make('utilisateur.nom')
-                    ->label("Utilisateur")
+                    ->label('Utilisateur')
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('question.name')
-                    ->label("Question ")
+                    ->label('Question ')
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('question.thematique.name')
-                    ->label("Thématique")
+                    ->label('Thématique')
                     ->limit(50),
 
-
                 Tables\Columns\TextColumn::make('reponse')
-                    ->label("Réponse")
+                    ->label('Réponse')
                     ->searchable()
                     ->limit(50),
 
                 Tables\Columns\IconColumn::make('isValid')
-                    ->label("Trouvée")
+                    ->label('Trouvée')
                     ->sortable()
                     ->boolean(),
 

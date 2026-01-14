@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Responses\ApiResponse;
-use App\Models\MenstrualCycle;
-use App\Models\CycleSymptom;
-use App\Models\CycleSetting;
 use App\Models\CycleReminder;
+use App\Models\CycleSetting;
+use App\Models\CycleSymptom;
+use App\Models\MenstrualCycle;
 use App\Models\Utilisateur;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class APICycleController extends Controller
 {
@@ -34,15 +34,15 @@ class APICycleController extends Controller
             return ApiResponse::error($validator->errors()->first(), 400);
         }
 
-        if (!$this->hasUserIdentifier($request)) {
+        if (! $this->hasUserIdentifier($request)) {
             return ApiResponse::error('Veuillez fournir user_id, email ou phone', 400);
         }
 
         $user = $this->resolveUser($request);
-        if (!$user) {
+        if (! $user) {
             return ApiResponse::error('Utilisateur introuvable', 404);
         }
-        
+
         // Récupérer ou créer les paramètres
         $settings = CycleSetting::firstOrCreate(
             ['utilisateur_id' => $user->id],
@@ -101,7 +101,8 @@ class APICycleController extends Controller
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            return ApiResponse::error('Erreur lors du démarrage du cycle: ' . $e->getMessage(), 500);
+
+            return ApiResponse::error('Erreur lors du démarrage du cycle: '.$e->getMessage(), 500);
         }
     }
 
@@ -122,12 +123,12 @@ class APICycleController extends Controller
             return ApiResponse::error($validator->errors()->first(), 400);
         }
 
-        if (!$this->hasUserIdentifier($request)) {
+        if (! $this->hasUserIdentifier($request)) {
             return ApiResponse::error('Veuillez fournir user_id, email ou phone', 400);
         }
 
         $user = $this->resolveUser($request);
-        if (!$user) {
+        if (! $user) {
             return ApiResponse::error('Utilisateur introuvable', 404);
         }
 
@@ -136,7 +137,7 @@ class APICycleController extends Controller
             ->whereNull('period_end_date')
             ->first();
 
-        if (!$cycle) {
+        if (! $cycle) {
             return ApiResponse::error('Aucun cycle actif trouvé', 404);
         }
 
@@ -148,7 +149,7 @@ class APICycleController extends Controller
         return ApiResponse::success([
             'cycle' => $cycle,
             'message' => 'Période terminée',
-            'period_length' => $cycle->period_length . ' jours',
+            'period_length' => $cycle->period_length.' jours',
         ]);
     }
 
@@ -179,12 +180,12 @@ class APICycleController extends Controller
             return ApiResponse::error($validator->errors()->first(), 400);
         }
 
-        if (!$this->hasUserIdentifier($request)) {
+        if (! $this->hasUserIdentifier($request)) {
             return ApiResponse::error('Veuillez fournir user_id, email ou phone', 400);
         }
 
         $user = $this->resolveUser($request);
-        if (!$user) {
+        if (! $user) {
             return ApiResponse::error('Utilisateur introuvable', 404);
         }
 
@@ -231,7 +232,7 @@ class APICycleController extends Controller
             $user = $this->resolveUser($request);
         }
 
-        if (!$user) {
+        if (! $user) {
             return ApiResponse::error('Utilisateur introuvable. Fournir user_id, email ou phone', 404);
         }
 
@@ -242,7 +243,7 @@ class APICycleController extends Controller
 
         $settings = CycleSetting::where('utilisateur_id', $user->id)->first();
 
-        if (!$cycle) {
+        if (! $cycle) {
             return ApiResponse::success([
                 'cycle' => null,
                 'settings' => $settings,
@@ -255,7 +256,7 @@ class APICycleController extends Controller
         $status = 'normal';
         $daysUntilPeriod = $cycle->daysUntilNextPeriod();
 
-        if ($cycle->period_start_date && !$cycle->period_end_date) {
+        if ($cycle->period_start_date && ! $cycle->period_end_date) {
             $status = 'period'; // En période de règles
         } elseif ($cycle->isInFertileWindow()) {
             $status = 'fertile'; // Fenêtre fertile
@@ -286,7 +287,7 @@ class APICycleController extends Controller
             $user = $this->resolveUser($request);
         }
 
-        if (!$user) {
+        if (! $user) {
             return ApiResponse::error('Utilisateur introuvable. Fournir user_id, email ou phone', 404);
         }
 
@@ -317,7 +318,7 @@ class APICycleController extends Controller
             $user = $this->resolveUser($request);
         }
 
-        if (!$user) {
+        if (! $user) {
             return ApiResponse::error('Utilisateur introuvable. Fournir user_id, email ou phone', 404);
         }
 
@@ -361,12 +362,12 @@ class APICycleController extends Controller
             return ApiResponse::error($validator->errors()->first(), 400);
         }
 
-        if (!$this->hasUserIdentifier($request)) {
+        if (! $this->hasUserIdentifier($request)) {
             return ApiResponse::error('Veuillez fournir user_id, email ou phone', 400);
         }
 
         $user = $this->resolveUser($request);
-        if (!$user) {
+        if (! $user) {
             return ApiResponse::error('Utilisateur introuvable', 404);
         }
 
@@ -422,12 +423,12 @@ class APICycleController extends Controller
             return ApiResponse::error($validator->errors()->first(), 400);
         }
 
-        if (!$this->hasUserIdentifier($request)) {
+        if (! $this->hasUserIdentifier($request)) {
             return ApiResponse::error('Veuillez fournir user_id, email ou phone', 400);
         }
 
         $user = $this->resolveUser($request);
-        if (!$user) {
+        if (! $user) {
             return ApiResponse::error('Utilisateur introuvable', 404);
         }
 
@@ -454,7 +455,8 @@ class APICycleController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return ApiResponse::error('Erreur: ' . $e->getMessage(), 500);
+
+            return ApiResponse::error('Erreur: '.$e->getMessage(), 500);
         }
     }
 
@@ -487,8 +489,6 @@ class APICycleController extends Controller
 
     /**
      * Résoudre un utilisateur par user_id, email ou phone
-     * @param Request $request
-     * @return Utilisateur|null
      */
     protected function resolveUser(Request $request): ?Utilisateur
     {
@@ -509,7 +509,8 @@ class APICycleController extends Controller
 
     /**
      * Valider qu'au moins un identifiant utilisateur est fourni
-     * @param Request $request
+     *
+     * @param  Request  $request
      * @return array Règles de validation pour l'identifiant
      */
     protected function getUserIdentifierRules(): array

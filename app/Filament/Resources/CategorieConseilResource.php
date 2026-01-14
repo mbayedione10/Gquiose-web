@@ -2,29 +2,33 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\CategorieConseil;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use App\Filament\Resources\CategorieConseilResource\Pages;
 use App\Filament\Resources\CategorieConseilResource\RelationManagers;
+use App\Models\CategorieConseil;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 class CategorieConseilResource extends Resource
 {
     protected static ?string $model = CategorieConseil::class;
 
-    protected static ?string $navigationLabel = "Conseils VBG";
-    protected static ?string $navigationGroup = "VBG";
+    protected static ?string $navigationLabel = 'Conseils VBG';
+
+    protected static ?string $navigationGroup = 'VBG';
+
     protected static ?string $navigationIcon = 'heroicon-o-light-bulb';
+
     protected static ?int $navigationSort = 13;
 
     protected static ?string $modelLabel = 'Conseil';
+
     protected static ?string $pluralModelLabel = 'Conseils VBG';
 
     public static function form(Form $form): Form

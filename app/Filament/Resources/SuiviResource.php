@@ -2,32 +2,34 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Filters\DateRangeFilter;
+use App\Filament\Resources\SuiviResource\Pages;
 use App\Models\Suivi;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
 use Filament\Tables\Filters\SelectFilter;
-use App\Filament\Filters\DateRangeFilter;
-use App\Filament\Resources\SuiviResource\Pages;
+use Filament\Tables\Table;
 
 class SuiviResource extends Resource
 {
     protected static ?string $model = Suivi::class;
 
-
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationLabel = "Suivis";
-    protected static ?string $navigationGroup = "VBG";
+    protected static ?string $navigationLabel = 'Suivis';
+
+    protected static ?string $navigationGroup = 'VBG';
+
     protected static ?string $navigationIcon = 'heroicon-o-check';
+
     protected static ?int $navigationSort = 11;
 
     public static function form(Form $form): Form

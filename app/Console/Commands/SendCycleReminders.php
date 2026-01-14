@@ -3,13 +3,13 @@
 namespace App\Console\Commands;
 
 use App\Events\CycleReminderTriggered;
-use App\Models\MenstrualCycle;
 use App\Models\Utilisateur;
 use Illuminate\Console\Command;
 
 class SendCycleReminders extends Command
 {
     protected $signature = 'cycle:send-reminders';
+
     protected $description = 'Envoie les rappels de cycle menstruel basés sur les prédictions';
 
     public function handle()
@@ -27,7 +27,7 @@ class SendCycleReminders extends Command
         foreach ($users as $user) {
             // Vérifier les préférences de notification
             $preferences = $user->notificationPreferences;
-            if (!$preferences || !$preferences->cycle_notifications || !$preferences->notifications_enabled) {
+            if (! $preferences || ! $preferences->cycle_notifications || ! $preferences->notifications_enabled) {
                 continue;
             }
 
@@ -36,7 +36,7 @@ class SendCycleReminders extends Command
                 ->orderBy('start_date', 'desc')
                 ->first();
 
-            if (!$latestCycle || !$latestCycle->next_period_date) {
+            if (! $latestCycle || ! $latestCycle->next_period_date) {
                 continue;
             }
 
@@ -66,6 +66,7 @@ class SendCycleReminders extends Command
         }
 
         $this->info("Total: {$remindersSent} rappels de cycle envoyés");
+
         return 0;
     }
 }

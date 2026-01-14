@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Structure;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class StructureFactory extends Factory

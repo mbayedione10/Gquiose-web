@@ -2,21 +2,17 @@
 
 namespace App\Filament\Resources\RubriqueResource\RelationManagers;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\RichEditor;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\BelongsToSelect;
-use Filament\Tables\Filters\MultiSelectFilter;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class ArticlesRelationManager extends RelationManager
 {
@@ -63,7 +59,7 @@ class ArticlesRelationManager extends RelationManager
 
                 TextInput::make('slug')
                     ->rules(['max:255', 'string'])
-                    ->unique('articles', 'slug', fn(?Model $record) => $record)
+                    ->unique('articles', 'slug', fn (?Model $record) => $record)
                     ->placeholder('Slug')
                     ->columnSpan([
                         'default' => 12,
@@ -129,21 +125,20 @@ class ArticlesRelationManager extends RelationManager
                     ->circular(),
 
                 Tables\Columns\TextColumn::make('title')
-                    ->label("Titre")
+                    ->label('Titre')
                     ->searchable()
                     ->limit(50),
 
-
                 Tables\Columns\ToggleColumn::make('status')
-                    ->label("Statut"),
+                    ->label('Statut'),
 
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label("Publié par")
+                    ->label('Publié par')
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label("Date de création")
-                    ->date('d F Y H:i')
+                    ->label('Date de création')
+                    ->date('d F Y H:i'),
             ]);
     }
 }

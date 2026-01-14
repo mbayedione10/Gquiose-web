@@ -11,10 +11,8 @@ class QuizBonneReponseChart extends DoughnutChartWidget
     protected static ?string $heading = 'Bonnes réponses au Quiz - Par thématique';
 
     protected static ?int $sort = 8;
-    
-    protected int | string | array $columnSpan = 'full';
 
-
+    protected int|string|array $columnSpan = 'full';
 
     protected function getData(): array
     {
@@ -28,17 +26,15 @@ class QuizBonneReponseChart extends DoughnutChartWidget
         $labels = $query->pluck('name')->toArray();
         $data = $query->pluck('data')->toArray();
 
-
         return [
             'datasets' => [
                 [
                     'label' => 'Thématique',
                     'data' => $data,
-                    'backgroundColor' => chartColors()
+                    'backgroundColor' => chartColors(),
                 ],
             ],
             'labels' => $labels,
         ];
     }
-
 }

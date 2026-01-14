@@ -2,24 +2,25 @@
 
 namespace App\Services\SMS;
 
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Vonage\Client;
 use Vonage\Client\Credentials\Basic;
 use Vonage\SMS\Message\SMS;
-use Exception;
 
 class VonageSMS implements SMSInterface
 {
     protected $client;
+
     protected $from;
 
     public function __construct()
     {
-        $key    = config('services.sms.vonage.key');
+        $key = config('services.sms.vonage.key');
         $secret = config('services.sms.vonage.secret');
         $this->from = config('services.sms.vonage.from');
 
-        if (!$key || !$secret || !$this->from) {
+        if (! $key || ! $secret || ! $this->from) {
             throw new Exception('Vonage credentials not configured');
         }
 
@@ -39,24 +40,24 @@ class VonageSMS implements SMSInterface
             Log::info('SMS sent via Vonage', [
                 'to' => $to,
                 'message_id' => $messageData->getMessageId(),
-                'status' => $messageData->getStatus()
+                'status' => $messageData->getStatus(),
             ]);
 
             return [
                 'success' => $messageData->getStatus() == 0,
                 'message_id' => $messageData->getMessageId(),
-                'error' => $messageData->getStatus() != 0 ? 'SMS failed with status: ' . $messageData->getStatus() : null
+                'error' => $messageData->getStatus() != 0 ? 'SMS failed with status: '.$messageData->getStatus() : null,
             ];
         } catch (Exception $e) {
             Log::error('Vonage SMS failed', [
                 'to' => $to,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return [
                 'success' => false,
                 'message_id' => null,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
     }
@@ -69,7 +70,7 @@ class VonageSMS implements SMSInterface
 
         return [
             'status' => 'unknown',
-            'delivered' => false
+            'delivered' => false,
         ];
     }
 }

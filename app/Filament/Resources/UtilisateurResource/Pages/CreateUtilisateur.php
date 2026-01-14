@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\UtilisateurResource\Pages;
 
-use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\UtilisateurResource;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateUtilisateur extends CreateRecord
 {

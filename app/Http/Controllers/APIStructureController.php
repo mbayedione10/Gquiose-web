@@ -29,7 +29,7 @@ class APIStructureController extends Controller
             ->where('structures.status', true)
             ->get();
 
-        $data = ["structures" => $structures];
+        $data = ['structures' => $structures];
 
         return response::success($data);
     }
@@ -90,22 +90,23 @@ class APIStructureController extends Controller
         $structures = $structures->filter(function ($structure) use ($radius) {
             return $structure->distance <= $radius;
         })
-        ->map(function ($structure) {
-            $structure->distance = round($structure->distance, 2);
-            return $structure;
-        })
-        ->sortBy('distance')
-        ->values(); // Réindexer après tri
+            ->map(function ($structure) {
+                $structure->distance = round($structure->distance, 2);
+
+                return $structure;
+            })
+            ->sortBy('distance')
+            ->values(); // Réindexer après tri
 
         $data = [
-            "structures" => $structures,
-            "search_params" => [
-                "latitude" => $lat,
-                "longitude" => $lng,
-                "radius_km" => $radius,
-                "type_structure_id" => $typeStructureId,
+            'structures' => $structures,
+            'search_params' => [
+                'latitude' => $lat,
+                'longitude' => $lng,
+                'radius_km' => $radius,
+                'type_structure_id' => $typeStructureId,
             ],
-            "count" => $structures->count(),
+            'count' => $structures->count(),
         ];
 
         return response::success($data);

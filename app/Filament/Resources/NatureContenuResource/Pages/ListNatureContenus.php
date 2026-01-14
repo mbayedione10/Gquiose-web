@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\NatureContenuResource\Pages;
 
-use Filament\Resources\Pages\ListRecords;
 use App\Filament\Resources\NatureContenuResource;
 use Filament\Actions\CreateAction;
+use Filament\Resources\Pages\ListRecords;
 
 class ListNatureContenus extends ListRecords
 {

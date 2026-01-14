@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\EvaluationStatsResource\Widgets;
 
 use App\Models\ReponseEvaluation;
-use App\Models\QuestionEvaluation;
 use Filament\Widgets\ChartWidget;
 
 class QuestionChartWidget extends ChartWidget
@@ -12,7 +11,7 @@ class QuestionChartWidget extends ChartWidget
 
     protected function getData(): array
     {
-        if (!$this->record) {
+        if (! $this->record) {
             return [
                 'datasets' => [],
                 'labels' => [],
@@ -37,13 +36,13 @@ class QuestionChartWidget extends ChartWidget
             case 'rating':
             case 'scale':
                 return $this->getNumericChart($reponses);
-            
+
             case 'yesno':
                 return $this->getBinaryChart($reponses);
-            
+
             case 'multiple_choice':
                 return $this->getMultipleChoiceChart($reponses);
-            
+
             default:
                 return $this->getTextSummary($reponses);
         }
@@ -51,11 +50,11 @@ class QuestionChartWidget extends ChartWidget
 
     protected function getType(): string
     {
-        if (!$this->record) {
+        if (! $this->record) {
             return 'bar';
         }
 
-        return match($this->record->type) {
+        return match ($this->record->type) {
             'yesno', 'multiple_choice' => 'pie',
             'rating', 'scale' => 'bar',
             default => 'bar',
@@ -76,7 +75,7 @@ class QuestionChartWidget extends ChartWidget
                     'backgroundColor' => '#10b981',
                 ],
             ],
-            'labels' => $distribution->keys()->map(fn($v) => (string)$v)->toArray(),
+            'labels' => $distribution->keys()->map(fn ($v) => (string) $v)->toArray(),
         ];
     }
 
@@ -128,6 +127,6 @@ class QuestionChartWidget extends ChartWidget
 
     public function getHeading(): ?string
     {
-        return $this->record ? 'Graphique : ' . $this->record->question : 'Statistiques';
+        return $this->record ? 'Graphique : '.$this->record->question : 'Statistiques';
     }
 }

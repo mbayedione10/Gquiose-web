@@ -3,31 +3,29 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ThematiqueChartResource\Widgets\QuestionThematiqueChart;
+use App\Filament\Resources\ThematiqueResource\Pages;
 use App\Filament\Resources\ThematiqueResource\Widgets\TrueResponsePerThematiqueChart;
 use App\Models\Thematique;
-use App\Models\Theme;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Toggle;
-use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Components\TextInput;
-use App\Filament\Filters\DateRangeFilter;
-use App\Filament\Resources\ThematiqueResource\Pages;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 class ThematiqueResource extends Resource
 {
     protected static ?string $model = Thematique::class;
 
-
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationLabel = "Thématiques";
-    protected static ?string $navigationGroup = "Quiz";
+    protected static ?string $navigationLabel = 'Thématiques';
+
+    protected static ?string $navigationGroup = 'Quiz';
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
     protected static ?int $navigationSort = 22;
 
     public static function form(Form $form): Form
@@ -35,13 +33,13 @@ class ThematiqueResource extends Resource
         return $form->schema([
             Section::make()->schema([
                 TextInput::make('name')
-                    ->label("Thématique")
+                    ->label('Thématique')
                     ->rules(['max:255', 'string'])
                     ->required()
                     ->unique(
                         'thematiques',
                         'name',
-                        fn(?Thematique $record) => $record
+                        fn (?Thematique $record) => $record
                     )
                     ->placeholder('Nom de la thématique')
                     ->columnSpan([
@@ -51,7 +49,7 @@ class ThematiqueResource extends Resource
                     ]),
 
                 Toggle::make('status')
-                    ->label("Activée")
+                    ->label('Activée')
                     ->rules(['boolean'])
                     ->required()
                     ->columnSpan([
@@ -70,17 +68,17 @@ class ThematiqueResource extends Resource
             ->poll('60s')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label("Nom")
+                    ->label('Nom')
                     ->searchable()
                     ->limit(50),
 
                 Tables\Columns\TextColumn::make('questions_count')
-                    ->label("Questions")
+                    ->label('Questions')
                     ->sortable()
                     ->counts('questions'),
 
                 Tables\Columns\IconColumn::make('status')
-                    ->label("Statut")
+                    ->label('Statut')
                     ->boolean(),
             ]);
     }
@@ -91,7 +89,6 @@ class ThematiqueResource extends Resource
             ThematiqueResource\RelationManagers\QuestionsRelationManager::class,
         ];
     }
-
 
     public static function getPages(): array
     {
@@ -106,8 +103,8 @@ class ThematiqueResource extends Resource
     public static function getWidgets(): array
     {
         return [
-          //QuestionThematiqueChart::class,
-          TrueResponsePerThematiqueChart::class
+            //QuestionThematiqueChart::class,
+            TrueResponsePerThematiqueChart::class,
         ];
     }
 }

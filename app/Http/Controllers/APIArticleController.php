@@ -4,16 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\ResourceNotFoundException;
 use App\Http\Responses\ApiResponse as response;
-
 use App\Models\Censure;
 use App\Models\Conseil;
 use App\Models\Faq;
 use App\Models\Information;
-use App\Models\Question;
-use App\Models\Rubrique;
 use App\Models\Structure;
-use App\Models\Theme;
 use App\Models\Thematique;
+use App\Models\Theme;
 use App\Models\Ville;
 use App\Services\ArticleService;
 use App\Services\RubriqueService;
@@ -26,15 +23,13 @@ class APIArticleController extends Controller
 
     /**
      * APIArticleController constructor.
-     * @param $article
      */
     public function __construct(ArticleService $article)
     {
         $this->articleService = $article;
     }
 
-
-    public function index(RubriqueService  $rubriqueService)
+    public function index(RubriqueService $rubriqueService)
     {
         $vedettes = $this->articleService->vedette();
         $recents = $this->articleService->recent();
@@ -53,8 +48,9 @@ class APIArticleController extends Controller
     {
         $article = $this->articleService->show($slug);
 
-        if ($article == null)
-            throw  new ResourceNotFoundException("Cet article n'existe pas");
+        if ($article == null) {
+            throw new ResourceNotFoundException("Cet article n'existe pas");
+        }
 
         return response::success($article);
     }
@@ -62,7 +58,7 @@ class APIArticleController extends Controller
     public function showByRubrique($rubriqueId)
     {
 
-        $articles= $this->articleService->findByRubrique($rubriqueId);
+        $articles = $this->articleService->findByRubrique($rubriqueId);
 
         return response::success($articles);
 
@@ -92,10 +88,10 @@ class APIArticleController extends Controller
             ->get();
 
         $informations = Information::where('status', true)
-            ->select('id', 'image', "rendez_vous", "structure_url", 'splash')
+            ->select('id', 'image', 'rendez_vous', 'structure_url', 'splash')
             ->first();
 
-        $conseils = Conseil::select("id", "message")->get();
+        $conseils = Conseil::select('id', 'message')->get();
 
         $structures = Structure::where('structures.status', true)
             ->join('villes', 'structures.ville_id', 'villes.id')
@@ -108,10 +104,10 @@ class APIArticleController extends Controller
             ->get();
 
         $themes = Theme::where('status', true)
-                ->select('id', 'name')
-                ->get();
+            ->select('id', 'name')
+            ->get();
 
-        $censures = Censure::select('id','name')
+        $censures = Censure::select('id', 'name')
             ->get();
 
         $data = [
@@ -138,7 +134,7 @@ class APIArticleController extends Controller
             ->first();
 
         return response::success([
-            'informations' => $informations
+            'informations' => $informations,
         ]);
     }
 
@@ -146,12 +142,12 @@ class APIArticleController extends Controller
      * GET /api/v1/quiz
      * Récupère les questions quiz avec filtre optionnel par thématique
      *
-     * @param Request $request
-     * Query params:
-     * - thematique_id (optional): Filtrer par ID de thématique
-     * - thematique (optional): Filtrer par nom de thématique
-     * - limit (optional): Nombre de questions (défaut: toutes)
-     * - random (optional): Mélanger les questions (true/false)
+     * @param  Request  $request
+     *                            Query params:
+     *                            - thematique_id (optional): Filtrer par ID de thématique
+     *                            - thematique (optional): Filtrer par nom de thématique
+     *                            - limit (optional): Nombre de questions (défaut: toutes)
+     *                            - random (optional): Mélanger les questions (true/false)
      */
     public function quiz(Request $request)
     {
@@ -177,7 +173,7 @@ class APIArticleController extends Controller
 
         // Filtre par nom de thématique
         if ($request->has('thematique')) {
-            $query->where('thematiques.name', 'LIKE', '%' . $request->thematique . '%');
+            $query->where('thematiques.name', 'LIKE', '%'.$request->thematique.'%');
         }
 
         // Mélanger les questions
@@ -195,7 +191,7 @@ class APIArticleController extends Controller
         // Récupérer les thématiques disponibles
         $thematiques = Thematique::where('status', true)
             ->select('id', 'name')
-            ->withCount(['questions' => function($q) {
+            ->withCount(['questions' => function ($q) {
                 $q->where('status', true);
             }])
             ->get();
@@ -203,7 +199,7 @@ class APIArticleController extends Controller
         return response::success([
             'quiz' => $quiz,
             'total' => $quiz->count(),
-            'thematiques_disponibles' => $thematiques
+            'thematiques_disponibles' => $thematiques,
         ]);
     }
 
@@ -215,14 +211,14 @@ class APIArticleController extends Controller
     {
         $thematiques = Thematique::where('status', true)
             ->select('id', 'name')
-            ->withCount(['questions' => function($q) {
+            ->withCount(['questions' => function ($q) {
                 $q->where('status', true);
             }])
             ->get();
 
         return response::success([
             'thematiques' => $thematiques,
-            'total' => $thematiques->count()
+            'total' => $thematiques->count(),
         ]);
     }
 
@@ -230,10 +226,10 @@ class APIArticleController extends Controller
      * GET /api/v1/conseils
      * Récupère les conseils d'hygiène menstruelle
      *
-     * @param Request $request
-     * Query params:
-     * - limit (optional): Nombre de conseils
-     * - random (optional): Mélanger les conseils
+     * @param  Request  $request
+     *                            Query params:
+     *                            - limit (optional): Nombre de conseils
+     *                            - random (optional): Mélanger les conseils
      */
     public function conseils(Request $request)
     {
@@ -253,7 +249,7 @@ class APIArticleController extends Controller
 
         return response::success([
             'conseils' => $conseils,
-            'total' => $conseils->count()
+            'total' => $conseils->count(),
         ]);
     }
 
@@ -261,14 +257,14 @@ class APIArticleController extends Controller
      * GET /api/v1/structures-sante
      * Récupère les structures de santé/aide avec filtres
      *
-     * @param Request $request
-     * Query params:
-     * - ville_id (optional): Filtrer par ID de ville
-     * - ville (optional): Filtrer par nom de ville
-     * - offre (optional): Filtrer par type d'offre (ex: "Médicale", "Psychosociale")
-     * - latitude & longitude (optional): Trier par proximité
-     * - rayon (optional): Rayon en km (défaut: 50km)
-     * - limit (optional): Nombre de structures
+     * @param  Request  $request
+     *                            Query params:
+     *                            - ville_id (optional): Filtrer par ID de ville
+     *                            - ville (optional): Filtrer par nom de ville
+     *                            - offre (optional): Filtrer par type d'offre (ex: "Médicale", "Psychosociale")
+     *                            - latitude & longitude (optional): Trier par proximité
+     *                            - rayon (optional): Rayon en km (défaut: 50km)
+     *                            - limit (optional): Nombre de structures
      */
     public function structuresSante(Request $request)
     {
@@ -294,12 +290,12 @@ class APIArticleController extends Controller
 
         // Filtre par nom de ville
         if ($request->has('ville')) {
-            $query->where('villes.name', 'LIKE', '%' . $request->ville . '%');
+            $query->where('villes.name', 'LIKE', '%'.$request->ville.'%');
         }
 
         // Filtre par type d'offre
         if ($request->has('offre')) {
-            $query->where('structures.offre', 'LIKE', '%' . $request->offre . '%');
+            $query->where('structures.offre', 'LIKE', '%'.$request->offre.'%');
         }
 
         // Tri par proximité si coordonnées fournies
@@ -312,11 +308,11 @@ class APIArticleController extends Controller
                 '(6371 * acos(cos(radians(?)) * cos(radians(structures.latitude)) * cos(radians(structures.longitude) - radians(?)) + sin(radians(?)) * sin(radians(structures.latitude)))) AS distance',
                 [$lat, $lng, $lat]
             )
-            ->whereRaw(
-                '(6371 * acos(cos(radians(?)) * cos(radians(structures.latitude)) * cos(radians(structures.longitude) - radians(?)) + sin(radians(?)) * sin(radians(structures.latitude)))) < ?',
-                [$lat, $lng, $lat, $rayon]
-            )
-            ->orderBy('distance');
+                ->whereRaw(
+                    '(6371 * acos(cos(radians(?)) * cos(radians(structures.latitude)) * cos(radians(structures.longitude) - radians(?)) + sin(radians(?)) * sin(radians(structures.latitude)))) < ?',
+                    [$lat, $lng, $lat, $rayon]
+                )
+                ->orderBy('distance');
         }
 
         // Limite
@@ -328,7 +324,7 @@ class APIArticleController extends Controller
 
         // Récupérer les villes disponibles
         $villes = Ville::select('id', 'name')
-            ->whereHas('structures', function($q) {
+            ->whereHas('structures', function ($q) {
                 $q->where('status', true);
             })
             ->orderBy('name')
@@ -339,7 +335,7 @@ class APIArticleController extends Controller
             ->whereNotNull('offre')
             ->distinct()
             ->pluck('offre')
-            ->flatMap(function($offre) {
+            ->flatMap(function ($offre) {
                 return explode(', ', $offre);
             })
             ->unique()
@@ -349,7 +345,7 @@ class APIArticleController extends Controller
             'structures' => $structures,
             'total' => $structures->count(),
             'villes_disponibles' => $villes,
-            'offres_disponibles' => $offres
+            'offres_disponibles' => $offres,
         ]);
     }
 
@@ -365,7 +361,7 @@ class APIArticleController extends Controller
 
         return response::success([
             'faqs' => $faqs,
-            'total' => $faqs->count()
+            'total' => $faqs->count(),
         ]);
     }
 }

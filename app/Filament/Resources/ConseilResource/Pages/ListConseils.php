@@ -10,14 +10,14 @@ class ListConseils extends ListRecords
 {
     protected static string $resource = ConseilResource::class;
 
-    protected static ?string $title = "Liste des conseils";
+    protected static ?string $title = 'Liste des conseils';
 
     protected function getHeaderActions(): array
     {
         return [
             Actions\CreateAction::make()
-                ->label("Nouveau conseil")
-                ->icon("heroicon-o-plus-circle")
+                ->label('Nouveau conseil')
+                ->icon('heroicon-o-plus-circle'),
         ];
     }
 }

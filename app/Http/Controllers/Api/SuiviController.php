@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
+use App\Http\Requests\SuiviStoreRequest;
+use App\Http\Requests\SuiviUpdateRequest;
+use App\Http\Resources\SuiviCollection;
+use App\Http\Resources\SuiviResource;
 use App\Models\Suivi;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Http\Controllers\Controller;
-use App\Http\Resources\SuiviResource;
-use App\Http\Resources\SuiviCollection;
-use App\Http\Requests\SuiviStoreRequest;
-use App\Http\Requests\SuiviUpdateRequest;
 
 class SuiviController extends Controller
 {

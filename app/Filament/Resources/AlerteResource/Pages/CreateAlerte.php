@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\AlerteResource\Pages;
 
-use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\AlerteResource;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateAlerte extends CreateRecord
 {

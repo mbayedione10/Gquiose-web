@@ -14,6 +14,7 @@ class NotificationLogSeeder extends Seeder
 
         if ($utilisateurs->isEmpty()) {
             $this->command->warn('Aucun utilisateur trouvé. Veuillez d\'abord exécuter UtilisateurSeeder.');
+
             return;
         }
 
@@ -186,16 +187,15 @@ class NotificationLogSeeder extends Seeder
             $openedAt = in_array($status, ['opened', 'clicked']) ? $deliveredAt->copy()->addMinutes(rand(1, 60)) : null;
             $clickedAt = $status === 'clicked' ? $openedAt->copy()->addSeconds(rand(5, 30)) : null;
 
-             // Déterminer la plateforme : priorité au token réel de l'utilisateur
-            if (!empty($utilisateur->apns_token)) {
+            // Déterminer la plateforme : priorité au token réel de l'utilisateur
+            if (! empty($utilisateur->apns_token)) {
                 $platform = 'ios';
-            } elseif (!empty($utilisateur->fcm_token)) {
+            } elseif (! empty($utilisateur->fcm_token)) {
                 $platform = 'android';
             } else {
                 // si pas de token sur l'utilisateur, générer aléatoirement
                 $platform = $platforms[array_rand($platforms)];
             }
-
 
             NotificationLog::create([
                 'utilisateur_id' => $utilisateur->id,
@@ -215,7 +215,7 @@ class NotificationLogSeeder extends Seeder
                 'failed_at' => null,
                 'error_message' => null,
                 'platform' => $platform,
-                'fcm_message_id' => 'fcm_' . uniqid(),
+                'fcm_message_id' => 'fcm_'.uniqid(),
             ]);
         }
 

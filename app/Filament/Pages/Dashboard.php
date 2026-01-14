@@ -2,21 +2,23 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Pages\Dashboard as BaseDashboard;
-use Filament\Actions\Action;
 use App\Exports\DashboardStatsExport;
-use Maatwebsite\Excel\Facades\Excel;
-use Barryvdh\DomPDF\Facade\Pdf;
-use App\Models\Utilisateur;
 use App\Models\Alerte;
 use App\Models\Article;
-use App\Models\Video;
 use App\Models\Structure;
+use App\Models\Utilisateur;
+use App\Models\Video;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Filament\Actions\Action;
+use Filament\Pages\Dashboard as BaseDashboard;
+use Maatwebsite\Excel\Facades\Excel;
 
 class Dashboard extends BaseDashboard
 {
     protected static ?string $navigationIcon = 'heroicon-o-home';
+
     protected static string $view = 'filament.pages.dashboard';
+
     protected static ?int $navigationSort = -2;
 
     protected function getHeaderActions(): array
@@ -56,6 +58,7 @@ class Dashboard extends BaseDashboard
             ->groupBy('type_alerte_id')
             ->map(function ($alertes) {
                 $typeAlerte = $alertes->first()->typeAlerte;
+
                 return (object) [
                     'type_name' => $typeAlerte?->name ?? 'Non classifié',
                     'total' => $alertes->count(),
@@ -77,8 +80,8 @@ class Dashboard extends BaseDashboard
         ));
 
         return response()->streamDownload(
-            fn () => print($pdf->output()),
-            'dashboard-stats-' . now()->format('Y-m-d') . '.pdf'
+            fn () => print ($pdf->output()),
+            'dashboard-stats-'.now()->format('Y-m-d').'.pdf'
         );
     }
 
@@ -86,7 +89,7 @@ class Dashboard extends BaseDashboard
     {
         return Excel::download(
             new DashboardStatsExport(),
-            'dashboard-stats-' . now()->format('Y-m-d') . '.xlsx'
+            'dashboard-stats-'.now()->format('Y-m-d').'.xlsx'
         );
     }
 }

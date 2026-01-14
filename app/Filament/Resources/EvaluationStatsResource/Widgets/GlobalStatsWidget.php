@@ -17,7 +17,7 @@ class GlobalStatsWidget extends StatsOverviewWidget
                 ->icon('heroicon-o-clipboard-document-check')
                 ->color('success'),
 
-            Stat::make('Score Moyen Global', number_format(Evaluation::avg('score_global') ?? 0, 2) . '/5')
+            Stat::make('Score Moyen Global', number_format(Evaluation::avg('score_global') ?? 0, 2).'/5')
                 ->description('Satisfaction générale')
                 ->icon('heroicon-o-star')
                 ->color('warning'),

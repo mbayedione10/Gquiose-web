@@ -44,6 +44,6 @@ class TypeAlerteSeeder extends Seeder
             );
         }
 
-        $this->command->info('✅ ' . count($types) . ' types d\'alertes VBG créés');
+        $this->command->info('✅ '.count($types).' types d\'alertes VBG créés');
     }
 }

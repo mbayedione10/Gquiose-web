@@ -61,7 +61,7 @@ class ListPushNotifications extends ListRecords
             ];
         });
 
-        $filename = 'statistiques-notifications-' . now()->format('Y-m-d-His') . '.xlsx';
+        $filename = 'statistiques-notifications-'.now()->format('Y-m-d-His').'.xlsx';
 
         return (new FastExcel($notifications))->download($filename);
     }

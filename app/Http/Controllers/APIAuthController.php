@@ -9,11 +9,11 @@ use App\Models\Utilisateur;
 use App\Services\SMS\SMSService;
 use App\Services\SocialAuth\SocialVerifier;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class APIAuthController extends Controller
 {
@@ -34,22 +34,24 @@ class APIAuthController extends Controller
         $field = $isEmail ? 'email' : 'phone';
 
         $identifier = $validated['identifier'];
-        if (!$isEmail) {
+        if (! $isEmail) {
             $client = Utilisateur::where('phone', $identifier)->first();
         } else {
             $client = Utilisateur::where('email', $identifier)->first();
         }
 
-        if (!$client || !Hash::check($validated['password'], $client->password)) {
+        if (! $client || ! Hash::check($validated['password'], $client->password)) {
             Log::warning('Login failed - invalid credentials', [
                 'identifier_type' => $field,
-                'identifier' => $isEmail ? $identifier : substr($identifier, 0, 4) . '****'
+                'identifier' => $isEmail ? $identifier : substr($identifier, 0, 4).'****',
             ]);
+
             return response::error('Les informations sont incorrectes', 400);
         }
 
-        if (!$client->status) {
+        if (! $client->status) {
             Log::warning('Login failed - account not activated', ['user_id' => $client->id]);
+
             return response::error('Votre compte n\'est pas encore activé', 403);
         }
 
@@ -67,13 +69,13 @@ class APIAuthController extends Controller
 
         Log::info('Login successful', [
             'user_id' => $client->id,
-            'platform' => $validated['platform']
+            'platform' => $validated['platform'],
         ]);
 
         return response::success([
             'utilisateur' => $client->only([
                 'id', 'nom', 'prenom', 'phone', 'email', 'anneedenaissance',
-                'sexe', 'photo', 'ville_id', 'status', 'provider', 'platform'
+                'sexe', 'photo', 'ville_id', 'status', 'provider', 'platform',
             ]),
             'token' => $token,
             'token_type' => 'Bearer',
@@ -108,13 +110,13 @@ class APIAuthController extends Controller
         // Détection automatique du type d'inscription
         $type = $request->input('type');
 
-        if (!$type) {
+        if (! $type) {
             // Auto-détection basée sur les champs présents (filled = non vide)
             if ($request->filled('access_token') && $request->filled('provider')) {
                 $type = 'social';
-            } elseif ($request->filled('email') && !$request->filled('phone')) {
+            } elseif ($request->filled('email') && ! $request->filled('phone')) {
                 $type = 'email';
-            } elseif ($request->filled('phone') && !$request->filled('email')) {
+            } elseif ($request->filled('phone') && ! $request->filled('email')) {
                 $type = 'phone';
             } elseif ($request->filled('email') && $request->filled('phone')) {
                 // Si les deux sont présents, privilégier email
@@ -126,10 +128,10 @@ class APIAuthController extends Controller
 
         try {
             return match ($type) {
-                'phone'  => $this->registerByPhone($request),
-                'email'  => $this->registerByEmail($request),
+                'phone' => $this->registerByPhone($request),
+                'email' => $this->registerByEmail($request),
                 'social' => $this->registerBySocial($request),
-                default  => response::error('Type d\'inscription invalide', 400),
+                default => response::error('Type d\'inscription invalide', 400),
             };
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response::error($e->errors(), 422);
@@ -137,13 +139,14 @@ class APIAuthController extends Controller
             Log::error('Erreur inscription', [
                 'type' => $type,
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             $message = 'Une erreur est survenue lors de l\'inscription';
             if (config('app.debug')) {
-                $message .= ' : ' . $e->getMessage();
+                $message .= ' : '.$e->getMessage();
             }
+
             return response::error($message, 500);
         }
     }
@@ -154,16 +157,16 @@ class APIAuthController extends Controller
     private function registerByPhone(Request $request)
     {
         $validated = $request->validate([
-            'phone'                => 'required|string|regex:/^\+?[0-9]{8,15}$/',
-            'sexe'                 => 'required|in:M,F,Autre',
-            'anneedenaissance'     => 'required|integer|min:' . (now()->year - 100) . '|max:' . now()->year,
-            'password'             => 'required|string|min:8|confirmed',
-            'password_confirmation'=> 'required',
-            'nom'                  => 'nullable|string|max:255',
-            'prenom'               => 'nullable|string|max:255',
-            'fcm_token'            => 'nullable|string',
-            'platform'             => 'required|in:android,ios',
-            'ville_id'             => 'nullable|exists:villes,id',
+            'phone' => 'required|string|regex:/^\+?[0-9]{8,15}$/',
+            'sexe' => 'required|in:M,F,Autre',
+            'anneedenaissance' => 'required|integer|min:'.(now()->year - 100).'|max:'.now()->year,
+            'password' => 'required|string|min:8|confirmed',
+            'password_confirmation' => 'required',
+            'nom' => 'nullable|string|max:255',
+            'prenom' => 'nullable|string|max:255',
+            'fcm_token' => 'nullable|string',
+            'platform' => 'required|in:android,ios',
+            'ville_id' => 'nullable|exists:villes,id',
         ], [
             'phone.regex' => 'Le numéro doit contenir entre 8 et 15 chiffres',
             'dob.min' => 'L\'âge ne peut pas dépasser 100 ans',
@@ -186,45 +189,47 @@ class APIAuthController extends Controller
         }
 
         // Anti-spam : vérifier qu'on n'a pas envoyé de code récemment
-        $antiSpamKey = 'sms_sent_' . $phone;
+        $antiSpamKey = 'sms_sent_'.$phone;
         if (Cache::has($antiSpamKey)) {
             $remainingTime = Cache::get($antiSpamKey) - time();
+
             return response::error("Veuillez patienter {$remainingTime} secondes avant de renvoyer un code", 429);
         }
 
         DB::beginTransaction();
         try {
             $utilisateur = Utilisateur::create([
-                'nom'              => $validated['nom'] ?? '',
-                'prenom'           => $validated['prenom'] ?? '',
-                'phone'            => $phone,
-                'sexe'             => $validated['sexe'],
+                'nom' => $validated['nom'] ?? '',
+                'prenom' => $validated['prenom'] ?? '',
+                'phone' => $phone,
+                'sexe' => $validated['sexe'],
                 'anneedenaissance' => $validated['anneedenaissance'],
-                'password'         => bcrypt($validated['password']),
-                'status'           => false,
-                'fcm_token'        => $validated['fcm_token'] ?? null,
-                'platform'         => $validated['platform'],
-                'ville_id'         => $validated['ville_id'] ?? null,
+                'password' => bcrypt($validated['password']),
+                'status' => false,
+                'fcm_token' => $validated['fcm_token'] ?? null,
+                'platform' => $validated['platform'],
+                'ville_id' => $validated['ville_id'] ?? null,
             ]);
 
             // Générer code 4 chiffres
             $codeValue = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
 
             Code::create([
-                'code'           => $codeValue,
+                'code' => $codeValue,
                 'utilisateur_id' => $utilisateur->id,
-                'phone'          => $phone,
+                'phone' => $phone,
             ]);
 
             // Envoyer le SMS
             $smsService = new SMSService();
             $smsSent = $smsService->sendVerificationCode($phone, $codeValue);
 
-            if (!$smsSent) {
+            if (! $smsSent) {
                 DB::rollBack();
                 Log::error('SMS sending failed during registration', [
-                    'phone' => substr($phone, 0, 4) . '****'
+                    'phone' => substr($phone, 0, 4).'****',
                 ]);
+
                 return response::error('Impossible d\'envoyer le SMS. Veuillez réessayer.', 500);
             }
 
@@ -235,7 +240,7 @@ class APIAuthController extends Controller
 
             Log::info('Registration by phone successful', [
                 'user_id' => $utilisateur->id,
-                'phone' => substr($phone, 0, 4) . '****'
+                'phone' => substr($phone, 0, 4).'****',
             ]);
 
             return response::success([
@@ -255,17 +260,17 @@ class APIAuthController extends Controller
     private function registerByEmail(Request $request)
     {
         $validated = $request->validate([
-            'email'                => 'required|email|unique:utilisateurs,email',
-            'phone'                => 'nullable|string|regex:/^\+?[0-9]{8,15}$/',
-            'sexe'                 => 'required|in:M,F,Autre',
-            'anneedenaissance'     => 'required|integer|min:' . (now()->year - 100) . '|max:' . now()->year,
-            'password'             => 'required|string|min:8|confirmed',
-            'password_confirmation'=> 'required',
-            'nom'                  => 'nullable|string|max:255',
-            'prenom'               => 'nullable|string|max:255',
-            'fcm_token'            => 'nullable|string',
-            'platform'             => 'required|in:android,ios',
-            'ville_id'             => 'nullable|exists:villes,id',
+            'email' => 'required|email|unique:utilisateurs,email',
+            'phone' => 'nullable|string|regex:/^\+?[0-9]{8,15}$/',
+            'sexe' => 'required|in:M,F,Autre',
+            'anneedenaissance' => 'required|integer|min:'.(now()->year - 100).'|max:'.now()->year,
+            'password' => 'required|string|min:8|confirmed',
+            'password_confirmation' => 'required',
+            'nom' => 'nullable|string|max:255',
+            'prenom' => 'nullable|string|max:255',
+            'fcm_token' => 'nullable|string',
+            'platform' => 'required|in:android,ios',
+            'ville_id' => 'nullable|exists:villes,id',
         ], [
             'dob.min' => 'L\'âge ne peut pas dépasser 100 ans',
             'dob.max' => 'L\'année de naissance ne peut pas être dans le futur',
@@ -281,45 +286,46 @@ class APIAuthController extends Controller
         }
 
         // Vérifier unicité du phone si fourni
-        if (!empty($validated['phone'])) {
+        if (! empty($validated['phone'])) {
             if (Utilisateur::where('phone', $validated['phone'])->exists()) {
                 return response::error('Ce numéro de téléphone est déjà utilisé', 409);
             }
         }
 
         // Anti-spam : vérifier qu'on n'a pas envoyé de code récemment
-        $antiSpamKey = 'email_sent_' . $validated['email'];
+        $antiSpamKey = 'email_sent_'.$validated['email'];
         if (Cache::has($antiSpamKey)) {
             $remainingTime = Cache::get($antiSpamKey) - time();
+
             return response::error("Veuillez patienter {$remainingTime} secondes avant de renvoyer un code", 429);
         }
 
         DB::beginTransaction();
         try {
             $utilisateur = Utilisateur::create([
-                'nom'              => $validated['nom'] ?? '',
-                'prenom'           => $validated['prenom'] ?? '',
-                'email'            => $validated['email'],
-                'phone'            => $validated['phone'] ?? null,
-                'sexe'             => $validated['sexe'],
+                'nom' => $validated['nom'] ?? '',
+                'prenom' => $validated['prenom'] ?? '',
+                'email' => $validated['email'],
+                'phone' => $validated['phone'] ?? null,
+                'sexe' => $validated['sexe'],
                 'anneedenaissance' => $validated['anneedenaissance'],
-                'password'         => bcrypt($validated['password']),
-                'status'           => false,
-                'fcm_token'        => $validated['fcm_token'] ?? null,
-                'platform'         => $validated['platform'],
-                'ville_id'         => $validated['ville_id'] ?? null,
+                'password' => bcrypt($validated['password']),
+                'status' => false,
+                'fcm_token' => $validated['fcm_token'] ?? null,
+                'platform' => $validated['platform'],
+                'ville_id' => $validated['ville_id'] ?? null,
             ]);
 
             // Générer code 4 chiffres (unifié avec phone)
             $codeValue = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
 
             Code::create([
-                'code'           => $codeValue,
+                'code' => $codeValue,
                 'utilisateur_id' => $utilisateur->id,
-                'email'          => $utilisateur->email,
+                'email' => $utilisateur->email,
             ]);
 
-            $fullname = trim($utilisateur->prenom . ' ' . $utilisateur->nom) ?: 'Utilisateur';
+            $fullname = trim($utilisateur->prenom.' '.$utilisateur->nom) ?: 'Utilisateur';
             $title = 'Bienvenue sur GquiOse !';
             $content = "Félicitations {$fullname} ! Vous êtes à un pas de rejoindre notre communauté. Utilisez le code ci-dessous pour activer votre compte et commencer votre aventure avec GquiOse.";
 
@@ -332,7 +338,7 @@ class APIAuthController extends Controller
 
             Log::info('Registration by email successful', [
                 'user_id' => $utilisateur->id,
-                'email' => $utilisateur->email
+                'email' => $utilisateur->email,
             ]);
 
             return response::success([
@@ -352,10 +358,10 @@ class APIAuthController extends Controller
     private function registerBySocial(Request $request)
     {
         $validated = $request->validate([
-            'provider'    => 'required|in:google,facebook,apple',
-            'access_token'=> 'required|string', // Token à vérifier
-            'fcm_token'   => 'nullable|string',
-            'platform'    => 'nullable|in:android,ios',
+            'provider' => 'required|in:google,facebook,apple',
+            'access_token' => 'required|string', // Token à vérifier
+            'fcm_token' => 'nullable|string',
+            'platform' => 'nullable|in:android,ios',
         ]);
 
         DB::beginTransaction();
@@ -364,10 +370,11 @@ class APIAuthController extends Controller
             $verifier = new SocialVerifier();
             $socialData = $verifier->verify($validated['provider'], $validated['access_token']);
 
-            if (!$socialData || !isset($socialData['provider_id'])) {
+            if (! $socialData || ! isset($socialData['provider_id'])) {
                 Log::warning('Social token verification failed', [
-                    'provider' => $validated['provider']
+                    'provider' => $validated['provider'],
                 ]);
+
                 return response::error('Token invalide ou expiré', 401);
             }
 
@@ -375,7 +382,7 @@ class APIAuthController extends Controller
             $existingUser = Utilisateur::where('email', $socialData['email'])
                 ->orWhere(function ($query) use ($validated, $socialData) {
                     $query->where('provider', $validated['provider'])
-                          ->where('provider_id', $socialData['provider_id']);
+                        ->where('provider_id', $socialData['provider_id']);
                 })
                 ->first();
 
@@ -388,17 +395,17 @@ class APIAuthController extends Controller
 
                 Log::info('Social login - existing user', [
                     'user_id' => $existingUser->id,
-                    'provider' => $validated['provider']
+                    'provider' => $validated['provider'],
                 ]);
 
                 return response::success([
                     'utilisateur' => $existingUser->only([
-                        'id', 'nom', 'prenom', 'email', 'photo', 'provider', 'platform'
+                        'id', 'nom', 'prenom', 'email', 'photo', 'provider', 'platform',
                     ]),
                     'token' => $token,
                     'token_type' => 'Bearer',
                     'expires_in' => 30 * 24 * 60 * 60,
-                    'message' => 'Connexion réussie'
+                    'message' => 'Connexion réussie',
                 ]);
             }
 
@@ -407,16 +414,16 @@ class APIAuthController extends Controller
             $prenom = $socialData['given_name'] ?? ($socialData['name'] ?? '');
 
             $utilisateur = Utilisateur::create([
-                'nom'         => $nom,
-                'prenom'      => $prenom,
-                'email'       => $socialData['email'],
-                'phone'       => null,
-                'provider'    => $validated['provider'],
+                'nom' => $nom,
+                'prenom' => $prenom,
+                'email' => $socialData['email'],
+                'phone' => null,
+                'provider' => $validated['provider'],
                 'provider_id' => $socialData['provider_id'],
-                'photo'       => $socialData['picture'] ?? null,
-                'fcm_token'   => $validated['fcm_token'] ?? null,
-                'platform'    => $validated['platform'] ?? null,
-                'status'      => true, // Activé directement (email vérifié par le provider)
+                'photo' => $socialData['picture'] ?? null,
+                'fcm_token' => $validated['fcm_token'] ?? null,
+                'platform' => $validated['platform'] ?? null,
+                'status' => true, // Activé directement (email vérifié par le provider)
                 'email_verified_at' => $socialData['email_verified'] ?? false ? now() : null,
             ]);
 
@@ -427,17 +434,17 @@ class APIAuthController extends Controller
 
             Log::info('Social registration successful', [
                 'user_id' => $utilisateur->id,
-                'provider' => $validated['provider']
+                'provider' => $validated['provider'],
             ]);
 
             return response::success([
                 'utilisateur' => $utilisateur->only([
-                    'id', 'nom', 'prenom', 'email', 'photo', 'provider', 'platform'
+                    'id', 'nom', 'prenom', 'email', 'photo', 'provider', 'platform',
                 ]),
                 'token' => $token,
                 'token_type' => 'Bearer',
                 'expires_in' => 30 * 24 * 60 * 60,
-                'message' => 'Compte créé avec succès'
+                'message' => 'Compte créé avec succès',
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -452,18 +459,18 @@ class APIAuthController extends Controller
     {
         $validated = $request->validate([
             'identifier' => 'required|string', // Email ou téléphone
-            'code'       => 'required|string|digits:4', // Unifié à 4 chiffres
+            'code' => 'required|string|digits:4', // Unifié à 4 chiffres
         ]);
 
         $isEmail = filter_var($validated['identifier'], FILTER_VALIDATE_EMAIL);
         $identifier = $validated['identifier'];
 
         // Normaliser le numéro de téléphone si ce n'est pas un email
-        if (!$isEmail) {
+        if (! $isEmail) {
             $identifier = $this->normalizePhoneNumber($identifier);
         }
 
-        $cacheKey = 'code_attempts_' . $identifier;
+        $cacheKey = 'code_attempts_'.$identifier;
         // $attempts = Cache::get($cacheKey, 0);
 
         // Limite de tentatives désactivée temporairement
@@ -491,9 +498,9 @@ class APIAuthController extends Controller
                 ->first();
         }
 
-        if (!$codeRecord) {
+        if (! $codeRecord) {
             Log::warning('Code confirmation failed - invalid code', [
-                'identifier' => $isEmail ? $validated['identifier'] : substr($validated['identifier'], 0, 4) . '****'
+                'identifier' => $isEmail ? $validated['identifier'] : substr($validated['identifier'], 0, 4).'****',
             ]);
 
             return response::error('Code incorrect ou expiré.', 400);
@@ -512,7 +519,7 @@ class APIAuthController extends Controller
             $utilisateur->save();
 
             // Créer les préférences de notifications par défaut
-            if (!$utilisateur->notificationPreferences) {
+            if (! $utilisateur->notificationPreferences) {
                 \App\Models\UserNotificationPreference::create([
                     'utilisateur_id' => $utilisateur->id,
                     'notifications_enabled' => true,
@@ -535,24 +542,25 @@ class APIAuthController extends Controller
 
             Log::info('Code confirmation successful - account activated', [
                 'user_id' => $utilisateur->id,
-                'verification_type' => $isEmail ? 'email' : 'phone'
+                'verification_type' => $isEmail ? 'email' : 'phone',
             ]);
 
             return response::success([
                 'utilisateur' => $utilisateur->only([
-                    'id', 'nom', 'prenom', 'phone', 'email', 'anneedenaissance', 'sexe', 'photo', 'ville_id', 'provider', 'platform'
+                    'id', 'nom', 'prenom', 'phone', 'email', 'anneedenaissance', 'sexe', 'photo', 'ville_id', 'provider', 'platform',
                 ]),
                 'token' => $token,
                 'token_type' => 'Bearer',
                 'expires_in' => 30 * 24 * 60 * 60,
-                'message' => 'Compte activé avec succès'
+                'message' => 'Compte activé avec succès',
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Erreur activation', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
+
             return response::error('Une erreur est survenue', 500);
         }
     }
@@ -569,9 +577,10 @@ class APIAuthController extends Controller
         $isEmail = filter_var($validated['identifier'], FILTER_VALIDATE_EMAIL);
 
         // Anti-spam : vérifier qu'on n'a pas envoyé de code récemment
-        $antiSpamKey = 'resend_code_' . $validated['identifier'];
+        $antiSpamKey = 'resend_code_'.$validated['identifier'];
         if (Cache::has($antiSpamKey)) {
             $remainingTime = Cache::get($antiSpamKey) - time();
+
             return response::error("Veuillez patienter {$remainingTime} secondes avant de renvoyer un code", 429);
         }
 
@@ -582,10 +591,11 @@ class APIAuthController extends Controller
             $utilisateur = Utilisateur::where('phone', $validated['identifier'])->first();
         }
 
-        if (!$utilisateur) {
+        if (! $utilisateur) {
             Log::warning('Resend code requested for non-existent user', [
-                'identifier' => $isEmail ? $validated['identifier'] : substr($validated['identifier'], 0, 4) . '****'
+                'identifier' => $isEmail ? $validated['identifier'] : substr($validated['identifier'], 0, 4).'****',
             ]);
+
             return response::error('Utilisateur introuvable', 404);
         }
 
@@ -605,15 +615,15 @@ class APIAuthController extends Controller
             $codeValue = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
 
             Code::create([
-                'code'           => $codeValue,
+                'code' => $codeValue,
                 'utilisateur_id' => $utilisateur->id,
-                'email'          => $isEmail ? $validated['identifier'] : null,
-                'phone'          => !$isEmail ? $validated['identifier'] : null,
+                'email' => $isEmail ? $validated['identifier'] : null,
+                'phone' => ! $isEmail ? $validated['identifier'] : null,
             ]);
 
             // Envoyer par email ou SMS
             if ($isEmail) {
-                $fullname = trim($utilisateur->prenom . ' ' . $utilisateur->nom) ?: 'Utilisateur';
+                $fullname = trim($utilisateur->prenom.' '.$utilisateur->nom) ?: 'Utilisateur';
                 $title = 'Nouveau code de vérification GquiOse';
                 $content = "{$fullname}, vous avez demandé un nouveau code de vérification. Utilisez le code ci-dessous pour finaliser l'activation de votre compte GquiOse.";
 
@@ -622,11 +632,12 @@ class APIAuthController extends Controller
                 $smsService = new SMSService();
                 $smsSent = $smsService->sendVerificationCode($validated['identifier'], $codeValue);
 
-                if (!$smsSent) {
+                if (! $smsSent) {
                     DB::rollBack();
                     Log::error('SMS sending failed during code resend', [
-                        'phone' => substr($validated['identifier'], 0, 4) . '****'
+                        'phone' => substr($validated['identifier'], 0, 4).'****',
                     ]);
+
                     return response::error('Impossible d\'envoyer le SMS. Veuillez réessayer.', 500);
                 }
             }
@@ -638,18 +649,19 @@ class APIAuthController extends Controller
 
             Log::info('Verification code resent', [
                 'user_id' => $utilisateur->id,
-                'type' => $isEmail ? 'email' : 'sms'
+                'type' => $isEmail ? 'email' : 'sms',
             ]);
 
             return response::success([
-                'message' => 'Un nouveau code de vérification a été envoyé'
+                'message' => 'Un nouveau code de vérification a été envoyé',
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error resending verification code', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
+
             return response::error('Une erreur est survenue', 500);
         }
     }
@@ -666,9 +678,10 @@ class APIAuthController extends Controller
         $isEmail = filter_var($validated['identifier'], FILTER_VALIDATE_EMAIL);
 
         // Anti-spam
-        $antiSpamKey = 'reset_code_sent_' . $validated['identifier'];
+        $antiSpamKey = 'reset_code_sent_'.$validated['identifier'];
         if (Cache::has($antiSpamKey)) {
             $remainingTime = Cache::get($antiSpamKey) - time();
+
             return response::error("Veuillez patienter {$remainingTime} secondes avant de renvoyer un code", 429);
         }
 
@@ -679,13 +692,14 @@ class APIAuthController extends Controller
             $utilisateur = Utilisateur::where('phone', $validated['identifier'])->first();
         }
 
-        if (!$utilisateur) {
+        if (! $utilisateur) {
             // Pour la sécurité, on retourne le même message même si l'utilisateur n'existe pas
             Log::warning('Password reset requested for non-existent user', [
-                'identifier' => $isEmail ? $validated['identifier'] : substr($validated['identifier'], 0, 4) . '****'
+                'identifier' => $isEmail ? $validated['identifier'] : substr($validated['identifier'], 0, 4).'****',
             ]);
+
             return response::success([
-                'message' => 'Si cet identifiant existe, un code de réinitialisation a été envoyé'
+                'message' => 'Si cet identifiant existe, un code de réinitialisation a été envoyé',
             ]);
         }
 
@@ -700,15 +714,15 @@ class APIAuthController extends Controller
             $codeValue = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
 
             Code::create([
-                'code'           => $codeValue,
+                'code' => $codeValue,
                 'utilisateur_id' => $utilisateur->id,
-                'email'          => $isEmail ? $validated['identifier'] : null,
-                'phone'          => !$isEmail ? $validated['identifier'] : null,
+                'email' => $isEmail ? $validated['identifier'] : null,
+                'phone' => ! $isEmail ? $validated['identifier'] : null,
             ]);
 
             // Envoyer par email ou SMS
             if ($isEmail) {
-                $fullname = trim($utilisateur->prenom . ' ' . $utilisateur->nom) ?: 'Utilisateur';
+                $fullname = trim($utilisateur->prenom.' '.$utilisateur->nom) ?: 'Utilisateur';
                 $title = 'Réinitialisation de votre mot de passe GquiOse';
                 $content = "{$fullname}, nous avons reçu une demande de réinitialisation de votre mot de passe. Utilisez le code ci-dessous pour créer un nouveau mot de passe sécurisé.";
 
@@ -717,11 +731,12 @@ class APIAuthController extends Controller
                 $smsService = new SMSService();
                 $smsSent = $smsService->sendPasswordResetCode($validated['identifier'], $codeValue);
 
-                if (!$smsSent) {
+                if (! $smsSent) {
                     DB::rollBack();
                     Log::error('SMS sending failed during password reset', [
-                        'phone' => substr($validated['identifier'], 0, 4) . '****'
+                        'phone' => substr($validated['identifier'], 0, 4).'****',
                     ]);
+
                     return response::error('Impossible d\'envoyer le SMS. Veuillez réessayer.', 500);
                 }
             }
@@ -733,18 +748,19 @@ class APIAuthController extends Controller
 
             Log::info('Password reset code sent', [
                 'user_id' => $utilisateur->id,
-                'type' => $isEmail ? 'email' : 'sms'
+                'type' => $isEmail ? 'email' : 'sms',
             ]);
 
             return response::success([
-                'message' => 'Un code de réinitialisation a été envoyé'
+                'message' => 'Un code de réinitialisation a été envoyé',
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error sending password reset code', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
+
             return response::error('Une erreur est survenue', 500);
         }
     }
@@ -763,7 +779,7 @@ class APIAuthController extends Controller
 
         $isEmail = filter_var($validated['identifier'], FILTER_VALIDATE_EMAIL);
 
-        $cacheKey = 'reset_attempts_' . $validated['identifier'];
+        $cacheKey = 'reset_attempts_'.$validated['identifier'];
         $attempts = Cache::get($cacheKey, 0);
 
         if ($attempts >= 3) {
@@ -785,18 +801,19 @@ class APIAuthController extends Controller
                 ->first();
         }
 
-        if (!$codeRecord) {
+        if (! $codeRecord) {
             Cache::put($cacheKey, $attempts + 1, now()->addDay());
             $remaining = 3 - ($attempts + 1);
 
             Log::warning('Password reset failed - invalid code', [
-                'identifier' => $isEmail ? $validated['identifier'] : substr($validated['identifier'], 0, 4) . '****',
-                'attempt' => $attempts + 1
+                'identifier' => $isEmail ? $validated['identifier'] : substr($validated['identifier'], 0, 4).'****',
+                'attempt' => $attempts + 1,
             ]);
 
             $msg = $remaining > 0
                 ? "Code incorrect. Il vous reste {$remaining} tentative(s)."
-                : "Trop de tentatives. Réessayez dans 24h.";
+                : 'Trop de tentatives. Réessayez dans 24h.';
+
             return response::error($msg, 400);
         }
 
@@ -814,13 +831,14 @@ class APIAuthController extends Controller
             Log::info('Password reset successful', ['user_id' => $utilisateur->id]);
 
             return response::success([
-                'message' => 'Mot de passe réinitialisé avec succès'
+                'message' => 'Mot de passe réinitialisé avec succès',
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error resetting password', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return response::error('Une erreur est survenue', 500);
         }
     }
@@ -832,17 +850,17 @@ class APIAuthController extends Controller
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response::error('Non authentifié', 401);
         }
 
         $validated = $request->validate([
-            'nom'              => 'nullable|string|max:255',
-            'prenom'           => 'nullable|string|max:255',
-            'sexe'             => 'nullable|in:M,F,Autre',
-            'anneedenaissance' => 'nullable|integer|min:' . (now()->year - 100) . '|max:' . now()->year,
-            'ville_id'         => 'nullable|exists:villes,id',
-            'photo'            => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+            'nom' => 'nullable|string|max:255',
+            'prenom' => 'nullable|string|max:255',
+            'sexe' => 'nullable|in:M,F,Autre',
+            'anneedenaissance' => 'nullable|integer|min:'.(now()->year - 100).'|max:'.now()->year,
+            'ville_id' => 'nullable|exists:villes,id',
+            'photo' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
         $user->fill(collect($validated)->except(['photo'])->toArray());
@@ -858,7 +876,7 @@ class APIAuthController extends Controller
 
         return response::success([
             'utilisateur' => $user->only(['id', 'nom', 'prenom', 'phone', 'email', 'anneedenaissance', 'sexe', 'photo', 'ville_id', 'provider', 'platform']),
-            'message' => 'Profil mis à jour avec succès'
+            'message' => 'Profil mis à jour avec succès',
         ]);
     }
 
@@ -869,14 +887,14 @@ class APIAuthController extends Controller
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response::error('Non authentifié', 401);
         }
 
         return response::success([
             'utilisateur' => $user->only([
                 'id', 'nom', 'prenom', 'phone', 'email', 'anneedenaissance',
-                'sexe', 'photo', 'ville_id', 'status', 'provider', 'platform'
+                'sexe', 'photo', 'ville_id', 'status', 'provider', 'platform',
             ]),
         ]);
     }
@@ -888,18 +906,19 @@ class APIAuthController extends Controller
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response::error('Non authentifié', 401);
         }
 
         $validated = $request->validate([
-            'old_password'             => 'required|string',
-            'new_password'             => 'required|string|min:8|confirmed',
-            'new_password_confirmation'=> 'required',
+            'old_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+            'new_password_confirmation' => 'required',
         ]);
 
-        if (!Hash::check($validated['old_password'], $user->password)) {
+        if (! Hash::check($validated['old_password'], $user->password)) {
             Log::warning('Password change failed - incorrect old password', ['user_id' => $user->id]);
+
             return response::error('Ancien mot de passe incorrect', 400);
         }
 
@@ -918,7 +937,7 @@ class APIAuthController extends Controller
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response::error('Non authentifié', 401);
         }
 
@@ -926,8 +945,9 @@ class APIAuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (!Hash::check($validated['password'], $user->password)) {
+        if (! Hash::check($validated['password'], $user->password)) {
             Log::warning('Account deletion failed - incorrect password', ['user_id' => $user->id]);
+
             return response::error('Mot de passe incorrect', 400);
         }
 
@@ -950,8 +970,9 @@ class APIAuthController extends Controller
             DB::rollBack();
             Log::error('Error deleting account', [
                 'user_id' => $userId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
+
             return response::error('Une erreur est survenue', 500);
         }
     }
@@ -966,7 +987,7 @@ class APIAuthController extends Controller
 
         // Si commence par 00, remplacer par +
         if (str_starts_with($phone, '00')) {
-            $phone = '+' . substr($phone, 2);
+            $phone = '+'.substr($phone, 2);
         }
 
         return $phone;
@@ -981,8 +1002,8 @@ class APIAuthController extends Controller
         $variants = [$normalized];
 
         // Avec + au début
-        if (!str_starts_with($normalized, '+')) {
-            $variants[] = '+' . $normalized;
+        if (! str_starts_with($normalized, '+')) {
+            $variants[] = '+'.$normalized;
         }
 
         // Sans + au début
@@ -992,7 +1013,7 @@ class APIAuthController extends Controller
 
         // Avec 00 au début au lieu de +
         if (str_starts_with($normalized, '+')) {
-            $variants[] = '00' . substr($normalized, 1);
+            $variants[] = '00'.substr($normalized, 1);
         }
 
         return array_unique($variants);

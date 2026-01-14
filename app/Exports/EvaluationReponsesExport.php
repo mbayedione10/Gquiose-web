@@ -2,7 +2,6 @@
 
 namespace App\Exports;
 
-use App\Models\Evaluation;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -26,9 +25,9 @@ class EvaluationReponsesExport implements FromCollection, WithHeadings, WithStyl
         foreach ($this->evaluations as $evaluation) {
             $data->push([
                 'ID' => $evaluation->id,
-                'Utilisateur' => $evaluation->utilisateur ? $evaluation->utilisateur->nom . ' ' . $evaluation->utilisateur->prenom : 'N/A',
+                'Utilisateur' => $evaluation->utilisateur ? $evaluation->utilisateur->nom.' '.$evaluation->utilisateur->prenom : 'N/A',
                 'Contexte' => ucfirst($evaluation->contexte),
-                'Score Global' => $evaluation->score_global ? $evaluation->score_global . '/5' : 'N/A',
+                'Score Global' => $evaluation->score_global ? $evaluation->score_global.'/5' : 'N/A',
                 'Commentaire' => $evaluation->commentaire ?: '',
                 'Date' => $evaluation->created_at->format('d/m/Y H:i'),
             ]);
@@ -37,9 +36,9 @@ class EvaluationReponsesExport implements FromCollection, WithHeadings, WithStyl
             foreach ($evaluation->reponsesDetails as $reponse) {
                 $data->push([
                     '',
-                    'Question: ' . $reponse->questionEvaluation->question,
-                    'Réponse: ' . $reponse->reponse,
-                    $reponse->valeur_numerique ? 'Note: ' . $reponse->valeur_numerique : '',
+                    'Question: '.$reponse->questionEvaluation->question,
+                    'Réponse: '.$reponse->reponse,
+                    $reponse->valeur_numerique ? 'Note: '.$reponse->valeur_numerique : '',
                     '',
                     '',
                 ]);

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Utilisateur;
 use App\Models\Code;
+use App\Models\Utilisateur;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Crypt;
 
@@ -44,6 +44,7 @@ class EncryptExistingPhones extends Command
                 $decrypted = Crypt::decryptString($user->phone);
                 // Déjà chiffré, skip
                 $usersAlreadyEncrypted++;
+
                 continue;
             } catch (\Exception $e) {
                 // Pas chiffré, on chiffre
@@ -56,7 +57,7 @@ class EncryptExistingPhones extends Command
         }
 
         $this->newLine();
-        $this->info("Users processed:");
+        $this->info('Users processed:');
         $this->line("  - Already encrypted: {$usersAlreadyEncrypted}");
         $this->line("  - Newly encrypted: {$usersCount}");
 
@@ -76,6 +77,7 @@ class EncryptExistingPhones extends Command
                 $decrypted = Crypt::decryptString($code->phone);
                 // Déjà chiffré, skip
                 $codesAlreadyEncrypted++;
+
                 continue;
             } catch (\Exception $e) {
                 // Pas chiffré, on chiffre
@@ -86,7 +88,7 @@ class EncryptExistingPhones extends Command
         }
 
         $this->newLine();
-        $this->info("Codes processed:");
+        $this->info('Codes processed:');
         $this->line("  - Already encrypted: {$codesAlreadyEncrypted}");
         $this->line("  - Newly encrypted: {$codesCount}");
 

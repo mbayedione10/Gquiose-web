@@ -5,12 +5,12 @@ namespace App\Services\Push;
 use App\Models\PushNotification;
 use App\Models\Utilisateur;
 use Illuminate\Support\Facades\Log;
+use Kreait\Firebase\Exception\FirebaseException;
+use Kreait\Firebase\Exception\Messaging\NotFound;
+use Kreait\Firebase\Exception\MessagingException;
 use Kreait\Firebase\Factory;
 use Kreait\Firebase\Messaging\CloudMessage;
 use Kreait\Firebase\Messaging\Notification as FirebaseNotification;
-use Kreait\Firebase\Exception\Messaging\NotFound;
-use Kreait\Firebase\Exception\FirebaseException;
-use Kreait\Firebase\Exception\MessagingException;
 
 class FCMService
 {
@@ -21,34 +21,33 @@ class FCMService
         try {
             $credentialsPath = config('services.fcm.credentials_path');
 
-            if (!$credentialsPath || !file_exists($credentialsPath)) {
-                Log::warning('FCM credentials file not found at: ' . $credentialsPath);
+            if (! $credentialsPath || ! file_exists($credentialsPath)) {
+                Log::warning('FCM credentials file not found at: '.$credentialsPath);
+
                 return;
             }
 
             $factory = (new Factory)->withServiceAccount($credentialsPath);
             $this->messaging = $factory->createMessaging();
         } catch (\Exception $e) {
-            Log::error('Failed to initialize Firebase Messaging: ' . $e->getMessage());
+            Log::error('Failed to initialize Firebase Messaging: '.$e->getMessage());
         }
     }
 
     /**
      * Envoie une notification push à un utilisateur via FCM.
-     *
-     * @param Utilisateur $user
-     * @param PushNotification $notification
-     * @return bool
      */
     public function sendToDevice(Utilisateur $user, PushNotification $notification): bool
     {
-        if (!$this->messaging) {
+        if (! $this->messaging) {
             Log::error('Firebase Messaging not initialized');
+
             return false;
         }
 
         if (empty($user->fcm_token)) {
             Log::warning("User {$user->id} has no FCM token");
+
             return false;
         }
 
@@ -110,25 +109,30 @@ class FCMService
             $this->messaging->send($message);
 
             Log::info("FCM notification sent successfully to user {$user->id}");
+
             return true;
 
         } catch (NotFound $e) {
             // Token invalide ou expiré
-            Log::warning("Invalid FCM token for user {$user->id}: " . $e->getMessage());
+            Log::warning("Invalid FCM token for user {$user->id}: ".$e->getMessage());
             // Optionnel: Supprimer le token invalide
             $user->update(['fcm_token' => null]);
+
             return false;
 
         } catch (MessagingException $e) {
-            Log::error("FCM messaging error for user {$user->id}: " . $e->getMessage());
+            Log::error("FCM messaging error for user {$user->id}: ".$e->getMessage());
+
             return false;
 
         } catch (FirebaseException $e) {
-            Log::error("Firebase error for user {$user->id}: " . $e->getMessage());
+            Log::error("Firebase error for user {$user->id}: ".$e->getMessage());
+
             return false;
 
         } catch (\Exception $e) {
-            Log::error("Unexpected error sending FCM to user {$user->id}: " . $e->getMessage());
+            Log::error("Unexpected error sending FCM to user {$user->id}: ".$e->getMessage());
+
             return false;
         }
     }
@@ -137,14 +141,14 @@ class FCMService
      * Envoie une notification à plusieurs utilisateurs en batch.
      * Plus efficace pour l'envoi massif.
      *
-     * @param array $users Array of Utilisateur models
-     * @param PushNotification $notification
+     * @param  array  $users  Array of Utilisateur models
      * @return array ['success' => int, 'failed' => int, 'invalid_tokens' => array]
      */
     public function sendToMultipleDevices(array $users, PushNotification $notification): array
     {
-        if (!$this->messaging) {
+        if (! $this->messaging) {
             Log::error('Firebase Messaging not initialized');
+
             return ['success' => 0, 'failed' => count($users), 'invalid_tokens' => []];
         }
 
@@ -152,7 +156,7 @@ class FCMService
         $userTokenMap = [];
 
         foreach ($users as $user) {
-            if (!empty($user->fcm_token)) {
+            if (! empty($user->fcm_token)) {
                 $tokens[] = $user->fcm_token;
                 $userTokenMap[$user->fcm_token] = $user->id;
             }
@@ -160,6 +164,7 @@ class FCMService
 
         if (empty($tokens)) {
             Log::warning('No valid FCM tokens found for batch send');
+
             return ['success' => 0, 'failed' => 0, 'invalid_tokens' => []];
         }
 
@@ -231,11 +236,11 @@ class FCMService
                         }
                     }
 
-                    Log::warning("FCM send failed for token {$failedToken}: " . $failure->error()->getMessage());
+                    Log::warning("FCM send failed for token {$failedToken}: ".$failure->error()->getMessage());
                 }
             }
 
-            Log::info("FCM batch send completed: {$totalSuccess} success, {$totalFailed} failed, " . count($invalidTokens) . " invalid tokens removed");
+            Log::info("FCM batch send completed: {$totalSuccess} success, {$totalFailed} failed, ".count($invalidTokens).' invalid tokens removed');
 
             return [
                 'success' => $totalSuccess,
@@ -244,20 +249,18 @@ class FCMService
             ];
 
         } catch (\Exception $e) {
-            Log::error("FCM batch send error: " . $e->getMessage());
+            Log::error('FCM batch send error: '.$e->getMessage());
+
             return ['success' => 0, 'failed' => count($tokens), 'invalid_tokens' => []];
         }
     }
 
     /**
      * Valide un token FCM en envoyant un message de test.
-     *
-     * @param string $token
-     * @return bool
      */
     public function validateToken(string $token): bool
     {
-        if (!$this->messaging) {
+        if (! $this->messaging) {
             return false;
         }
 
@@ -266,9 +269,11 @@ class FCMService
                 ->withData(['test' => 'validation']);
 
             $this->messaging->validate($message);
+
             return true;
         } catch (\Exception $e) {
-            Log::debug("FCM token validation failed: " . $e->getMessage());
+            Log::debug('FCM token validation failed: '.$e->getMessage());
+
             return false;
         }
     }

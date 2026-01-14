@@ -2,26 +2,27 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Ville;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Toggle;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Forms\Components\TextInput;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\VilleResource\Pages;
+use App\Models\Ville;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 
 class VilleResource extends Resource
 {
     protected static ?string $model = Ville::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-map-pin';
+
     protected static ?int $navigationSort = 70;
-    protected static ?string $navigationGroup = "Configuration";
+
+    protected static ?string $navigationGroup = 'Configuration';
 
     protected static ?string $recordTitleAttribute = 'name';
 
@@ -37,7 +38,7 @@ class VilleResource extends Resource
                         ->unique(
                             'villes',
                             'name',
-                            fn(?Ville $record) => $record
+                            fn (?Ville $record) => $record
                         )
                         ->placeholder('Ex: Conakry, Labé, Kankan, etc.')
                         ->helperText('Entrez le nom de la ville')
@@ -74,25 +75,25 @@ class VilleResource extends Resource
                     ->searchable(true, null, true)
                     ->limit(50)
                     ->sortable(),
-                    
+
                 Tables\Columns\IconColumn::make('status')
                     ->label('Statut')
                     ->toggleable()
                     ->boolean()
                     ->sortable(),
-                    
+
                 Tables\Columns\TextColumn::make('structures_count')
                     ->label('Structures')
                     ->counts('structures')
                     ->color('success')
                     ->toggleable(),
-                    
+
                 Tables\Columns\TextColumn::make('alertes_count')
                     ->label('Alertes')
                     ->counts('alertes')
                     ->color('warning')
                     ->toggleable(),
-                    
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Date de création')
                     ->date('d/m/Y')

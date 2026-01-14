@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources\ThematiqueResource\Pages;
 
-use App\Filament\Resources\ThematiqueResource;
 use App\Events\NewQuizPublished;
-use Filament\Actions;
+use App\Filament\Resources\ThematiqueResource;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateThematique extends CreateRecord

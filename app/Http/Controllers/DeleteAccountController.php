@@ -10,7 +10,7 @@ class DeleteAccountController extends Controller
 {
     public function form()
     {
-        $title = "Suppression du compte";
+        $title = 'Suppression du compte';
 
         return view('frontend.remove', compact('title'));
     }
@@ -18,7 +18,7 @@ class DeleteAccountController extends Controller
     public function remove(Request $request)
     {
         $this->validate($request, [
-            'email' => 'required|email'
+            'email' => 'required|email',
         ]);
 
         $user = Utilisateur::whereEmail($request['email'])->first();
@@ -28,7 +28,7 @@ class DeleteAccountController extends Controller
         if ($user == null) {
             $message = "Ce courriel n'existe pas dans notre base de données";
         } else {
-            $message = "Votre compte a bien été supprimé";
+            $message = 'Votre compte a bien été supprimé';
             $error = false;
 
             // Supprimer les données liées
@@ -43,7 +43,7 @@ class DeleteAccountController extends Controller
 
         return redirect(route('remove.form'))->with([
             'error' => $error,
-            'message' => $message
+            'message' => $message,
         ]);
     }
 
@@ -56,19 +56,19 @@ class DeleteAccountController extends Controller
         // Parse the signed request from Facebook
         $signedRequest = $request->input('signed_request');
 
-        if (!$signedRequest) {
+        if (! $signedRequest) {
             return response()->json(['error' => 'Missing signed_request'], 400);
         }
 
         $data = $this->parseSignedRequest($signedRequest);
 
-        if (!$data) {
+        if (! $data) {
             return response()->json(['error' => 'Invalid signed_request'], 400);
         }
 
         $facebookUserId = $data['user_id'] ?? null;
 
-        if (!$facebookUserId) {
+        if (! $facebookUserId) {
             return response()->json(['error' => 'Missing user_id'], 400);
         }
 
@@ -86,12 +86,12 @@ class DeleteAccountController extends Controller
             $user->delete();
 
             Log::info('Facebook data deletion callback - user deleted', [
-                'facebook_user_id' => $facebookUserId
+                'facebook_user_id' => $facebookUserId,
             ]);
         }
 
         // Generate a confirmation code
-        $confirmationCode = 'del_' . bin2hex(random_bytes(10));
+        $confirmationCode = 'del_'.bin2hex(random_bytes(10));
 
         // Return the response Facebook expects
         return response()->json([
@@ -105,7 +105,7 @@ class DeleteAccountController extends Controller
      */
     private function parseSignedRequest($signedRequest)
     {
-        list($encodedSig, $payload) = explode('.', $signedRequest, 2);
+        [$encodedSig, $payload] = explode('.', $signedRequest, 2);
 
         $secret = config('services.facebook.app_secret');
 
@@ -118,6 +118,7 @@ class DeleteAccountController extends Controller
 
         if ($sig !== $expectedSig) {
             Log::warning('Facebook signed request signature mismatch');
+
             return null;
         }
 

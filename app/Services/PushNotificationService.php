@@ -2,12 +2,12 @@
 
 namespace App\Services;
 
+use App\Jobs\SendBatchNotifications;
+use App\Models\NotificationLog;
 use App\Models\PushNotification;
 use App\Models\Utilisateur;
-use App\Models\NotificationLog;
-use App\Services\Push\FCMService;
 use App\Services\Push\APNsService;
-use App\Jobs\SendBatchNotifications;
+use App\Services\Push\FCMService;
 use Illuminate\Support\Facades\Log;
 
 class PushNotificationService
@@ -15,7 +15,6 @@ class PushNotificationService
     /**
      * Envoie une notification automatiquement aux utilisateurs ciblés.
      *
-     * @param PushNotification $notification
      * @return void
      */
     public function sendNotification(PushNotification $notification)
@@ -31,8 +30,7 @@ class PushNotificationService
      * Envoie une notification en utilisant des jobs en queue pour optimiser les envois massifs.
      * Plus performant pour les grandes audiences.
      *
-     * @param PushNotification $notification
-     * @param int $batchSize Nombre d'utilisateurs par batch (défaut: 100)
+     * @param  int  $batchSize  Nombre d'utilisateurs par batch (défaut: 100)
      * @return void
      */
     public function sendNotificationInBatches(PushNotification $notification, int $batchSize = 100)
@@ -48,6 +46,7 @@ class PushNotificationService
         if ($totalUsers <= 50) {
             Log::info("Small audience ({$totalUsers} users), sending synchronously");
             $this->sendPushNotification($notification, $users->toArray());
+
             return;
         }
 
@@ -73,7 +72,6 @@ class PushNotificationService
     /**
      * Récupère les utilisateurs ciblés selon les filtres de la notification.
      *
-     * @param PushNotification $notification
      * @return \Illuminate\Database\Eloquent\Collection
      */
     protected function getTargetedUsers(PushNotification $notification)
@@ -109,7 +107,7 @@ class PushNotificationService
 
             // Filtres d'activité
             if (isset($filters['active_users'])) {
-                $days = match($filters['active_users']) {
+                $days = match ($filters['active_users']) {
                     'last_7_days' => 7,
                     'last_30_days' => 30,
                     'last_90_days' => 90,
@@ -136,8 +134,6 @@ class PushNotificationService
     /**
      * Envoie une notification push à une liste d'utilisateurs.
      *
-     * @param PushNotification $notification
-     * @param array $users
      * @return void
      */
     public function sendPushNotification(PushNotification $notification, array $users)
@@ -169,17 +165,13 @@ class PushNotificationService
 
     /**
      * Envoie la notification à un appareil spécifique.
-     *
-     * @param Utilisateur $user
-     * @param PushNotification $notification
-     * @return bool
      */
     protected function sendToDevice(Utilisateur $user, PushNotification $notification): bool
     {
         $sent = false;
 
         // Envoyer à Android (FCM) - Utilise le nouveau Firebase Admin SDK
-        if (!empty($user->fcm_token)) {
+        if (! empty($user->fcm_token)) {
             try {
                 $fcmService = app(FCMService::class);
                 $sent = $fcmService->sendToDevice($user, $notification);
@@ -188,12 +180,12 @@ class PushNotificationService
                     $this->trackNotificationStatus($notification->id, $user->id, 'sent');
                 }
             } catch (\Exception $e) {
-                Log::error("FCM send failed for user {$user->id}: " . $e->getMessage());
+                Log::error("FCM send failed for user {$user->id}: ".$e->getMessage());
             }
         }
 
         // Envoyer à iOS (APNs)
-        if (!$sent && !empty($user->apns_token)) {
+        if (! $sent && ! empty($user->apns_token)) {
             try {
                 $apnsService = app(APNsService::class);
                 $sent = $apnsService->sendToDevice($user, $notification);
@@ -202,7 +194,7 @@ class PushNotificationService
                     $this->trackNotificationStatus($notification->id, $user->id, 'sent');
                 }
             } catch (\Exception $e) {
-                Log::error("APNs send failed for user {$user->id}: " . $e->getMessage());
+                Log::error("APNs send failed for user {$user->id}: ".$e->getMessage());
             }
         }
 
@@ -222,7 +214,7 @@ class PushNotificationService
         // Vérifier les préférences de notification
         $preferences = $user->notificationPreferences;
 
-        if (!$preferences || !$preferences->notifications_enabled) {
+        if (! $preferences || ! $preferences->notifications_enabled) {
             return false;
         }
 
@@ -242,19 +234,19 @@ class PushNotificationService
         // Vérifier les préférences par type de notification
         $notificationType = $this->getNotificationType($notification);
 
-        if ($notificationType === 'cycle' && !$preferences->cycle_notifications) {
+        if ($notificationType === 'cycle' && ! $preferences->cycle_notifications) {
             return false;
         }
-        if ($notificationType === 'content' && !$preferences->content_notifications) {
+        if ($notificationType === 'content' && ! $preferences->content_notifications) {
             return false;
         }
-        if ($notificationType === 'forum' && !$preferences->forum_notifications) {
+        if ($notificationType === 'forum' && ! $preferences->forum_notifications) {
             return false;
         }
-        if ($notificationType === 'health_tips' && !$preferences->health_tips_notifications) {
+        if ($notificationType === 'health_tips' && ! $preferences->health_tips_notifications) {
             return false;
         }
-        if ($notificationType === 'admin' && !$preferences->admin_notifications) {
+        if ($notificationType === 'admin' && ! $preferences->admin_notifications) {
             return false;
         }
 
@@ -294,33 +286,30 @@ class PushNotificationService
 
     /**
      * Enregistrer le statut de la notification (envoyé, ouvert, cliqué).
-     *
-     * @param int $notificationId
-     * @param int $userId
-     * @param string $status
-     * @return NotificationLog|null
      */
     protected function trackNotificationStatus(int $notificationId, int $userId, string $status): ?NotificationLog
     {
         try {
             $notification = PushNotification::find($notificationId);
 
-            if (!$notification) {
+            if (! $notification) {
                 Log::warning("Notification {$notificationId} not found for tracking");
+
                 return null;
             }
 
             $user = Utilisateur::find($userId);
-            if (!$user) {
+            if (! $user) {
                 Log::warning("User {$userId} not found for tracking");
+
                 return null;
             }
 
             // Déterminer la plateforme
             $platform = null;
-            if (!empty($user->fcm_token)) {
+            if (! empty($user->fcm_token)) {
                 $platform = 'android';
-            } elseif (!empty($user->apns_token)) {
+            } elseif (! empty($user->apns_token)) {
                 $platform = 'ios';
             }
 
@@ -345,7 +334,8 @@ class PushNotificationService
             return $log;
 
         } catch (\Exception $e) {
-            Log::error("Error tracking notification status: " . $e->getMessage());
+            Log::error('Error tracking notification status: '.$e->getMessage());
+
             return null;
         }
     }
@@ -353,7 +343,6 @@ class PushNotificationService
     /**
      * Mettre à jour les statistiques de la notification
      *
-     * @param PushNotification $notification
      * @return void
      */
     public function updateNotificationStats(PushNotification $notification)

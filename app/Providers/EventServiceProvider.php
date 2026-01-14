@@ -6,10 +6,6 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
-use App\Listeners\SendArticleNotification;
-use App\Listeners\SendHealthCenterNotification;
-use App\Listeners\SendQuizNotification;
-use App\Listeners\SendVideoNotification;
 
 class EventServiceProvider extends ServiceProvider
 {

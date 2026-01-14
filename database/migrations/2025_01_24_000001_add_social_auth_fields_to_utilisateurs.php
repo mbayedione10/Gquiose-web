@@ -15,12 +15,12 @@ return new class extends Migration
             $table->text('fcm_token')->nullable()->after('photo');
             $table->enum('platform', ['android', 'ios'])->nullable()->after('fcm_token');
             $table->timestamp('email_verified_at')->nullable()->after('status');
-            
+
             $table->index(['provider', 'provider_id']);
         });
 
         Schema::table('codes', function (Blueprint $table) {
-            if (!Schema::hasColumn('codes', 'phone')) {
+            if (! Schema::hasColumn('codes', 'phone')) {
                 $table->string('phone')->nullable()->after('email');
             }
         });

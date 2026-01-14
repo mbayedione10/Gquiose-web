@@ -12,19 +12,23 @@ class UserMentioned
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public Utilisateur $mentionedUser;
+
     public Utilisateur $mentioner;
+
     public string $content;
+
     public string $context;
+
     public int $contextId;
 
     /**
      * Create a new event instance.
      *
-     * @param Utilisateur $mentionedUser The user being mentioned
-     * @param Utilisateur $mentioner The user who mentioned
-     * @param string $content The message content
-     * @param string $context Either 'message' or 'chat'
-     * @param int $contextId The ID of the message or chat
+     * @param  Utilisateur  $mentionedUser  The user being mentioned
+     * @param  Utilisateur  $mentioner  The user who mentioned
+     * @param  string  $content  The message content
+     * @param  string  $context  Either 'message' or 'chat'
+     * @param  int  $contextId  The ID of the message or chat
      */
     public function __construct(
         Utilisateur $mentionedUser,

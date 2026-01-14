@@ -12,13 +12,13 @@ class QuestionEvaluationTypesSeeder extends Seeder
     {
         // Formulaire satisfaction quiz
         $this->createQuizQuestions();
-        
+
         // Formulaire satisfaction article
         $this->createArticleQuestions();
-        
+
         // Formulaire satisfaction structure
         $this->createStructureQuestions();
-        
+
         // Formulaire évaluation générale
         $this->createGeneralQuestions();
     }

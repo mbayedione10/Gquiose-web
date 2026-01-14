@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\UtilisateurResource\Pages;
 
-use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\UtilisateurResource;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\EditRecord;
 
 class EditUtilisateur extends EditRecord
 {

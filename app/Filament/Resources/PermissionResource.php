@@ -2,30 +2,33 @@
 
 namespace App\Filament\Resources;
 
-use App\Models\Permission;
-use Filament\{Tables, Forms};
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Forms\Components\TextInput;
 use App\Filament\Filters\DateRangeFilter;
 use App\Filament\Resources\PermissionResource\Pages;
 use App\Filament\Traits\HasResourcePermissions;
+use App\Models\Permission;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class PermissionResource extends Resource
 {
     use HasResourcePermissions;
-    protected static ?string $model = Permission::class;
 
+    protected static ?string $model = Permission::class;
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static ?string $navigationLabel = "Permissions";
-    protected static ?string $navigationGroup = "Gestion des utilisateurs";
+    protected static ?string $navigationLabel = 'Permissions';
+
+    protected static ?string $navigationGroup = 'Gestion des utilisateurs';
+
     protected static ?string $navigationIcon = 'heroicon-o-adjustments-horizontal';
+
     protected static ?int $navigationSort = 103;
 
     public static function form(Form $form): Form
@@ -39,7 +42,7 @@ class PermissionResource extends Resource
                         ->unique(
                             'permissions',
                             'name',
-                            fn(?Model $record) => $record
+                            fn (?Model $record) => $record
                         )
                         ->placeholder('Name')
                         ->columnSpan([
@@ -54,7 +57,7 @@ class PermissionResource extends Resource
                         ->unique(
                             'permissions',
                             'label',
-                            fn(?Model $record) => $record
+                            fn (?Model $record) => $record
                         )
                         ->placeholder('Label')
                         ->columnSpan([

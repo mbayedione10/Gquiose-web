@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class AlerteStoreRequest extends FormRequest
@@ -35,7 +34,7 @@ class AlerteStoreRequest extends FormRequest
             'preuves.*' => [
                 'file',
                 'max:10240', // 10 MB max par fichier
-                'mimes:jpeg,jpg,png,pdf,mp4,mov,avi,doc,docx'
+                'mimes:jpeg,jpg,png,pdf,mp4,mov,avi,doc,docx',
             ],
 
             // === Champs spécifiques violences numériques ===

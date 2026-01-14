@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Models\Scopes\Searchable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -79,11 +79,11 @@ class CategorieConseil extends Model
     public function getTypeLabelAttribute(): string
     {
         if ($this->sousTypeViolenceNumerique) {
-            return 'Sous-type: ' . $this->sousTypeViolenceNumerique->nom;
+            return 'Sous-type: '.$this->sousTypeViolenceNumerique->nom;
         }
 
         if ($this->typeAlerte) {
-            return 'Type: ' . $this->typeAlerte->name;
+            return 'Type: '.$this->typeAlerte->name;
         }
 
         return $this->is_default ? 'Par défaut' : 'Non assigné';

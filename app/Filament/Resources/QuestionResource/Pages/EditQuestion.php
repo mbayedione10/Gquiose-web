@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\QuestionResource\Pages;
 
-use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\QuestionResource;
+use Filament\Resources\Pages\EditRecord;
 
 class EditQuestion extends EditRecord
 {
