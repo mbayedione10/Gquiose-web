@@ -179,8 +179,6 @@ Route::prefix('v1')
             Route::prefix('notifications')->group(function () {
                 Route::post('/broadcast', [AdminNotificationController::class, 'sendBroadcast']);
                 Route::get('/stats', [AdminNotificationController::class, 'getStats']);
-                Route::get('/analytics/dashboard', [App\Http\Controllers\NotificationAnalyticsController::class, 'dashboard']);
-                Route::get('/analytics/cohort', [App\Http\Controllers\NotificationAnalyticsController::class, 'cohortAnalysis']);
             });
         });
 

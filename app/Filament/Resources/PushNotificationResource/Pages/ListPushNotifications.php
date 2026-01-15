@@ -33,6 +33,14 @@ class ListPushNotifications extends ListRecords
         ];
     }
 
+    protected function getFooterWidgets(): array
+    {
+        return [
+            PushNotificationResource\Widgets\NotificationsByCategoryWidget::class,
+            PushNotificationResource\Widgets\NotificationsTrendWidget::class,
+        ];
+    }
+
     protected function exportToExcel()
     {
         $notifications = PushNotification::all()->map(function ($notification) {

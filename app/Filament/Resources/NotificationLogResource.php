@@ -26,6 +26,9 @@ class NotificationLogResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    // Masquer de la navigation principale (accessible via relation dans PushNotifications)
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function form(Form $form): Form
     {
         return $form

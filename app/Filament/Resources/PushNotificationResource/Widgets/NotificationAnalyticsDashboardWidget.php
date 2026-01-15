@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\PushNotificationResource\Widgets;
 
 use App\Models\NotificationLog;
+use App\Models\PushNotification;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Facades\DB;
@@ -11,104 +12,185 @@ class NotificationAnalyticsDashboardWidget extends BaseWidget
 {
     protected function getStats(): array
     {
-        // Période de 7 jours
-        $last7Days = now()->subDays(7);
+        // Détecter quelle source utiliser
+        $useNotificationLogs = NotificationLog::exists();
+
+        // Statistiques des 7 derniers jours
+        $last7Days = $useNotificationLogs 
+            ? $this->getMetricsFromLogs(now()->subDays(7))
+            : $this->getMetricsFromPush(now()->subDays(7));
         
-        // Statistiques 7 derniers jours
-        $stats7d = NotificationLog::where('created_at', '>=', $last7Days)
-            ->select([
-                DB::raw('COUNT(*) as total_sent'),
-                DB::raw('SUM(CASE WHEN delivered_at IS NOT NULL THEN 1 ELSE 0 END) as total_delivered'),
-                DB::raw('SUM(CASE WHEN opened_at IS NOT NULL THEN 1 ELSE 0 END) as total_opened'),
-                DB::raw('SUM(CASE WHEN clicked_at IS NOT NULL THEN 1 ELSE 0 END) as total_clicked'),
-            ])
-            ->first();
-
-        $sentCount7d = $stats7d->total_sent ?? 0;
-        $deliveredCount7d = $stats7d->total_delivered ?? 0;
-        $openedCount7d = $stats7d->total_opened ?? 0;
-        $clickedCount7d = $stats7d->total_clicked ?? 0;
-
-        // Calcul des taux
-        $deliveryRate = $sentCount7d > 0 ? round(($deliveredCount7d / $sentCount7d) * 100, 1) : 0;
-        $openRate = $deliveredCount7d > 0 ? round(($openedCount7d / $deliveredCount7d) * 100, 1) : 0;
-        $clickRate = $openedCount7d > 0 ? round(($clickedCount7d / $openedCount7d) * 100, 1) : 0;
-
-        // Tendances (comparaison avec 7 jours précédents)
-        $previous7Days = now()->subDays(14);
-        $statsPrev = NotificationLog::whereBetween('created_at', [$previous7Days, $last7Days])
-            ->select([
-                DB::raw('COUNT(*) as total_sent'),
-                DB::raw('SUM(CASE WHEN opened_at IS NOT NULL THEN 1 ELSE 0 END) as total_opened'),
-            ])
-            ->first();
-
-        $sentTrend = $sentCount7d - ($statsPrev->total_sent ?? 0);
-        $openedTrend = $openedCount7d - ($statsPrev->total_opened ?? 0);
-
-        // Catégorie la plus utilisée (category existe dans notification_logs)
-        $topCategory = NotificationLog::where('created_at', '>=', $last7Days)
-            ->whereNotNull('category')
-            ->select('category', DB::raw('COUNT(*) as count'))
-            ->groupBy('category')
-            ->orderByDesc('count')
-            ->first();
+        // Statistiques des 30 derniers jours
+        $last30Days = $useNotificationLogs
+            ? $this->getMetricsFromLogs(now()->subDays(30))
+            : $this->getMetricsFromPush(now()->subDays(30));
+        
+        // Tendance (comparaison 7 derniers jours vs 7 jours précédents)
+        $previous7Days = $useNotificationLogs
+            ? $this->getMetricsFromLogs(now()->subDays(14), now()->subDays(7))
+            : $this->getMetricsFromPush(now()->subDays(14), now()->subDays(7));
+        
+        $sentTrend = $this->calculateTrend($last7Days['sent_count'], $previous7Days['sent_count']);
+        $openRateTrend = $this->calculateTrend($last7Days['open_rate'], $previous7Days['open_rate']);
+        $clickRateTrend = $this->calculateTrend($last7Days['click_rate'], $previous7Days['click_rate']);
 
         return [
-            Stat::make('Notifications envoyées (7j)', number_format($sentCount7d))
-                ->description($sentTrend >= 0 ? '+'.$sentTrend.' vs semaine précédente' : $sentTrend.' vs semaine précédente')
+            Stat::make('Notifications envoyées (7j)', number_format($last7Days['sent_count']))
+                ->description($this->getTrendDescription($sentTrend))
                 ->descriptionIcon($sentTrend >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($sentTrend >= 0 ? 'success' : 'danger')
-                ->chart($this->getSentTrend()),
+                ->chart($useNotificationLogs ? $this->getLast7DaysChartFromLogs() : $this->getLast7DaysChartFromPush()),
 
-            Stat::make('Taux de livraison', $deliveryRate.'%')
-                ->description($deliveredCount7d.' livrées sur '.$sentCount7d.' envoyées')
-                ->descriptionIcon('heroicon-m-check-circle')
-                ->color($deliveryRate >= 95 ? 'success' : ($deliveryRate >= 85 ? 'warning' : 'danger')),
+            Stat::make('Taux d\'ouverture (7j)', number_format($last7Days['open_rate'], 1) . '%')
+                ->description($this->getTrendDescription($openRateTrend, true))
+                ->descriptionIcon($openRateTrend >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
+                ->color($openRateTrend >= 0 ? 'success' : 'danger'),
 
-            Stat::make('Taux d\'ouverture', $openRate.'%')
-                ->description($openedCount7d.' ouvertures')
-                ->descriptionIcon($openedTrend >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
-                ->color($openRate >= 40 ? 'success' : ($openRate >= 20 ? 'warning' : 'danger'))
-                ->chart($this->getOpenTrend()),
+            Stat::make('Taux de clic (7j)', number_format($last7Days['click_rate'], 1) . '%')
+                ->description($this->getTrendDescription($clickRateTrend, true))
+                ->descriptionIcon($clickRateTrend >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
+                ->color($clickRateTrend >= 0 ? 'success' : 'danger'),
 
-            Stat::make('Taux de clic', $clickRate.'%')
-                ->description($clickedCount7d.' clics')
-                ->descriptionIcon('heroicon-m-cursor-arrow-rays')
-                ->color($clickRate >= 30 ? 'success' : ($clickRate >= 15 ? 'warning' : 'danger')),
-
-            Stat::make('Catégorie la plus performante', ucfirst($topCategory->category ?? 'N/A'))
-                ->description(($topCategory->count ?? 0).' notifications')
-                ->descriptionIcon('heroicon-m-star')
+            Stat::make('Total livré (30j)', number_format($last30Days['delivered_count']))
+                ->description('Sur ' . number_format($last30Days['sent_count']) . ' envoyées')
                 ->color('info'),
         ];
     }
 
     /**
-     * Graphique tendance des envois (7 derniers jours)
+     * Récupérer les métriques depuis notification_logs (source précise)
      */
-    protected function getSentTrend(): array
+    private function getMetricsFromLogs($since, $until = null)
     {
-        $data = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i)->toDateString();
-            $count = NotificationLog::whereDate('created_at', $date)->count();
-            $data[] = $count;
+        $query = NotificationLog::where('sent_at', '>=', $since);
+        
+        if ($until) {
+            $query->where('sent_at', '<', $until);
         }
-        return $data;
+
+        $stats = $query->select(
+            DB::raw('COUNT(*) as sent_count'),
+            DB::raw('SUM(CASE WHEN delivered_at IS NOT NULL THEN 1 ELSE 0 END) as delivered_count'),
+            DB::raw('SUM(CASE WHEN opened_at IS NOT NULL THEN 1 ELSE 0 END) as opened_count'),
+            DB::raw('SUM(CASE WHEN clicked_at IS NOT NULL THEN 1 ELSE 0 END) as clicked_count')
+        )->first();
+
+        $sentCount = $stats->sent_count ?? 0;
+        $deliveredCount = $stats->delivered_count ?? 0;
+        $openedCount = $stats->opened_count ?? 0;
+        $clickedCount = $stats->clicked_count ?? 0;
+
+        return [
+            'sent_count' => $sentCount,
+            'delivered_count' => $deliveredCount,
+            'opened_count' => $openedCount,
+            'clicked_count' => $clickedCount,
+            'delivery_rate' => $sentCount > 0 ? round(($deliveredCount / $sentCount) * 100, 2) : 0,
+            'open_rate' => $deliveredCount > 0 ? round(($openedCount / $deliveredCount) * 100, 2) : 0,
+            'click_rate' => $openedCount > 0 ? round(($clickedCount / $openedCount) * 100, 2) : 0,
+        ];
     }
 
     /**
-     * Graphique tendance des ouvertures (7 derniers jours)
+     * Récupérer les métriques depuis push_notifications (fallback)
      */
-    protected function getOpenTrend(): array
+    private function getMetricsFromPush($since, $until = null)
     {
-        $data = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i)->toDateString();
-            $count = NotificationLog::whereDate('opened_at', $date)->count();
-            $data[] = $count;
+        $query = PushNotification::where('sent_at', '>=', $since)
+            ->where('status', 'sent');
+        
+        if ($until) {
+            $query->where('sent_at', '<', $until);
         }
-        return $data;
+
+        $stats = $query->select(
+            DB::raw('SUM(sent_count) as sent_count'),
+            DB::raw('SUM(delivered_count) as delivered_count'),
+            DB::raw('SUM(opened_count) as opened_count'),
+            DB::raw('SUM(clicked_count) as clicked_count')
+        )->first();
+
+        $sentCount = $stats->sent_count ?? 0;
+        $deliveredCount = $stats->delivered_count ?? 0;
+        $openedCount = $stats->opened_count ?? 0;
+        $clickedCount = $stats->clicked_count ?? 0;
+
+        return [
+            'sent_count' => $sentCount,
+            'delivered_count' => $deliveredCount,
+            'opened_count' => $openedCount,
+            'clicked_count' => $clickedCount,
+            'delivery_rate' => $sentCount > 0 ? round(($deliveredCount / $sentCount) * 100, 2) : 0,
+            'open_rate' => $deliveredCount > 0 ? round(($openedCount / $deliveredCount) * 100, 2) : 0,
+            'click_rate' => $openedCount > 0 ? round(($clickedCount / $openedCount) * 100, 2) : 0,
+        ];
+    }
+
+    /**
+     * Calculer la tendance entre deux valeurs
+     */
+    private function calculateTrend($current, $previous)
+    {
+        if ($previous == 0) {
+            return $current > 0 ? 100 : 0;
+        }
+
+        return round((($current - $previous) / $previous) * 100, 1);
+    }
+
+    /**
+     * Description de la tendance
+     */
+    private function getTrendDescription($trend, $isPercentage = false)
+    {
+        $prefix = $trend >= 0 ? '+' : '';
+        $suffix = $isPercentage ? ' points' : '';
+        
+        return $prefix . number_format($trend, 1) . '%' . $suffix . ' vs période précédente';
+    }
+
+    /**
+     * Graphique des 7 derniers jours (depuis logs)
+     */
+    private function getLast7DaysChartFromLogs(): array
+    {
+        $data = NotificationLog::select(
+            DB::raw('DATE(sent_at) as date'),
+            DB::raw('COUNT(*) as count')
+        )
+            ->where('sent_at', '>=', now()->subDays(7))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->pluck('count')
+            ->toArray();
+
+        while (count($data) < 7) {
+            array_unshift($data, 0);
+        }
+
+        return array_slice($data, -7);
+    }
+
+    /**
+     * Graphique des 7 derniers jours (depuis push_notifications)
+     */
+    private function getLast7DaysChartFromPush(): array
+    {
+        $data = PushNotification::select(
+            DB::raw('DATE(sent_at) as date'),
+            DB::raw('SUM(sent_count) as count')
+        )
+            ->where('sent_at', '>=', now()->subDays(7))
+            ->where('status', 'sent')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->pluck('count')
+            ->toArray();
+
+        while (count($data) < 7) {
+            array_unshift($data, 0);
+        }
+
+        return array_slice($data, -7);
     }
 }

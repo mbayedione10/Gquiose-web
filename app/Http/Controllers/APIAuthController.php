@@ -535,11 +535,6 @@ class APIAuthController extends Controller
                 'verification_type' => $isEmail ? 'email' : 'phone',
             ]);
 
-            // Envoyer la notification de bienvenue (asynchrone)
-            dispatch(function () use ($utilisateur) {
-                $this->sendWelcomeNotification($utilisateur);
-            })->afterResponse();
-
             return response::success([
                 'utilisateur' => $utilisateur->only([
                     'id', 'nom', 'prenom', 'phone', 'email', 'anneedenaissance', 'sexe', 'photo', 'ville_id', 'provider', 'platform', 'onesignal_player_id',
