@@ -18,13 +18,13 @@ class APIPushNotificationController extends Controller
     }
 
     /**
-     * Enregistrer le token FCM d'un utilisateur
+     * Enregistrer le player_id OneSignal d'un utilisateur
      */
     public function registerToken(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:utilisateurs,id',
-            'fcm_token' => 'required|string',
+            'player_id' => 'required|string',
             'platform' => 'required|in:android,ios',
         ]);
 
@@ -37,13 +37,13 @@ class APIPushNotificationController extends Controller
 
         $user = Utilisateur::find($request->user_id);
         $user->update([
-            'fcm_token' => $request->fcm_token,
+            'onesignal_player_id' => $request->player_id,
             'platform' => $request->platform,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Token FCM enregistré avec succès',
+            'message' => 'Player ID OneSignal enregistré avec succès',
         ]);
     }
 

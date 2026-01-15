@@ -10,6 +10,7 @@
     "require": {
         "php": "^8.3",
         "barryvdh/laravel-dompdf": "^3.1",
+        "berkayk/onesignal-laravel": "^2.4",
         "doctrine/dbal": "^3.7",
         "edamov/pushok": "^0.18.1",
         "filament/filament": "^3.2",

@@ -29,6 +29,7 @@ class Utilisateur extends Model
         'email_verified_at',
         'phone_verified_at',
         'fcm_token',
+        'onesignal_player_id',
         'platform',
         'ville_id',
     ];

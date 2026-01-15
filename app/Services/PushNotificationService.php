@@ -6,8 +6,7 @@ use App\Jobs\SendBatchNotifications;
 use App\Models\NotificationLog;
 use App\Models\PushNotification;
 use App\Models\Utilisateur;
-use App\Services\Push\APNsService;
-use App\Services\Push\FCMService;
+use App\Services\Push\OneSignalService;
 use Illuminate\Support\Facades\Log;
 
 class PushNotificationService
@@ -128,86 +127,46 @@ class PushNotificationService
             }
         }
 
-        return $query->whereNotNull('fcm_token')->where('status', true)->get();
+        return $query->whereNotNull('onesignal_player_id')->where('status', true)->get();
     }
 
     /**
-     * Envoie une notification push à une liste d'utilisateurs.
+     * Envoie une notification push à une liste d'utilisateurs via OneSignal.
      *
      * @return void
      */
     public function sendPushNotification(PushNotification $notification, array $users)
     {
-        $failed = 0;
-        $success = 0;
+        // Filtrer les utilisateurs autorisés
+        $eligibleUsers = array_filter($users, fn($user) => $this->canSendToUser($user, $notification));
 
-        foreach ($users as $user) {
-            if ($this->canSendToUser($user, $notification)) {
-                $result = $this->sendToDevice($user, $notification);
-                if ($result) {
-                    $success++;
-                } else {
-                    $failed++;
-                }
-            } else {
-                $failed++;
-            }
+        if (empty($eligibleUsers)) {
+            Log::info('No eligible users for notification');
+            $notification->update(['sent' => 0, 'failed' => count($users)]);
+
+            return;
         }
+
+        // Envoyer via OneSignal
+        $oneSignalService = app(OneSignalService::class);
+        $result = $oneSignalService->sendToUsers($eligibleUsers, $notification);
 
         // Enregistrer les statistiques
         $notification->update([
-            'sent' => $success,
-            'failed' => $failed,
+            'sent' => $result['success'],
+            'failed' => $result['failed'] + (count($users) - count($eligibleUsers)),
         ]);
 
-        Log::info("Push notification sent: Success={$success}, Failed={$failed}");
-    }
-
-    /**
-     * Envoie la notification à un appareil spécifique.
-     */
-    protected function sendToDevice(Utilisateur $user, PushNotification $notification): bool
-    {
-        $sent = false;
-
-        // Envoyer à Android (FCM) - Utilise le nouveau Firebase Admin SDK
-        if (! empty($user->fcm_token)) {
-            try {
-                $fcmService = app(FCMService::class);
-                $sent = $fcmService->sendToDevice($user, $notification);
-
-                if ($sent) {
-                    $this->trackNotificationStatus($notification->id, $user->id, 'sent');
-                }
-            } catch (\Exception $e) {
-                Log::error("FCM send failed for user {$user->id}: ".$e->getMessage());
-            }
-        }
-
-        // Envoyer à iOS (APNs)
-        if (! $sent && ! empty($user->apns_token)) {
-            try {
-                $apnsService = app(APNsService::class);
-                $sent = $apnsService->sendToDevice($user, $notification);
-
-                if ($sent) {
-                    $this->trackNotificationStatus($notification->id, $user->id, 'sent');
-                }
-            } catch (\Exception $e) {
-                Log::error("APNs send failed for user {$user->id}: ".$e->getMessage());
-            }
-        }
-
-        return $sent;
+        Log::info("Push notification sent via OneSignal: Success={$result['success']}, Failed={$result['failed']}");
     }
 
     /**
      * Vérifier si on peut envoyer à cet utilisateur.
      */
-    protected function canSendToUser(Utilisateur $user, PushNotification $notification)
+    protected function canSendToUser($user, PushNotification $notification)
     {
-        // Vérifier si l'utilisateur a un token FCM
-        if (empty($user->fcm_token)) {
+        // Vérifier si l'utilisateur a un player_id OneSignal
+        if (empty($user->onesignal_player_id)) {
             return false;
         }
 
@@ -306,12 +265,7 @@ class PushNotificationService
             }
 
             // Déterminer la plateforme
-            $platform = null;
-            if (! empty($user->fcm_token)) {
-                $platform = 'android';
-            } elseif (! empty($user->apns_token)) {
-                $platform = 'ios';
-            }
+            $platform = $user->platform ?? 'unknown';
 
             // Créer ou mettre à jour le log
             $log = NotificationLog::create([
