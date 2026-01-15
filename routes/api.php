@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AdminNotificationController;
 use App\Http\Controllers\APIAlertController;
 use App\Http\Controllers\APIArticleController;
 use App\Http\Controllers\APIAuthController;
@@ -58,6 +57,7 @@ Route::prefix('v1')
                 Route::post('/register-token', [App\Http\Controllers\APIPushNotificationController::class, 'registerToken'])->middleware('auth:sanctum');
                 Route::post('/preferences', [App\Http\Controllers\APIPushNotificationController::class, 'updatePreferences']);
                 Route::get('/preferences', [App\Http\Controllers\APIPushNotificationController::class, 'getPreferences']);
+                Route::get('/history', [App\Http\Controllers\APIPushNotificationController::class, 'getHistory']);
                 Route::post('/{notificationId}/opened', [App\Http\Controllers\APIPushNotificationController::class, 'trackOpened']);
                 Route::post('/{notificationId}/clicked', [App\Http\Controllers\APIPushNotificationController::class, 'trackClicked']);
             });
@@ -171,13 +171,6 @@ Route::prefix('v1')
             Route::post('/symptoms', [APICycleController::class, 'getSymptoms']);
             Route::post('/settings', [APICycleController::class, 'updateSettings']);
             Route::post('/reminders', [APICycleController::class, 'configureReminders']);
-        });
-
-        // Admin notification routes (protected)
-        Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
-            Route::prefix('notifications')->group(function () {
-                Route::post('/broadcast', [AdminNotificationController::class, 'sendBroadcast']);
-            });
         });
 
     });

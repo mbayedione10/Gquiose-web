@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\NotificationLog;
 use App\Models\PushNotification;
 use App\Models\Utilisateur;
 use App\Services\PushNotificationService;
@@ -187,6 +188,76 @@ class APIPushNotificationController extends Controller
 
         return response()->json([
             'success' => true,
+        ]);
+    }
+
+    /**
+     * Récupérer l'historique des notifications de l'utilisateur connecté
+     */
+    public function getHistory(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non authentifié',
+            ], 401);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'per_page' => 'integer|min:1|max:100',
+            'type' => 'string|in:automatic,manual,scheduled',
+            'category' => 'string',
+            'status' => 'string|in:pending,sent,delivered,opened,clicked,failed',
+            'from_date' => 'date',
+            'to_date' => 'date|after_or_equal:from_date',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $perPage = $request->input('per_page', 20);
+
+        $query = NotificationLog::where('utilisateur_id', $user->id)
+            ->orderBy('sent_at', 'desc');
+
+        // Filtres optionnels
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('from_date')) {
+            $query->whereDate('sent_at', '>=', $request->from_date);
+        }
+
+        if ($request->filled('to_date')) {
+            $query->whereDate('sent_at', '<=', $request->to_date);
+        }
+
+        $notifications = $query->paginate($perPage);
+
+        return response()->json([
+            'success' => true,
+            'data' => $notifications->items(),
+            'pagination' => [
+                'current_page' => $notifications->currentPage(),
+                'last_page' => $notifications->lastPage(),
+                'per_page' => $notifications->perPage(),
+                'total' => $notifications->total(),
+            ],
         ]);
     }
 }
