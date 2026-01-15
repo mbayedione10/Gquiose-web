@@ -20,6 +20,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Enregistrer les observers
+        \App\Models\Article::observe(\App\Observers\ArticleObserver::class);
+        \App\Models\Message::observe(\App\Observers\MessageObserver::class);
+        \App\Models\Chat::observe(\App\Observers\ChatObserver::class);
+        
         // Créer les préférences de notification par défaut pour les nouveaux utilisateurs
         \App\Models\Utilisateur::created(function ($user) {
             \App\Models\UserNotificationPreference::create([

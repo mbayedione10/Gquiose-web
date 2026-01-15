@@ -21,7 +21,14 @@ class SendBatchNotifications implements ShouldQueue
      *
      * @var int
      */
-    public $tries = 3;
+    public $tries = 5;
+
+    /**
+     * Délai entre les tentatives (en secondes)
+     *
+     * @var array
+     */
+    public $backoff = [10, 30, 60, 120, 300]; // 10s, 30s, 1min, 2min, 5min
 
     /**
      * Le timeout du job en secondes
@@ -84,15 +91,20 @@ class SendBatchNotifications implements ShouldQueue
     }
 
     /**
-     * Le job a échoué
+     * Le job a échoué après toutes les tentatives
      */
     public function failed(\Throwable $exception): void
     {
-        Log::error("Batch notification send failed permanently for notification {$this->notification->id}: " . $exception->getMessage());
+        Log::error("Batch notification send failed permanently for notification {$this->notification->id}", [
+            'error' => $exception->getMessage(),
+            'user_ids_count' => count($this->userIds),
+            'attempts' => $this->attempts(),
+        ]);
 
-        // Optionnel: marquer la notification comme échouée
+        // Marquer la notification comme échouée si tous les batches échouent
         $this->notification->update([
             'status' => 'failed',
+            'error_message' => 'Échec après ' . $this->attempts() . ' tentatives: ' . $exception->getMessage(),
         ]);
     }
 }

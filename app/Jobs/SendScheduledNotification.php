@@ -15,6 +15,27 @@ class SendScheduledNotification implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * Le nombre de tentatives du job
+     *
+     * @var int
+     */
+    public $tries = 5;
+
+    /**
+     * Délai entre les tentatives (en secondes)
+     *
+     * @var array
+     */
+    public $backoff = [10, 30, 60, 120, 300]; // 10s, 30s, 1min, 2min, 5min
+
+    /**
+     * Le timeout du job en secondes
+     *
+     * @var int
+     */
+    public $timeout = 600; // 10 minutes
+
     protected $notificationId;
 
     public function __construct($notificationId)
@@ -55,9 +76,31 @@ class SendScheduledNotification implements ShouldQueue
 
             $notification->update([
                 'status' => 'failed',
+                'error_message' => $e->getMessage(),
             ]);
 
-            throw $e;
+            throw $e; // Relancer pour déclencher les tentatives
         }
+    }
+
+    /**
+     * Le job a échoué après toutes les tentatives
+     */
+    public function failed(\Throwable $exception): void
+    {
+        $notification = PushNotification::find($this->notificationId);
+
+        if ($notification) {
+            $notification->update([
+                'status' => 'failed',
+                'error_message' => 'Échec après ' . $this->attempts() . ' tentatives: ' . $exception->getMessage(),
+            ]);
+        }
+
+        Log::error("Scheduled notification send failed permanently", [
+            'notification_id' => $this->notificationId,
+            'error' => $exception->getMessage(),
+            'attempts' => $this->attempts(),
+        ]);
     }
 }

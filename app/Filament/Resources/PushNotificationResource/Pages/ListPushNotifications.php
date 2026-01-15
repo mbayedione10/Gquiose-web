@@ -26,6 +26,13 @@ class ListPushNotifications extends ListRecords
         ];
     }
 
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            PushNotificationResource\Widgets\NotificationAnalyticsDashboardWidget::class,
+        ];
+    }
+
     protected function exportToExcel()
     {
         $notifications = PushNotification::all()->map(function ($notification) {

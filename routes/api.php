@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminNotificationController;
 use App\Http\Controllers\APIAlertController;
 use App\Http\Controllers\APIArticleController;
 use App\Http\Controllers\APIAuthController;
@@ -171,6 +172,16 @@ Route::prefix('v1')
             Route::post('/symptoms', [APICycleController::class, 'getSymptoms']);
             Route::post('/settings', [APICycleController::class, 'updateSettings']);
             Route::post('/reminders', [APICycleController::class, 'configureReminders']);
+        });
+
+        // Admin notification routes (protected)
+        Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
+            Route::prefix('notifications')->group(function () {
+                Route::post('/broadcast', [AdminNotificationController::class, 'sendBroadcast']);
+                Route::get('/stats', [AdminNotificationController::class, 'getStats']);
+                Route::get('/analytics/dashboard', [App\Http\Controllers\NotificationAnalyticsController::class, 'dashboard']);
+                Route::get('/analytics/cohort', [App\Http\Controllers\NotificationAnalyticsController::class, 'cohortAnalysis']);
+            });
         });
 
     });
