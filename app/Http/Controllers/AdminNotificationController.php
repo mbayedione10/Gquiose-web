@@ -138,45 +138,4 @@ class AdminNotificationController extends Controller
             ], 500);
         }
     }
-
-    /**
-     * Récupérer les statistiques des notifications envoyées
-     * Endpoint: GET /api/v1/admin/notifications/stats
-     */
-    public function getStats(Request $request)
-    {
-        $user = $request->user();
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Non authentifié',
-            ], 401);
-        }
-
-        try {
-            $stats = [
-                'total_sent' => PushNotification::where('status', 'sent')->count(),
-                'total_pending' => PushNotification::where('status', 'pending')->count(),
-                'total_scheduled' => PushNotification::where('status', 'scheduled')->count(),
-                'total_failed' => PushNotification::where('status', 'failed')->count(),
-                'total_opens' => PushNotification::sum('opened_count'),
-                'total_clicks' => PushNotification::sum('clicked_count'),
-            ];
-
-            return response()->json([
-                'success' => true,
-                'data' => $stats,
-            ]);
-
-        } catch (\Exception $e) {
-            Log::error("Failed to fetch notification stats", [
-                'error' => $e->getMessage(),
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Une erreur est survenue',
-            ], 500);
-        }
-    }
 }

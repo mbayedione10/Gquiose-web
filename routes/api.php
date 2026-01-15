@@ -51,7 +51,6 @@ Route::prefix('v1')
             Route::prefix('notifications')->group(function () {
                 Route::post('opened', [NotificationTrackingController::class, 'markAsOpened']);
                 Route::post('clicked', [NotificationTrackingController::class, 'markAsClicked']);
-                Route::get('history', [NotificationTrackingController::class, 'getHistory']);
             });
 
             // Push Notifications Routes
@@ -178,7 +177,6 @@ Route::prefix('v1')
         Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
             Route::prefix('notifications')->group(function () {
                 Route::post('/broadcast', [AdminNotificationController::class, 'sendBroadcast']);
-                Route::get('/stats', [AdminNotificationController::class, 'getStats']);
             });
         });
 
