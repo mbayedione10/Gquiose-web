@@ -19,11 +19,20 @@ class APIPushNotificationController extends Controller
 
     /**
      * Enregistrer le player_id OneSignal d'un utilisateur
+     * Authentification requise - l'utilisateur connecté enregistre son propre player_id
      */
     public function registerToken(Request $request)
     {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Non authentifié',
+            ], 401);
+        }
+
         $validator = Validator::make($request->all(), [
-            'user_id' => 'required|exists:utilisateurs,id',
             'player_id' => 'required|string',
             'platform' => 'required|in:android,ios',
         ]);
@@ -35,7 +44,6 @@ class APIPushNotificationController extends Controller
             ], 422);
         }
 
-        $user = Utilisateur::find($request->user_id);
         $user->update([
             'onesignal_player_id' => $request->player_id,
             'platform' => $request->platform,
@@ -44,6 +52,7 @@ class APIPushNotificationController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Player ID OneSignal enregistré avec succès',
+            'utilisateur' => $user->only(['id', 'onesignal_player_id', 'platform']),
         ]);
     }
 

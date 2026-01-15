@@ -32,6 +32,12 @@ class OneSignalService
             return false;
         }
 
+        // Vérifier les préférences de notification
+        if (!$this->shouldSendNotification($user, $notification)) {
+            Log::info("Notification skipped for user {$user->id} due to preferences");
+            return false;
+        }
+
         return $this->sendToPlayerIds(
             [$user->onesignal_player_id],
             $notification,
@@ -302,4 +308,69 @@ class OneSignalService
 
         return 'content';
     }
-}
+    /**
+     * Vérifier si une notification doit être envoyée à l'utilisateur
+     * en fonction de ses préférences et de la période silencieuse
+     */
+    protected function shouldSendNotification(Utilisateur $user, PushNotification $notification): bool
+    {
+        $preferences = $user->notificationPreferences;
+
+        if (!$preferences) {
+            return true; // Pas de préférences = tout autorisé
+        }
+
+        // Mode Ne Pas Déranger actif
+        if ($preferences->do_not_disturb) {
+            Log::info("User {$user->id} has do_not_disturb enabled");
+            return false;
+        }
+
+        // Notifications globalement désactivées
+        if (!$preferences->notifications_enabled) {
+            Log::info("User {$user->id} has notifications disabled");
+            return false;
+        }
+
+        // Vérifier la période silencieuse (quiet hours)
+        if ($preferences->quiet_start && $preferences->quiet_end) {
+            $now = now();
+            $quietStart = \Carbon\Carbon::createFromFormat('H:i', $preferences->quiet_start);
+            $quietEnd = \Carbon\Carbon::createFromFormat('H:i', $preferences->quiet_end);
+
+            // Gérer le cas où quiet_end est le lendemain (ex: 22:00 - 07:00)
+            if ($quietEnd->lessThan($quietStart)) {
+                // La période traverse minuit
+                if ($now->format('H:i') >= $quietStart->format('H:i') || $now->format('H:i') < $quietEnd->format('H:i')) {
+                    Log::info("User {$user->id} is in quiet hours ({$preferences->quiet_start} - {$preferences->quiet_end})");
+                    return false;
+                }
+            } else {
+                // Période normale dans la même journée
+                if ($now->format('H:i') >= $quietStart->format('H:i') && $now->format('H:i') < $quietEnd->format('H:i')) {
+                    Log::info("User {$user->id} is in quiet hours ({$preferences->quiet_start} - {$preferences->quiet_end})");
+                    return false;
+                }
+            }
+        }
+
+        // Vérifier les préférences par catégorie
+        $category = $this->getNotificationType($notification);
+        if ($category === 'cycle' && !$preferences->cycle_notifications) {
+            return false;
+        }
+        if ($category === 'content' && !$preferences->content_notifications) {
+            return false;
+        }
+        if ($category === 'forum' && !$preferences->forum_notifications) {
+            return false;
+        }
+        if ($category === 'health_tips' && !$preferences->health_tips_notifications) {
+            return false;
+        }
+        if ($category === 'admin' && !$preferences->admin_notifications) {
+            return false;
+        }
+
+        return true;
+    }}
