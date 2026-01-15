@@ -3,8 +3,8 @@
 namespace App\Jobs;
 
 use App\Models\PushNotification;
-use App\Services\Push\APNsService;
-use App\Services\Push\FCMService;
+use App\Models\Utilisateur;
+use App\Services\Push\OneSignalService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -41,18 +41,12 @@ class SendBatchNotifications implements ShouldQueue
     protected $userIds;
 
     /**
-     * @var string
-     */
-    protected $platform; // 'fcm', 'apns', or 'all'
-
-    /**
      * Create a new job instance.
      */
-    public function __construct(PushNotification $notification, array $userIds, string $platform = 'all')
+    public function __construct(PushNotification $notification, array $userIds)
     {
         $this->notification = $notification;
         $this->userIds = $userIds;
-        $this->platform = $platform;
     }
 
     /**
@@ -61,60 +55,30 @@ class SendBatchNotifications implements ShouldQueue
     public function handle(): void
     {
         try {
-            Log::info("Starting batch notification send for notification {$this->notification->id} to ".count($this->userIds).' users');
+            Log::info("Starting batch notification send for notification {$this->notification->id} to " . count($this->userIds) . ' users');
 
-            // Charger les utilisateurs
-            $users = \App\Models\Utilisateur::whereIn('id', $this->userIds)->get();
+            // Charger les utilisateurs avec un player_id OneSignal
+            $users = Utilisateur::whereIn('id', $this->userIds)
+                ->whereNotNull('onesignal_player_id')
+                ->get();
 
             if ($users->isEmpty()) {
-                Log::warning('No users found for batch send');
+                Log::warning('No users with OneSignal player_id found for batch send');
 
                 return;
             }
 
-            // Séparer les utilisateurs par plateforme
-            $fcmUsers = [];
-            $apnsUsers = [];
-
-            foreach ($users as $user) {
-                if (($this->platform === 'all' || $this->platform === 'fcm') && ! empty($user->fcm_token)) {
-                    $fcmUsers[] = $user;
-                }
-                if (($this->platform === 'all' || $this->platform === 'apns') && ! empty($user->apns_token)) {
-                    $apnsUsers[] = $user;
-                }
-            }
-
-            $totalSuccess = 0;
-            $totalFailed = 0;
-
-            // Envoyer via FCM
-            if (! empty($fcmUsers)) {
-                Log::info('Sending to '.count($fcmUsers).' FCM users');
-                $fcmService = app(FCMService::class);
-                $result = $fcmService->sendToMultipleDevices($fcmUsers, $this->notification);
-
-                $totalSuccess += $result['success'];
-                $totalFailed += $result['failed'];
-            }
-
-            // Envoyer via APNs
-            if (! empty($apnsUsers)) {
-                Log::info('Sending to '.count($apnsUsers).' APNs users');
-                $apnsService = app(APNsService::class);
-                $result = $apnsService->sendToMultipleDevices($apnsUsers, $this->notification);
-
-                $totalSuccess += $result['success'];
-                $totalFailed += $result['failed'];
-            }
+            // Envoyer via OneSignal
+            $oneSignalService = app(OneSignalService::class);
+            $result = $oneSignalService->sendToUsers($users->toArray(), $this->notification);
 
             // Mettre à jour les statistiques de la notification
-            $this->notification->increment('sent_count', $totalSuccess);
+            $this->notification->increment('sent_count', $result['success']);
 
-            Log::info("Batch notification send completed: {$totalSuccess} success, {$totalFailed} failed");
+            Log::info("Batch notification send completed: {$result['success']} success, {$result['failed']} failed");
 
         } catch (\Exception $e) {
-            Log::error('Batch notification send error: '.$e->getMessage());
+            Log::error('Batch notification send error: ' . $e->getMessage());
             throw $e; // Relancer l'exception pour déclencher les tentatives
         }
     }
@@ -124,7 +88,7 @@ class SendBatchNotifications implements ShouldQueue
      */
     public function failed(\Throwable $exception): void
     {
-        Log::error("Batch notification send failed permanently for notification {$this->notification->id}: ".$exception->getMessage());
+        Log::error("Batch notification send failed permanently for notification {$this->notification->id}: " . $exception->getMessage());
 
         // Optionnel: marquer la notification comme échouée
         $this->notification->update([

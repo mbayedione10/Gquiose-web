@@ -19,7 +19,7 @@ class SendCycleReminders extends Command
         // Récupérer tous les utilisateurs avec des données de cycle
         $users = Utilisateur::whereHas('menstrualCycles')
             ->where('status', true)
-            ->whereNotNull('fcm_token')
+            ->whereNotNull('onesignal_player_id')
             ->get();
 
         $remindersSent = 0;

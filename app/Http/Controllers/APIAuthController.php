@@ -25,7 +25,6 @@ class APIAuthController extends Controller
         $validated = $request->validate([
             'identifier' => 'required|string', // Email ou téléphone
             'password' => 'required|string',
-            'fcm_token' => 'nullable|string',
             'platform' => 'required|in:android,ios',
         ]);
 
@@ -55,14 +54,11 @@ class APIAuthController extends Controller
             return response::error('Votre compte n\'est pas encore activé', 403);
         }
 
-        // Mise à jour du token FCM et de la plateforme
-        if (isset($validated['fcm_token'])) {
-            $client->fcm_token = $validated['fcm_token'];
-        }
+        // Mise à jour de la plateforme
         if (isset($validated['platform'])) {
             $client->platform = $validated['platform'];
+            $client->save();
         }
-        $client->save();
 
         // Générer un token Sanctum
         $token = $client->createToken('auth_token', ['*'], now()->addDays(30))->plainTextToken;
@@ -164,7 +160,6 @@ class APIAuthController extends Controller
             'password_confirmation' => 'required',
             'nom' => 'nullable|string|max:255',
             'prenom' => 'nullable|string|max:255',
-            'fcm_token' => 'nullable|string',
             'platform' => 'required|in:android,ios',
             'ville_id' => 'nullable|exists:villes,id',
         ], [
@@ -206,7 +201,6 @@ class APIAuthController extends Controller
                 'anneedenaissance' => $validated['anneedenaissance'],
                 'password' => bcrypt($validated['password']),
                 'status' => false,
-                'fcm_token' => $validated['fcm_token'] ?? null,
                 'platform' => $validated['platform'],
                 'ville_id' => $validated['ville_id'] ?? null,
             ]);
@@ -268,7 +262,6 @@ class APIAuthController extends Controller
             'password_confirmation' => 'required',
             'nom' => 'nullable|string|max:255',
             'prenom' => 'nullable|string|max:255',
-            'fcm_token' => 'nullable|string',
             'platform' => 'required|in:android,ios',
             'ville_id' => 'nullable|exists:villes,id',
         ], [
@@ -311,7 +304,6 @@ class APIAuthController extends Controller
                 'anneedenaissance' => $validated['anneedenaissance'],
                 'password' => bcrypt($validated['password']),
                 'status' => false,
-                'fcm_token' => $validated['fcm_token'] ?? null,
                 'platform' => $validated['platform'],
                 'ville_id' => $validated['ville_id'] ?? null,
             ]);
@@ -360,7 +352,6 @@ class APIAuthController extends Controller
         $validated = $request->validate([
             'provider' => 'required|in:google,facebook,apple',
             'access_token' => 'required|string', // Token à vérifier
-            'fcm_token' => 'nullable|string',
             'platform' => 'nullable|in:android,ios',
         ]);
 
@@ -421,7 +412,6 @@ class APIAuthController extends Controller
                 'provider' => $validated['provider'],
                 'provider_id' => $socialData['provider_id'],
                 'photo' => $socialData['picture'] ?? null,
-                'fcm_token' => $validated['fcm_token'] ?? null,
                 'platform' => $validated['platform'] ?? null,
                 'status' => true, // Activé directement (email vérifié par le provider)
                 'email_verified_at' => $socialData['email_verified'] ?? false ? now() : null,

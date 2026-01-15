@@ -235,7 +235,7 @@ class PushNotificationResource extends Resource
                                             $query->whereIn('ville_id', $filters['villes']);
                                         }
 
-                                        $count = $query->whereNotNull('fcm_token')->count();
+                                        $count = $query->whereNotNull('onesignal_player_id')->count();
 
                                         return "{$count} utilisateurs seront ciblés";
                                     }),

@@ -28,7 +28,7 @@ class EditUtilisateur extends EditRecord
         unset($data['platform']);
         unset($data['provider']);
         unset($data['provider_id']);
-        unset($data['fcm_token']);
+        unset($data['onesignal_player_id']);
         unset($data['email_verified_at']);
 
         return $data;

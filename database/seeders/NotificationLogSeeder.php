@@ -187,15 +187,8 @@ class NotificationLogSeeder extends Seeder
             $openedAt = in_array($status, ['opened', 'clicked']) ? $deliveredAt->copy()->addMinutes(rand(1, 60)) : null;
             $clickedAt = $status === 'clicked' ? $openedAt->copy()->addSeconds(rand(5, 30)) : null;
 
-            // Déterminer la plateforme : priorité au token réel de l'utilisateur
-            if (! empty($utilisateur->apns_token)) {
-                $platform = 'ios';
-            } elseif (! empty($utilisateur->fcm_token)) {
-                $platform = 'android';
-            } else {
-                // si pas de token sur l'utilisateur, générer aléatoirement
-                $platform = $platforms[array_rand($platforms)];
-            }
+            // Déterminer la plateforme
+            $platform = $utilisateur->platform ?? $platforms[array_rand($platforms)];
 
             NotificationLog::create([
                 'utilisateur_id' => $utilisateur->id,
