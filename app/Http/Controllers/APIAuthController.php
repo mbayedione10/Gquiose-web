@@ -71,7 +71,7 @@ class APIAuthController extends Controller
         return response::success([
             'utilisateur' => $client->only([
                 'id', 'nom', 'prenom', 'phone', 'email', 'anneedenaissance',
-                'sexe', 'photo', 'ville_id', 'status', 'provider', 'platform',
+                'sexe', 'photo', 'ville_id', 'status', 'provider', 'platform', 'onesignal_player_id',
             ]),
             'token' => $token,
             'token_type' => 'Bearer',
@@ -238,7 +238,7 @@ class APIAuthController extends Controller
             ]);
 
             return response::success([
-                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'sexe', 'anneedenaissance', 'provider', 'platform']),
+                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'sexe', 'anneedenaissance', 'provider', 'platform', 'onesignal_player_id']),
                 'message' => 'Un code de vérification a été envoyé à votre numéro',
                 'verification_status' => 'pending_verification',
             ], 201);
@@ -334,7 +334,7 @@ class APIAuthController extends Controller
             ]);
 
             return response::success([
-                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'email', 'sexe', 'anneedenaissance', 'ville_id', 'provider', 'platform']),
+                'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'email', 'sexe', 'anneedenaissance', 'ville_id', 'provider', 'platform', 'onesignal_player_id']),
                 'message' => 'Un code de vérification a été envoyé à votre email',
                 'verification_status' => 'pending_verification',
             ], 201);
@@ -391,7 +391,7 @@ class APIAuthController extends Controller
 
                 return response::success([
                     'utilisateur' => $existingUser->only([
-                        'id', 'nom', 'prenom', 'email', 'photo', 'provider', 'platform',
+                        'id', 'nom', 'prenom', 'email', 'photo', 'provider', 'platform', 'onesignal_player_id',
                     ]),
                     'token' => $token,
                     'token_type' => 'Bearer',
@@ -429,7 +429,7 @@ class APIAuthController extends Controller
 
             return response::success([
                 'utilisateur' => $utilisateur->only([
-                    'id', 'nom', 'prenom', 'email', 'photo', 'provider', 'platform',
+                    'id', 'nom', 'prenom', 'email', 'photo', 'provider', 'platform', 'onesignal_player_id',
                 ]),
                 'token' => $token,
                 'token_type' => 'Bearer',
@@ -537,7 +537,7 @@ class APIAuthController extends Controller
 
             return response::success([
                 'utilisateur' => $utilisateur->only([
-                    'id', 'nom', 'prenom', 'phone', 'email', 'anneedenaissance', 'sexe', 'photo', 'ville_id', 'provider', 'platform',
+                    'id', 'nom', 'prenom', 'phone', 'email', 'anneedenaissance', 'sexe', 'photo', 'ville_id', 'provider', 'platform', 'onesignal_player_id',
                 ]),
                 'token' => $token,
                 'token_type' => 'Bearer',
@@ -865,7 +865,7 @@ class APIAuthController extends Controller
         Log::info('Profile updated', ['user_id' => $user->id]);
 
         return response::success([
-            'utilisateur' => $user->only(['id', 'nom', 'prenom', 'phone', 'email', 'anneedenaissance', 'sexe', 'photo', 'ville_id', 'provider', 'platform']),
+            'utilisateur' => $user->only(['id', 'nom', 'prenom', 'phone', 'email', 'anneedenaissance', 'sexe', 'photo', 'ville_id', 'provider', 'platform', 'onesignal_player_id']),
             'message' => 'Profil mis à jour avec succès',
         ]);
     }
@@ -884,7 +884,7 @@ class APIAuthController extends Controller
         return response::success([
             'utilisateur' => $user->only([
                 'id', 'nom', 'prenom', 'phone', 'email', 'anneedenaissance',
-                'sexe', 'photo', 'ville_id', 'status', 'provider', 'platform',
+                'sexe', 'photo', 'ville_id', 'status', 'provider', 'platform', 'onesignal_player_id',
             ]),
         ]);
     }
