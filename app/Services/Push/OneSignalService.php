@@ -177,10 +177,20 @@ class OneSignalService
             ]);
 
             if (isset($response['id'])) {
+                $recipients = $response['recipients'] ?? count($externalUserIds);
+                
                 Log::info("OneSignal notification sent successfully via External User IDs", [
                     'onesignal_id' => $response['id'],
                     'notification_id' => $notification->id,
-                    'recipients' => $response['recipients'] ?? count($externalUserIds),
+                    'recipients' => $recipients,
+                ]);
+
+                // Mettre à jour le statut et les compteurs de la notification
+                $notification->update([
+                    'status' => 'sent',
+                    'sent_count' => ($notification->sent_count ?? 0) + $recipients,
+                    'success_count' => ($notification->success_count ?? 0) + $recipients,
+                    'sent_at' => now(),
                 ]);
 
                 // Créer les logs pour chaque utilisateur
@@ -266,10 +276,20 @@ class OneSignalService
             ]);
 
             if (isset($response['id'])) {
+                $recipients = $response['recipients'] ?? count($playerIds);
+                
                 Log::info("OneSignal notification sent successfully", [
                     'onesignal_id' => $response['id'],
                     'notification_id' => $notification->id,
-                    'recipients' => $response['recipients'] ?? count($playerIds),
+                    'recipients' => $recipients,
+                ]);
+
+                // Mettre à jour le statut et les compteurs de la notification
+                $notification->update([
+                    'status' => 'sent',
+                    'sent_count' => ($notification->sent_count ?? 0) + $recipients,
+                    'success_count' => ($notification->success_count ?? 0) + $recipients,
+                    'sent_at' => now(),
                 ]);
 
                 // Créer les logs pour chaque utilisateur
