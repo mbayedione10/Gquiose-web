@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\PushNotificationResource\Widgets;
+namespace App\Filament\Resources\NotificationLogResource\Widgets;
 
 use App\Models\NotificationLog;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class NotificationsTrendWidget extends ChartWidget
+class NotificationLogsTrendWidget extends ChartWidget
 {
     protected static ?string $heading = 'Tendance des notifications (30 derniers jours)';
 

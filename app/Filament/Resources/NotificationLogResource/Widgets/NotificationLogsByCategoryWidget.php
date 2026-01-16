@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Filament\Resources\PushNotificationResource\Widgets;
+namespace App\Filament\Resources\NotificationLogResource\Widgets;
 
 use App\Models\NotificationLog;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-class NotificationsByCategoryWidget extends ChartWidget
+class NotificationLogsByCategoryWidget extends ChartWidget
 {
     protected static ?string $heading = 'Notifications par catégorie (30 derniers jours)';
 
