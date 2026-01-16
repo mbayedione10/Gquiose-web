@@ -27,16 +27,31 @@ class OneSignalService
     public function sendToUser(Utilisateur $user, PushNotification $notification): bool
     {
         if (empty($user->onesignal_player_id)) {
-            Log::warning("User {$user->id} has no OneSignal player_id");
+            Log::warning("User {$user->id} has no OneSignal player_id", [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'notification_id' => $notification->id,
+            ]);
 
             return false;
         }
 
         // Vérifier les préférences de notification
         if (!$this->shouldSendNotification($user, $notification)) {
-            Log::info("Notification skipped for user {$user->id} due to preferences");
+            Log::info("Notification skipped for user {$user->id} due to preferences", [
+                'user_id' => $user->id,
+                'notification_id' => $notification->id,
+                'notification_title' => $notification->title,
+            ]);
             return false;
         }
+
+        Log::info("Sending notification to user {$user->id}", [
+            'user_id' => $user->id,
+            'player_id' => $user->onesignal_player_id,
+            'notification_id' => $notification->id,
+            'notification_title' => $notification->title,
+        ]);
 
         return $this->sendToPlayerIds(
             [$user->onesignal_player_id],
@@ -97,6 +112,13 @@ class OneSignalService
     protected function sendToPlayerIds(array $playerIds, PushNotification $notification, array $users = []): bool
     {
         try {
+            Log::info("Preparing to send OneSignal notification", [
+                'notification_id' => $notification->id,
+                'player_ids_count' => count($playerIds),
+                'player_ids' => $playerIds,
+                'title' => $notification->title,
+            ]);
+
             $params = [
                 'app_id' => $this->appId,
                 'include_player_ids' => $playerIds,
@@ -128,7 +150,15 @@ class OneSignalService
             $params['ios_badgeType'] = 'Increase';
             $params['ios_badgeCount'] = 1;
 
+            Log::info("Sending request to OneSignal API", [
+                'params' => $params,
+            ]);
+
             $response = $this->sendRequest($params);
+
+            Log::info("OneSignal API response received", [
+                'response' => $response,
+            ]);
 
             if (isset($response['id'])) {
                 Log::info("OneSignal notification sent successfully", [
@@ -156,6 +186,9 @@ class OneSignalService
             Log::error('OneSignal send error: ' . $e->getMessage(), [
                 'notification_id' => $notification->id,
                 'player_ids_count' => count($playerIds),
+                'player_ids' => $playerIds,
+                'exception' => $e,
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return false;

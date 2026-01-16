@@ -371,6 +371,83 @@ class UtilisateurResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('test_push_notification')
+                    ->label('Test Push')
+                    ->icon('heroicon-o-bell')
+                    ->color('info')
+                    ->visible(fn (Utilisateur $record): bool => !empty($record->onesignal_player_id))
+                    ->requiresConfirmation()
+                    ->modalHeading('Envoyer une notification de test')
+                    ->modalSubheading(fn (Utilisateur $record): string => 
+                        "Envoyer une notification de test à {$record->name}\n" .
+                        "Player ID: {$record->onesignal_player_id}"
+                    )
+                    ->modalButton('Envoyer')
+                    ->action(function (Utilisateur $record) {
+                        try {
+                            // Créer une notification de test
+                            $notification = new \App\Models\PushNotification([
+                                'title' => '🔔 Test de notification',
+                                'message' => 'Ceci est une notification de test envoyée depuis l\'admin Filament.',
+                                'icon' => '🔔',
+                                'action' => 'test',
+                                'type' => 'manual',
+                                'target_audience' => 'specific',
+                            ]);
+                            $notification->save();
+
+                            // Envoyer via OneSignal (bypass préférences pour le test admin)
+                            $oneSignalService = new \App\Services\Push\OneSignalService();
+                            
+                            // Utiliser reflection pour accéder à sendToPlayerIds directement
+                            $reflection = new \ReflectionClass($oneSignalService);
+                            $method = $reflection->getMethod('sendToPlayerIds');
+                            $method->setAccessible(true);
+                            
+                            $result = $method->invoke(
+                                $oneSignalService, 
+                                [$record->onesignal_player_id], 
+                                $notification, 
+                                [$record]
+                            );
+
+                            // Supprimer la notification de test
+                            $notification->delete();
+
+                            if ($result) {
+                                \Illuminate\Support\Facades\Log::info('Admin test push notification sent', [
+                                    'user_id' => $record->id,
+                                    'player_id' => $record->onesignal_player_id,
+                                    'admin_id' => auth()->id(),
+                                ]);
+
+                                Notification::make()
+                                    ->title('✅ Notification envoyée')
+                                    ->body("La notification de test a été envoyée avec succès à {$record->name}")
+                                    ->success()
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->title('❌ Échec d\'envoi')
+                                    ->body('L\'envoi de la notification a échoué. Consultez les logs pour plus de détails.')
+                                    ->danger()
+                                    ->send();
+                            }
+
+                        } catch (\Exception $e) {
+                            \Illuminate\Support\Facades\Log::error('Admin test push notification error', [
+                                'error' => $e->getMessage(),
+                                'user_id' => $record->id,
+                                'trace' => $e->getTraceAsString(),
+                            ]);
+
+                            Notification::make()
+                                ->title('Erreur')
+                                ->body('Une erreur est survenue: ' . $e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
                 Tables\Actions\Action::make('resend_verification_code')
                     ->label('Renvoyer le code')
                     ->icon('heroicon-o-envelope')
