@@ -90,7 +90,9 @@ class OneSignalService
         $userMap = [];
 
         foreach ($users as $user) {
-            $externalUserId = (string) $user->id;
+            // Support both array and object access
+            $userId = is_array($user) ? ($user['id'] ?? null) : $user->id;
+            $externalUserId = (string) $userId;
             $externalUserIds[] = $externalUserId;
             $userMap[$externalUserId] = $user;
         }
@@ -458,8 +460,12 @@ class OneSignalService
     protected function createNotificationLog(PushNotification $notification, $user, string $status): void
     {
         try {
+            // Support both array and object access
+            $userId = is_array($user) ? ($user['id'] ?? null) : $user->id;
+            $platform = is_array($user) ? ($user['platform'] ?? 'unknown') : ($user->platform ?? 'unknown');
+            
             NotificationLog::create([
-                'utilisateur_id' => $user->id,
+                'utilisateur_id' => $userId,
                 'notification_schedule_id' => $notification->id,
                 'title' => $notification->title,
                 'message' => $notification->message,
@@ -469,7 +475,7 @@ class OneSignalService
                 'type' => $notification->type ?? 'manual',
                 'category' => $this->getNotificationType($notification),
                 'status' => $status,
-                'platform' => $user->platform ?? 'unknown',
+                'platform' => $platform,
                 'sent_at' => now(),
             ]);
         } catch (\Exception $e) {
