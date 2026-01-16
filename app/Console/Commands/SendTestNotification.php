@@ -92,8 +92,8 @@ class SendTestNotification extends Command
                 }
             }
 
-            // Supprimer la notification de test
-            $notification->delete();
+            // Ne pas supprimer la notification de test pour permettre le tracking
+            $this->info("💡 Notification ID: {$notification->id} (conservée pour testing)");
 
         } catch (\Exception $e) {
             $this->error("❌ Erreur: " . $e->getMessage());
