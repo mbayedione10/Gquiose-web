@@ -22,20 +22,42 @@ class OneSignalService
     }
 
     /**
-     * Envoyer une notification à un utilisateur spécifique via son player_id.
+     * Définir l'External User ID pour lier le Player ID à l'ID utilisateur
      */
-    public function sendToUser(Utilisateur $user, PushNotification $notification): bool
+    public function setExternalUserId(string $playerId, string $externalUserId): bool
     {
-        if (empty($user->onesignal_player_id)) {
-            Log::warning("User {$user->id} has no OneSignal player_id", [
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'notification_id' => $notification->id,
+        try {
+            $response = $this->client->request('PUT', "https://onesignal.com/api/v1/apps/{$this->appId}/users/{$playerId}", [
+                'headers' => [
+                    'Authorization' => 'Basic ' . $this->apiKey,
+                    'Content-Type' => 'application/json',
+                ],
+                'json' => [
+                    'external_user_id' => $externalUserId,
+                ],
+            ]);
+
+            Log::info("OneSignal External User ID set successfully", [
+                'player_id' => $playerId,
+                'external_user_id' => $externalUserId,
+            ]);
+
+            return true;
+        } catch (\Exception $e) {
+            Log::error('OneSignal setExternalUserId error: ' . $e->getMessage(), [
+                'player_id' => $playerId,
+                'external_user_id' => $externalUserId,
             ]);
 
             return false;
         }
+    }
 
+    /**
+     * Envoyer une notification à un utilisateur spécifique via son External User ID.
+     */
+    public function sendToUser(Utilisateur $user, PushNotification $notification): bool
+    {
         // Vérifier les préférences de notification
         if (!$this->shouldSendNotification($user, $notification)) {
             Log::info("Notification skipped for user {$user->id} due to preferences", [
@@ -48,13 +70,12 @@ class OneSignalService
 
         Log::info("Sending notification to user {$user->id}", [
             'user_id' => $user->id,
-            'player_id' => $user->onesignal_player_id,
             'notification_id' => $notification->id,
             'notification_title' => $notification->title,
         ]);
 
-        return $this->sendToPlayerIds(
-            [$user->onesignal_player_id],
+        return $this->sendToExternalUserIds(
+            [(string) $user->id],
             $notification,
             [$user]
         );
@@ -72,47 +93,131 @@ class OneSignalService
             if (!empty($user->onesignal_player_id)) {
                 $playerIds[] = $user->onesignal_player_id;
                 $userMap[$user->onesignal_player_id] = $user;
-            }
+            }External User IDs.
+     */
+    public function sendToUsers(array $users, PushNotification $notification): array
+    {
+        $externalUserIds = [];
+        $userMap = [];
+
+        foreach ($users as $user) {
+            $externalUserId = (string) $user->id;
+            $externalUserIds[] = $externalUserId;
+            $userMap[$externalUserId] = $user;
         }
 
-        if (empty($playerIds)) {
-            Log::warning('No valid OneSignal player_ids found for batch send');
-
-            return ['success' => 0, 'failed' => count($users)];
+        if (empty($externalUserIds)) {
+            Log::warning('No users found for batch send');
+            return ['success' => 0, 'failed' => 0];
         }
 
-        // OneSignal supporte jusqu'à 2000 player_ids par requête
-        $chunks = array_chunk($playerIds, 2000);
+        // OneSignal supporte jusqu'à 2000 external_user_ids par requête
+        $chunks = array_chunk($externalUserIds, 2000);
         $totalSuccess = 0;
         $totalFailed = 0;
 
         foreach ($chunks as $chunk) {
             $chunkUsers = array_map(fn($id) => $userMap[$id], $chunk);
-            $success = $this->sendToPlayerIds($chunk, $notification, $chunkUsers);
+            $success = $this->sendToExternalUserIds($chunk, $notification, $chunkUsers);
 
             if ($success) {
                 $totalSuccess += count($chunk);
             } else {
                 $totalFailed += count($chunk);
             }
+        }ushNotification $notification, array $users = []): bool
+    {
+        try {
+            Log::info("Preparing to seExternal User IDs spécifiques.
+     */
+    protected function sendToExternalUserIds(array $externalUserIds, PushNotification $notification, array $users = []): bool
+    {
+        try {
+            Log::info("Preparing to send OneSignal notification via External User IDs", [
+                'notification_id' => $notification->id,
+                'external_user_ids_count' => count($externalUserIds),
+                'external_user_ids' => $externalUserIds,
+                'title' => $notification->title,
+            ]);
+
+            $params = [
+                'app_id' => $this->appId,
+                'include_external_user_ids' => $externalUserIds,
+                'headings' => ['en' => $notification->title, 'fr' => $notification->title],
+                'contents' => ['en' => $notification->message, 'fr' => $notification->message],
+            ];
+
+            // Ajouter l'image si présente
+            if (!empty($notification->image)) {
+                $params['big_picture'] = $notification->image;
+                $params['ios_attachments'] = ['image' => $notification->image];
+            }
+
+            // Ajouter l'icône si présente
+            if (!empty($notification->icon)) {
+                $params['small_icon'] = $notification->icon;
+                $params['large_icon'] = $notification->icon;
+            }
+
+            // Ajouter les données additionnelles pour l'action
+            if (!empty($notification->action)) {
+                $params['data'] = [
+                    'action' => $notification->action,
+                    'notification_id' => $notification->id,
+                ];
+            }
+
+            // Configuration iOS
+            $params['ios_badgeType'] = 'Increase';
+            $params['ios_badgeCount'] = 1;
+
+            Log::info("Sending request to OneSignal API with External User IDs", [
+                'params' => $params,
+            ]);
+
+            $response = $this->sendRequest($params);
+
+            Log::info("OneSignal API response received", [
+                'response' => $response,
+            ]);
+
+            if (isset($response['id'])) {
+                Log::info("OneSignal notification sent successfully via External User IDs", [
+                    'onesignal_id' => $response['id'],
+                    'notification_id' => $notification->id,
+                    'recipients' => $response['recipients'] ?? count($externalUserIds),
+                ]);
+
+                // Créer les logs pour chaque utilisateur
+                foreach ($users as $user) {
+                    $this->createNotificationLog($notification, $user, 'sent');
+                }
+
+                return true;
+            }
+
+            Log::error('OneSignal notification failed with External User IDs', [
+                'response' => $response,
+                'notification_id' => $notification->id,
+            ]);
+
+            return false;
+
+        } catch (\Exception $e) {
+            Log::error('OneSignal send error with External User IDs: ' . $e->getMessage(), [
+                'notification_id' => $notification->id,
+                'external_user_ids_count' => count($externalUserIds),
+                'external_user_ids' => $externalUserIds,
+                'exception' => $e,
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return false;
         }
-
-        // Comptabiliser les utilisateurs sans player_id
-        $totalFailed += count($users) - count($playerIds);
-
-        return [
-            'success' => $totalSuccess,
-            'failed' => $totalFailed,
-        ];
     }
 
     /**
-     * Envoyer une notification à des player_ids spécifiques.
-     */
-    protected function sendToPlayerIds(array $playerIds, PushNotification $notification, array $users = []): bool
-    {
-        try {
-            Log::info("Preparing to send OneSignal notification", [
+     * Envoyer une notification à des player_ids spécifiques (fallback pour compatibilité)ion", [
                 'notification_id' => $notification->id,
                 'player_ids_count' => count($playerIds),
                 'player_ids' => $playerIds,

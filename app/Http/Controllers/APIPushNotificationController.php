@@ -45,10 +45,29 @@ class APIPushNotificationController extends Controller
             ], 422);
         }
 
+        // Enregistrer le Player ID
         $user->update([
             'onesignal_player_id' => $request->player_id,
             'platform' => $request->platform,
         ]);
+
+        // Lier le Player ID à l'External User ID sur OneSignal
+        try {
+            $oneSignalService = app(\App\Services\Push\OneSignalService::class);
+            $oneSignalService->setExternalUserId($request->player_id, (string) $user->id);
+            
+            \Illuminate\Support\Facades\Log::info("OneSignal External User ID set", [
+                'user_id' => $user->id,
+                'player_id' => $request->player_id,
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Failed to set OneSignal External User ID", [
+                'user_id' => $user->id,
+                'player_id' => $request->player_id,
+                'error' => $e->getMessage(),
+            ]);
+            // Ne pas bloquer l'enregistrement si ça échoue
+        }
 
         return response()->json([
             'success' => true,
