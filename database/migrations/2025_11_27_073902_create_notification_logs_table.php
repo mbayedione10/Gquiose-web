@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('notification_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('utilisateur_id')->constrained('utilisateurs')->onDelete('cascade');
-            $table->foreignId('notification_schedule_id')->nullable()->constrained('notification_schedules')->onDelete('set null');
+            $table->foreignId('notification_schedule_id')->nullable()->constrained('push_notifications')->onDelete('set null');
 
             $table->string('title', 65);
             $table->text('message');
