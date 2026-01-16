@@ -82,18 +82,7 @@ class OneSignalService
     }
 
     /**
-     * Envoyer une notification à plusieurs utilisateurs via leurs player_ids.
-     */
-    public function sendToUsers(array $users, PushNotification $notification): array
-    {
-        $playerIds = [];
-        $userMap = [];
-
-        foreach ($users as $user) {
-            if (!empty($user->onesignal_player_id)) {
-                $playerIds[] = $user->onesignal_player_id;
-                $userMap[$user->onesignal_player_id] = $user;
-            }External User IDs.
+     * Envoyer une notification à plusieurs utilisateurs via leurs External User IDs.
      */
     public function sendToUsers(array $users, PushNotification $notification): array
     {
@@ -125,10 +114,16 @@ class OneSignalService
             } else {
                 $totalFailed += count($chunk);
             }
-        }ushNotification $notification, array $users = []): bool
-    {
-        try {
-            Log::info("Preparing to seExternal User IDs spécifiques.
+        }
+
+        return [
+            'success' => $totalSuccess,
+            'failed' => $totalFailed,
+        ];
+    }
+
+    /**
+     * Envoyer une notification à des External User IDs spécifiques.
      */
     protected function sendToExternalUserIds(array $externalUserIds, PushNotification $notification, array $users = []): bool
     {
@@ -217,7 +212,12 @@ class OneSignalService
     }
 
     /**
-     * Envoyer une notification à des player_ids spécifiques (fallback pour compatibilité)ion", [
+     * Envoyer une notification à des player_ids spécifiques (fallback pour compatibilité).
+     */
+    protected function sendToPlayerIds(array $playerIds, PushNotification $notification, array $users = []): bool
+    {
+        try {
+            Log::info("Preparing to send OneSignal notification", [
                 'notification_id' => $notification->id,
                 'player_ids_count' => count($playerIds),
                 'player_ids' => $playerIds,
