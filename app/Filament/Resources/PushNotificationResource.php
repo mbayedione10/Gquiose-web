@@ -47,6 +47,9 @@ class PushNotificationResource extends Resource
                                         $set('icon', $template->icon);
                                         $set('action', $template->action);
                                         $set('image', $template->image);
+                                        $set('category', $template->category);
+                                        $set('related_type', $template->related_type);
+                                        $set('related_id', $template->related_id);
                                     }
                                 }
                             }),
@@ -98,48 +101,133 @@ class PushNotificationResource extends Resource
                             ->directory('notifications/images'),
 
                         Forms\Components\TextInput::make('action')
-                            ->label('Action (route/URL)')
+                            ->label('Action (route/URL) - Obsolète')
                             ->maxLength(255)
-                            ->helperText('Route ou URL à ouvrir au clic'),
-
-                        Forms\Components\Select::make('related_type')
-                            ->label('Type de contenu lié')
-                            ->options([
-                                'article' => 'Article',
-                                'forum_reply' => 'Réponse Forum',
-                                'cycle' => 'Cycle Menstruel',
-                                'alerte' => 'Alerte VBG',
-                                'structure' => 'Structure',
-                                'quiz' => 'Quiz',
-                                'evaluation' => 'Évaluation',
-                            ])
-                            ->searchable()
-                            ->placeholder('Sélectionner un type')
-                            ->helperText('Type de contenu pour le deep linking')
-                            ->reactive(),
-
-                        Forms\Components\TextInput::make('related_id')
-                            ->label('ID du contenu lié')
-                            ->numeric()
-                            ->minValue(1)
-                            ->visible(fn ($get) => !empty($get('related_type')))
-                            ->helperText('ID de l\'article, réponse forum, cycle, etc.'),
-
-                        Forms\Components\Select::make('category')
-                            ->label('Catégorie')
-                            ->options([
-                                'cycle' => 'Cycle Menstruel',
-                                'content' => 'Contenu',
-                                'forum' => 'Forum',
-                                'health_tips' => 'Conseils de Santé',
-                                'admin' => 'Administratif',
-                                'alert' => 'Alerte',
-                            ])
-                            ->searchable()
-                            ->placeholder('Sélectionner une catégorie')
-                            ->helperText('Catégorie pour filtrage des notifications'),
+                            ->helperText('⚠️ Préférez utiliser "Type de contenu lié" ci-dessous')
+                            ->columnSpan(2),
                     ])
                     ->columns(2),
+
+                Forms\Components\Section::make('Deep Linking OneSignal')
+                    ->description('🔗 Configuration du deep linking pour navigation automatique vers le contenu')
+                    ->schema([
+                        Forms\Components\Grid::make(3)
+                            ->schema([
+                                Forms\Components\Select::make('related_type')
+                                    ->label('Type de contenu lié')
+                                    ->options([
+                                        'article' => '📚 Article',
+                                        'forum_reply' => '💬 Réponse Forum',
+                                        'cycle' => '🩸 Cycle Menstruel',
+                                        'alerte' => '⚠️ Alerte VBG',
+                                        'structure' => '🏥 Structure d\'aide',
+                                        'quiz' => '❓ Quiz',
+                                        'evaluation' => '📝 Évaluation',
+                                    ])
+                                    ->searchable()
+                                    ->placeholder('Sélectionner un type de contenu')
+                                    ->helperText('Type de ressource liée')
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        // Auto-générer l'action si related_type et related_id sont définis
+                                        if ($state && $get('related_id')) {
+                                            $routes = [
+                                                'article' => '/articles/',
+                                                'forum_reply' => '/forum/replies/',
+                                                'alerte' => '/alertes/',
+                                                'structure' => '/structures/',
+                                                'quiz' => '/quiz/',
+                                                'evaluation' => '/evaluations/',
+                                                'cycle' => '/cycle',
+                                            ];
+                                            if (isset($routes[$state])) {
+                                                $action = $routes[$state];
+                                                if ($state !== 'cycle') {
+                                                    $action .= $get('related_id');
+                                                }
+                                                $set('action', $action);
+                                            }
+                                        }
+                                    }),
+
+                                Forms\Components\TextInput::make('related_id')
+                                    ->label('ID du contenu lié')
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->visible(fn ($get) => !empty($get('related_type')))
+                                    ->helperText('ID de la ressource')
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                                        // Auto-générer l'action si related_type et related_id sont définis
+                                        $relatedType = $get('related_type');
+                                        if ($state && $relatedType) {
+                                            $routes = [
+                                                'article' => '/articles/',
+                                                'forum_reply' => '/forum/replies/',
+                                                'alerte' => '/alertes/',
+                                                'structure' => '/structures/',
+                                                'quiz' => '/quiz/',
+                                                'evaluation' => '/evaluations/',
+                                            ];
+                                            if (isset($routes[$relatedType])) {
+                                                $set('action', $routes[$relatedType] . $state);
+                                            }
+                                        }
+                                    }),
+
+                                Forms\Components\Select::make('category')
+                                    ->label('Catégorie de notification')
+                                    ->options([
+                                        'cycle' => '🩸 Cycle Menstruel',
+                                        'content' => '📚 Contenu',
+                                        'forum' => '💬 Forum',
+                                        'health_tips' => '💡 Conseils de Santé',
+                                        'admin' => 'ℹ️ Administratif',
+                                        'alert' => '⚠️ Alerte',
+                                    ])
+                                    ->searchable()
+                                    ->placeholder('Sélectionner une catégorie')
+                                    ->helperText('Pour filtrage des préférences utilisateur')
+                                    ->reactive()
+                                    ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                                        // Suggérer un related_type basé sur la catégorie
+                                        if (!$get('related_type')) {
+                                            $suggestions = [
+                                                'cycle' => 'cycle',
+                                                'content' => 'article',
+                                                'forum' => 'forum_reply',
+                                                'alert' => 'alerte',
+                                            ];
+                                            if (isset($suggestions[$state])) {
+                                                $set('related_type', $suggestions[$state]);
+                                            }
+                                        }
+                                    }),
+                            ]),
+
+                        Forms\Components\Placeholder::make('deep_linking_preview')
+                            ->label('Aperçu du payload OneSignal')
+                            ->content(function ($get) {
+                                $payload = [];
+                                if ($get('related_type')) {
+                                    $payload['related_type'] = $get('related_type');
+                                }
+                                if ($get('related_id')) {
+                                    $payload['related_id'] = (int) $get('related_id');
+                                }
+                                if ($get('category')) {
+                                    $payload['category'] = $get('category');
+                                }
+                                if ($get('action')) {
+                                    $payload['action'] = $get('action');
+                                }
+                                return $payload ? '```json
+' . json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . '
+```' : 'Aucune donnée de deep linking configurée';
+                            })
+                            ->columnSpan(3),
+                    ])
+                    ->columns(1),
 
                 Forms\Components\Section::make()
                     ->schema([
@@ -314,6 +402,50 @@ class PushNotificationResource extends Resource
                         default => 'gray',
                     }),
 
+                Tables\Columns\TextColumn::make('category')
+                    ->label('Catégorie')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'cycle' => '🩸 Cycle',
+                        'content' => '📚 Contenu',
+                        'forum' => '💬 Forum',
+                        'health_tips' => '💡 Conseils',
+                        'admin' => 'ℹ️ Admin',
+                        'alert' => '⚠️ Alerte',
+                        default => $state,
+                    })
+                    ->color(fn ($state) => match ($state) {
+                        'cycle' => 'danger',
+                        'content' => 'success',
+                        'forum' => 'primary',
+                        'health_tips' => 'warning',
+                        'admin' => 'gray',
+                        'alert' => 'danger',
+                        default => 'gray',
+                    })
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('related_type')
+                    ->label('Deep Link')
+                    ->badge()
+                    ->formatStateUsing(function ($state, $record) {
+                        if (!$state) return null;
+                        $emoji = match($state) {
+                            'article' => '📚',
+                            'forum_reply' => '💬',
+                            'cycle' => '🩸',
+                            'alerte' => '⚠️',
+                            'structure' => '🏥',
+                            'quiz' => '❓',
+                            'evaluation' => '📝',
+                            default => '🔗'
+                        };
+                        return "{$emoji} {$state}" . ($record->related_id ? " #{$record->related_id}" : '');
+                    })
+                    ->color(fn ($state) => $state ? 'info' : null)
+                    ->sortable()
+                    ->toggleable(),
+
                 Tables\Columns\TextColumn::make('status')
                     ->label('Statut')
                     ->badge()
@@ -369,6 +501,29 @@ class PushNotificationResource extends Resource
                         'pending' => 'En attente',
                         'sent' => 'Envoyé',
                         'failed' => 'Échoué',
+                    ]),
+
+                Tables\Filters\SelectFilter::make('category')
+                    ->label('Catégorie')
+                    ->options([
+                        'cycle' => '🩸 Cycle Menstruel',
+                        'content' => '📚 Contenu',
+                        'forum' => '💬 Forum',
+                        'health_tips' => '💡 Conseils de Santé',
+                        'admin' => 'ℹ️ Administratif',
+                        'alert' => '⚠️ Alerte',
+                    ]),
+
+                Tables\Filters\SelectFilter::make('related_type')
+                    ->label('Type de Deep Link')
+                    ->options([
+                        'article' => '📚 Article',
+                        'forum_reply' => '💬 Réponse Forum',
+                        'cycle' => '🩸 Cycle Menstruel',
+                        'alerte' => '⚠️ Alerte VBG',
+                        'structure' => '🏥 Structure d\'aide',
+                        'quiz' => '❓ Quiz',
+                        'evaluation' => '📝 Évaluation',
                     ]),
             ])
             ->actions([

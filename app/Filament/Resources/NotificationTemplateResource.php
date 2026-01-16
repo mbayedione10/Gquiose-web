@@ -96,7 +96,8 @@ class NotificationTemplateResource extends Resource
 
                         Forms\Components\TextInput::make('action')
                             ->label('Action (route/URL)')
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->helperText('Route ou URL à ouvrir au clic'),
 
                         Forms\Components\FileUpload::make('image')
                             ->label('Image (optionnelle)')
@@ -104,6 +105,35 @@ class NotificationTemplateResource extends Resource
                             ->directory('notifications/images'),
                     ])
                     ->columns(2),
+
+                Forms\Components\Section::make('Deep Linking')
+                    ->description('Configuration du deep linking pour naviguer vers le contenu spécifique')
+                    ->schema([
+                        Forms\Components\Select::make('related_type')
+                            ->label('Type de contenu lié')
+                            ->options([
+                                'article' => '📚 Article',
+                                'forum_reply' => '💬 Réponse Forum',
+                                'cycle' => '🩸 Cycle Menstruel',
+                                'alerte' => '⚠️ Alerte VBG',
+                                'structure' => '🏥 Structure d\'aide',
+                                'quiz' => '❓ Quiz',
+                                'evaluation' => '📝 Évaluation',
+                            ])
+                            ->searchable()
+                            ->placeholder('Sélectionner un type de contenu')
+                            ->helperText('Type de contenu pour le deep linking mobile')
+                            ->reactive(),
+
+                        Forms\Components\TextInput::make('related_id')
+                            ->label('ID du contenu lié')
+                            ->numeric()
+                            ->minValue(1)
+                            ->visible(fn ($get) => !empty($get('related_type')))
+                            ->helperText('ID de la ressource liée (article, forum, etc.)'),
+                    ])
+                    ->columns(2)
+                    ->collapsed(),
             ]);
     }
 
@@ -144,6 +174,14 @@ class NotificationTemplateResource extends Resource
 
                 Tables\Columns\TextColumn::make('icon')
                     ->label('Icône'),
+
+                Tables\Columns\TextColumn::make('related_type')
+                    ->label('Deep Link')
+                    ->badge()
+                    ->formatStateUsing(fn ($state, $record) => $state ? "{$state}" . ($record->related_id ? " #{$record->related_id}" : '') : 'Aucun')
+                    ->color(fn ($state) => $state ? 'success' : 'gray')
+                    ->icon(fn ($state) => $state ? 'heroicon-o-link' : null)
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Créé le')

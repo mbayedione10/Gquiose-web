@@ -18,5 +18,7 @@ class NotificationTemplate extends Model
         'action',
         'image',
         'category',
+        'related_type',
+        'related_id',
     ];
 }
