@@ -9,9 +9,8 @@ use App\Http\Controllers\APIEvaluationStatsController;
 use App\Http\Controllers\APIForumController;
 use App\Http\Controllers\APIQuizController;
 use App\Http\Controllers\APIVideoController;
-use App\Http\Controllers\NotificationTrackingController; // Added for evaluation routes
-use Illuminate\Http\Request; // Added for cycle routes
-use Illuminate\Support\Facades\Route; // Added for evaluation stats routes
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,11 +57,11 @@ Route::prefix('v1')
                 // Historique
                 Route::get('/history', [App\Http\Controllers\APIPushNotificationController::class, 'getHistory']);
                 
-                // Tracking avec log détaillé (méthode recommandée)
-                Route::post('/opened', [NotificationTrackingController::class, 'markAsOpened']);
-                Route::post('/clicked', [NotificationTrackingController::class, 'markAsClicked']);
+                // Tracking avec log détaillé (body: {notification_id, log_id?})
+                Route::post('/opened', [App\Http\Controllers\APIPushNotificationController::class, 'markAsOpened']);
+                Route::post('/clicked', [App\Http\Controllers\APIPushNotificationController::class, 'markAsClicked']);
                 
-                // Tracking simple par ID (fallback pour compatibilité)
+                // Tracking simple par ID dans URL (fallback pour compatibilité)
                 Route::post('/{notificationId}/opened', [App\Http\Controllers\APIPushNotificationController::class, 'trackOpened']);
                 Route::post('/{notificationId}/clicked', [App\Http\Controllers\APIPushNotificationController::class, 'trackClicked']);
             });
