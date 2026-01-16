@@ -46,18 +46,23 @@ Route::prefix('v1')
             Route::post('change-password', [APIAuthController::class, 'changePassword']);
             Route::post('delete-account', [APIAuthController::class, 'deleteAccount']);
 
-            // Notification tracking
-            Route::prefix('notifications')->group(function () {
-                Route::post('opened', [NotificationTrackingController::class, 'markAsOpened']);
-                Route::post('clicked', [NotificationTrackingController::class, 'markAsClicked']);
-            });
-
             // Push Notifications Routes
             Route::prefix('notifications')->group(function () {
-                Route::post('/register-token', [App\Http\Controllers\APIPushNotificationController::class, 'registerToken'])->middleware('auth:sanctum');
+                // Enregistrement du token
+                Route::post('/register-token', [App\Http\Controllers\APIPushNotificationController::class, 'registerToken']);
+                
+                // Préférences
                 Route::post('/preferences', [App\Http\Controllers\APIPushNotificationController::class, 'updatePreferences']);
                 Route::get('/preferences', [App\Http\Controllers\APIPushNotificationController::class, 'getPreferences']);
+                
+                // Historique
                 Route::get('/history', [App\Http\Controllers\APIPushNotificationController::class, 'getHistory']);
+                
+                // Tracking avec log détaillé (méthode recommandée)
+                Route::post('/opened', [NotificationTrackingController::class, 'markAsOpened']);
+                Route::post('/clicked', [NotificationTrackingController::class, 'markAsClicked']);
+                
+                // Tracking simple par ID (fallback pour compatibilité)
                 Route::post('/{notificationId}/opened', [App\Http\Controllers\APIPushNotificationController::class, 'trackOpened']);
                 Route::post('/{notificationId}/clicked', [App\Http\Controllers\APIPushNotificationController::class, 'trackClicked']);
             });
