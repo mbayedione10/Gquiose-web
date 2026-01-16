@@ -154,13 +154,30 @@ class OneSignalService
                 $params['large_icon'] = $notification->icon;
             }
 
-            // Ajouter les données additionnelles pour l'action
+            // Ajouter les données additionnelles pour deep linking et action
+            $data = [
+                'notification_id' => $notification->id,
+            ];
+            
             if (!empty($notification->action)) {
-                $params['data'] = [
-                    'action' => $notification->action,
-                    'notification_id' => $notification->id,
-                ];
+                $data['action'] = $notification->action;
             }
+            
+            // Deep linking: Ajouter le type et l'ID de la ressource liée
+            if (!empty($notification->related_type)) {
+                $data['related_type'] = $notification->related_type;
+            }
+            
+            if (!empty($notification->related_id)) {
+                $data['related_id'] = $notification->related_id;
+            }
+            
+            // Catégorie de notification
+            if (!empty($notification->category)) {
+                $data['category'] = $notification->category;
+            }
+            
+            $params['data'] = $data;
 
             // Configuration iOS
             $params['ios_badgeType'] = 'Increase';
@@ -253,13 +270,30 @@ class OneSignalService
                 $params['large_icon'] = $notification->icon;
             }
 
-            // Ajouter les données additionnelles pour l'action
+            // Ajouter les données additionnelles pour deep linking et action
+            $data = [
+                'notification_id' => $notification->id,
+            ];
+            
             if (!empty($notification->action)) {
-                $params['data'] = [
-                    'action' => $notification->action,
-                    'notification_id' => $notification->id,
-                ];
+                $data['action'] = $notification->action;
             }
+            
+            // Deep linking: Ajouter le type et l'ID de la ressource liée
+            if (!empty($notification->related_type)) {
+                $data['related_type'] = $notification->related_type;
+            }
+            
+            if (!empty($notification->related_id)) {
+                $data['related_id'] = $notification->related_id;
+            }
+            
+            // Catégorie de notification
+            if (!empty($notification->category)) {
+                $data['category'] = $notification->category;
+            }
+            
+            $params['data'] = $data;
 
             // Configuration iOS
             $params['ios_badgeType'] = 'Increase';

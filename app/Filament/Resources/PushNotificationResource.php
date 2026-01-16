@@ -99,7 +99,45 @@ class PushNotificationResource extends Resource
 
                         Forms\Components\TextInput::make('action')
                             ->label('Action (route/URL)')
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->helperText('Route ou URL à ouvrir au clic'),
+
+                        Forms\Components\Select::make('related_type')
+                            ->label('Type de contenu lié')
+                            ->options([
+                                'article' => 'Article',
+                                'forum_reply' => 'Réponse Forum',
+                                'cycle' => 'Cycle Menstruel',
+                                'alerte' => 'Alerte VBG',
+                                'structure' => 'Structure',
+                                'quiz' => 'Quiz',
+                                'evaluation' => 'Évaluation',
+                            ])
+                            ->searchable()
+                            ->placeholder('Sélectionner un type')
+                            ->helperText('Type de contenu pour le deep linking')
+                            ->reactive(),
+
+                        Forms\Components\TextInput::make('related_id')
+                            ->label('ID du contenu lié')
+                            ->numeric()
+                            ->minValue(1)
+                            ->visible(fn ($get) => !empty($get('related_type')))
+                            ->helperText('ID de l\'article, réponse forum, cycle, etc.'),
+
+                        Forms\Components\Select::make('category')
+                            ->label('Catégorie')
+                            ->options([
+                                'cycle' => 'Cycle Menstruel',
+                                'content' => 'Contenu',
+                                'forum' => 'Forum',
+                                'health_tips' => 'Conseils de Santé',
+                                'admin' => 'Administratif',
+                                'alert' => 'Alerte',
+                            ])
+                            ->searchable()
+                            ->placeholder('Sélectionner une catégorie')
+                            ->helperText('Catégorie pour filtrage des notifications'),
                     ])
                     ->columns(2),
 

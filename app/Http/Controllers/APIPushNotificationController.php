@@ -429,9 +429,26 @@ class APIPushNotificationController extends Controller
 
         $notifications = $query->paginate($perPage);
 
+        // Enrichir les données avec la notification parent pour avoir related_type, related_id, category
+        $enrichedData = $notifications->getCollection()->map(function ($log) {
+            $notification = PushNotification::find($log->notification_schedule_id);
+            
+            $data = $log->toArray();
+            
+            // Ajouter les informations de deep linking depuis la notification parent
+            if ($notification) {
+                $data['related_type'] = $notification->related_type;
+                $data['related_id'] = $notification->related_id;
+                $data['category'] = $notification->category;
+                $data['action'] = $notification->action;
+            }
+            
+            return $data;
+        });
+
         return response()->json([
             'success' => true,
-            'data' => $notifications->items(),
+            'data' => $enrichedData,
             'pagination' => [
                 'current_page' => $notifications->currentPage(),
                 'last_page' => $notifications->lastPage(),
