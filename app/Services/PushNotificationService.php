@@ -179,20 +179,36 @@ class PushNotificationService
      */
     protected function canSendToUser($user, PushNotification $notification)
     {
+        // Support both array and object access
+        $isArray = is_array($user);
+        $userId = $isArray ? ($user['id'] ?? null) : $user->id;
+        $playerId = $isArray ? ($user['onesignal_player_id'] ?? null) : $user->onesignal_player_id;
+        
         // Vérifier si l'utilisateur a un player_id OneSignal
-        if (empty($user->onesignal_player_id)) {
+        if (empty($playerId)) {
+            Log::debug("User {$userId} filtered: no player_id");
+            return false;
+        }
+
+        // Récupérer le modèle si on a reçu un array
+        $userModel = $isArray ? Utilisateur::find($userId) : $user;
+        
+        if (!$userModel) {
+            Log::debug("User {$userId} filtered: model not found");
             return false;
         }
 
         // Vérifier les préférences de notification
-        $preferences = $user->notificationPreferences;
+        $preferences = $userModel->notificationPreferences;
 
         if (! $preferences || ! $preferences->notifications_enabled) {
+            Log::debug("User {$userId} filtered: notifications disabled (enabled=" . ($preferences->notifications_enabled ?? 'null') . ")");
             return false;
         }
 
         // Vérifier le mode silencieux
         if ($preferences->do_not_disturb) {
+            Log::debug("User {$userId} filtered: DND mode");
             return false;
         }
 
@@ -200,6 +216,7 @@ class PushNotificationService
         if ($preferences->quiet_start && $preferences->quiet_end) {
             $now = now()->format('H:i:s');
             if ($now >= $preferences->quiet_start && $now <= $preferences->quiet_end) {
+                Log::debug("User {$userId} filtered: quiet hours ({$preferences->quiet_start}-{$preferences->quiet_end})");
                 return false;
             }
         }
@@ -208,21 +225,27 @@ class PushNotificationService
         $notificationType = $this->getNotificationType($notification);
 
         if ($notificationType === 'cycle' && ! $preferences->cycle_notifications) {
+            Log::debug("User {$userId} filtered: cycle notifications disabled");
             return false;
         }
         if ($notificationType === 'content' && ! $preferences->content_notifications) {
+            Log::debug("User {$userId} filtered: content notifications disabled");
             return false;
         }
         if ($notificationType === 'forum' && ! $preferences->forum_notifications) {
+            Log::debug("User {$userId} filtered: forum notifications disabled");
             return false;
         }
         if ($notificationType === 'health_tips' && ! $preferences->health_tips_notifications) {
+            Log::debug("User {$userId} filtered: health tips notifications disabled");
             return false;
         }
         if ($notificationType === 'admin' && ! $preferences->admin_notifications) {
+            Log::debug("User {$userId} filtered: admin notifications disabled");
             return false;
         }
 
+        Log::debug("User {$userId} eligible for {$notificationType} notification");
         return true;
     }
 
