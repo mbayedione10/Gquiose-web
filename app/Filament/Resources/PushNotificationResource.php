@@ -436,10 +436,58 @@ class PushNotificationResource extends Resource
                     ->icon('heroicon-o-paper-airplane')
                     ->color('success')
                     ->requiresConfirmation()
+                    ->modalHeading('Envoyer la notification')
+                    ->modalDescription(fn (PushNotification $record) => 
+                        "Voulez-vous envoyer cette notification à " . 
+                        ($record->target_audience === 'all' ? 'tous les utilisateurs' : 'les utilisateurs filtrés') . 
+                        " ?"
+                    )
                     ->visible(fn (PushNotification $record) => $record->status === 'pending')
                     ->action(function (PushNotification $record) {
                         $service = app(\App\Services\PushNotificationService::class);
-                        $service->sendNotification($record);
+                        
+                        try {
+                            // Compter les utilisateurs ciblés avant l'envoi
+                            $query = \App\Models\Utilisateur::query()
+                                ->whereNotNull('onesignal_player_id')
+                                ->where('status', true);
+                            
+                            $targetCount = $query->count();
+                            
+                            if ($targetCount === 0) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Aucun utilisateur trouvé')
+                                    ->body('Aucun utilisateur avec OneSignal player_id trouvé.')
+                                    ->warning()
+                                    ->send();
+                                return;
+                            }
+                            
+                            // Envoyer la notification
+                            $service->sendNotification($record);
+                            
+                            // Recharger pour obtenir les stats à jour
+                            $record->refresh();
+                            
+                            \Filament\Notifications\Notification::make()
+                                ->title('Notification envoyée !')
+                                ->body("Envoyée avec succès à {$record->sent_count} utilisateur(s).")
+                                ->success()
+                                ->send();
+                                
+                        } catch (\Exception $e) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Erreur d\'envoi')
+                                ->body('Erreur: ' . $e->getMessage())
+                                ->danger()
+                                ->send();
+                                
+                            \Log::error('Error sending notification from Filament', [
+                                'notification_id' => $record->id,
+                                'error' => $e->getMessage(),
+                                'trace' => $e->getTraceAsString()
+                            ]);
+                        }
                     }),
                 Tables\Actions\Action::make('duplicate')
                     ->label('Dupliquer')

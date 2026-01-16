@@ -140,9 +140,24 @@ class PushNotificationService
         // Filtrer les utilisateurs autorisés
         $eligibleUsers = array_filter($users, fn($user) => $this->canSendToUser($user, $notification));
 
+        $totalUsers = count($users);
+        $eligibleCount = count($eligibleUsers);
+        $filteredOut = $totalUsers - $eligibleCount;
+
+        Log::info("Notification {$notification->id}: Total users={$totalUsers}, Eligible={$eligibleCount}, Filtered out={$filteredOut}");
+
         if (empty($eligibleUsers)) {
-            Log::info('No eligible users for notification');
-            $notification->update(['sent' => 0, 'failed' => count($users)]);
+            Log::warning('No eligible users for notification', [
+                'notification_id' => $notification->id,
+                'total_users' => $totalUsers,
+                'reason' => 'All users filtered out by preferences or missing player_id'
+            ]);
+            
+            $notification->update([
+                'status' => 'sent',
+                'sent_count' => 0,
+                'sent_at' => now(),
+            ]);
 
             return;
         }
@@ -151,13 +166,12 @@ class PushNotificationService
         $oneSignalService = app(OneSignalService::class);
         $result = $oneSignalService->sendToUsers($eligibleUsers, $notification);
 
-        // Enregistrer les statistiques
-        $notification->update([
-            'sent' => $result['success'],
-            'failed' => $result['failed'] + (count($users) - count($eligibleUsers)),
+        Log::info("Push notification sent via OneSignal", [
+            'notification_id' => $notification->id,
+            'success' => $result['success'],
+            'failed' => $result['failed'],
+            'filtered_out' => $filteredOut,
         ]);
-
-        Log::info("Push notification sent via OneSignal: Success={$result['success']}, Failed={$result['failed']}");
     }
 
     /**
