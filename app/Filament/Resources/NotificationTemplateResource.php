@@ -97,43 +97,39 @@ class NotificationTemplateResource extends Resource
                         Forms\Components\TextInput::make('action')
                             ->label('Action (route/URL)')
                             ->maxLength(255)
-                            ->helperText('Route ou URL à ouvrir au clic'),
+                            ->placeholder('Ex: /articles/42')
+                            ->columnSpan(2),
 
                         Forms\Components\FileUpload::make('image')
                             ->label('Image (optionnelle)')
                             ->image()
-                            ->directory('notifications/images'),
+                            ->directory('notifications/images')
+                            ->columnSpan(2),
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Deep Linking')
-                    ->description('Configuration du deep linking pour naviguer vers le contenu spécifique')
+                Forms\Components\Section::make('Lien vers contenu (pour templates d\'articles, forum, etc.)')
+                    ->description('Définir un type de contenu par défaut pour ce template')
                     ->schema([
-                        Forms\Components\Select::make('related_type')
-                            ->label('Type de contenu lié')
+                        Forms\Components\Select::make('category')
+                            ->label('Catégorie')
                             ->options([
-                                'article' => '📚 Article',
-                                'forum_reply' => '💬 Réponse Forum',
+                                'content' => '📚 Contenu (Articles)',
+                                'forum' => '💬 Forum',
                                 'cycle' => '🩸 Cycle Menstruel',
-                                'alerte' => '⚠️ Alerte VBG',
-                                'structure' => '🏥 Structure d\'aide',
-                                'quiz' => '❓ Quiz',
-                                'evaluation' => '📝 Évaluation',
+                                'health_tips' => '💡 Conseils',
+                                'alert' => '⚠️ Alertes',
+                                'admin' => 'ℹ️ Info Générale',
+                                'other' => 'Autre',
                             ])
-                            ->searchable()
-                            ->placeholder('Sélectionner un type de contenu')
-                            ->helperText('Type de contenu pour le deep linking mobile')
-                            ->reactive(),
+                            ->default('other')
+                            ->required(),
 
-                        Forms\Components\TextInput::make('related_id')
-                            ->label('ID du contenu lié')
-                            ->numeric()
-                            ->minValue(1)
-                            ->visible(fn ($get) => !empty($get('related_type')))
-                            ->helperText('ID de la ressource liée (article, forum, etc.)'),
+                        Forms\Components\Hidden::make('related_type'),
+                        Forms\Components\Hidden::make('related_id'),
                     ])
-                    ->columns(2)
-                    ->collapsed(),
+                    ->collapsed()
+                    ->columns(1),
             ]);
     }
 
@@ -174,14 +170,6 @@ class NotificationTemplateResource extends Resource
 
                 Tables\Columns\TextColumn::make('icon')
                     ->label('Icône'),
-
-                Tables\Columns\TextColumn::make('related_type')
-                    ->label('Deep Link')
-                    ->badge()
-                    ->formatStateUsing(fn ($state, $record) => $state ? "{$state}" . ($record->related_id ? " #{$record->related_id}" : '') : 'Aucun')
-                    ->color(fn ($state) => $state ? 'success' : 'gray')
-                    ->icon(fn ($state) => $state ? 'heroicon-o-link' : null)
-                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Créé le')
