@@ -6,7 +6,7 @@ use App\Models\NotificationLog;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
-class NotificationLogsByCategoryWidget extends ChartWidget
+class NotificationsByCategoryWidget extends ChartWidget
 {
     protected static ?string $heading = 'Notifications par catégorie (30 derniers jours)';
 

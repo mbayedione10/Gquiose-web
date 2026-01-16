@@ -3,6 +3,9 @@
 namespace App\Filament\Resources\NotificationLogResource\Pages;
 
 use App\Filament\Resources\NotificationLogResource;
+use App\Filament\Resources\NotificationLogResource\Widgets\NotificationLogStatsWidget;
+use App\Filament\Resources\NotificationLogResource\Widgets\NotificationsByCategoryWidget;
+use App\Filament\Resources\NotificationLogResource\Widgets\NotificationsTrendWidget;
 use Filament\Resources\Pages\ListRecords;
 
 class ListNotificationLogs extends ListRecords
@@ -13,6 +16,15 @@ class ListNotificationLogs extends ListRecords
     {
         return [
             //
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            NotificationLogStatsWidget::class,
+            NotificationsByCategoryWidget::class,
+            NotificationsTrendWidget::class,
         ];
     }
 }

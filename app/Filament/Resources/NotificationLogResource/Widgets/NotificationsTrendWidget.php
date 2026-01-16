@@ -7,7 +7,7 @@ use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class NotificationLogsTrendWidget extends ChartWidget
+class NotificationsTrendWidget extends ChartWidget
 {
     protected static ?string $heading = 'Tendance des notifications (30 derniers jours)';
 
