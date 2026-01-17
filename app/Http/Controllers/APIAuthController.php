@@ -194,7 +194,7 @@ class APIAuthController extends Controller
         // Vérifier unicité du phone (avec variantes)
         $phoneVariants = $this->getPhoneVariants($phone);
         if (Utilisateur::whereIn('phone', $phoneVariants)->exists()) {
-            return response::error('Ce numéro est déjà utilisé', 409);
+            return response::error('Un compte existe déjà avec ce numéro. Connectez-vous ou réinitialisez votre mot de passe.', 409);
         }
 
         // Anti-spam : vérifier qu'on n'a pas envoyé de code récemment
@@ -279,6 +279,7 @@ class APIAuthController extends Controller
             'platform' => 'required|in:android,ios',
             'ville_id' => 'nullable|exists:villes,id',
         ], [
+            'email.unique' => 'Un compte existe déjà avec cet email. Connectez-vous ou réinitialisez votre mot de passe.',
             'dob.min' => 'L\'âge ne peut pas dépasser 100 ans',
             'dob.max' => 'L\'année de naissance ne peut pas être dans le futur',
             'phone.regex' => 'Le numéro doit contenir entre 8 et 15 chiffres',
@@ -295,7 +296,7 @@ class APIAuthController extends Controller
         // Vérifier unicité du phone si fourni
         if (! empty($validated['phone'])) {
             if (Utilisateur::where('phone', $validated['phone'])->exists()) {
-                return response::error('Ce numéro de téléphone est déjà utilisé', 409);
+                return response::error('Un compte existe déjà avec ce numéro. Connectez-vous ou utilisez un autre numéro.', 409);
             }
         }
 
