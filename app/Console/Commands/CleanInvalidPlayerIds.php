@@ -55,7 +55,8 @@ class CleanInvalidPlayerIds extends Command
 
         foreach ($usersWithPlayerId as $user) {
             if ($isDryRun) {
-                $this->line("  → User #{$user->id} ({$user->email ?: $user->phone}) - Player: {$user->onesignal_player_id}");
+                $identifier = $user->email ?: $user->phone;
+                $this->line("  → User #{$user->id} ({$identifier}) - Player: {$user->onesignal_player_id}");
                 $cleaned++;
             } else {
                 try {

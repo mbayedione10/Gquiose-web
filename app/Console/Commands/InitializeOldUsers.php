@@ -54,14 +54,16 @@ class InitializeOldUsers extends Command
 
         $this->table(
             ['ID', 'Nom', 'Email/Phone', 'Créé le', 'Status', 'Player ID'],
-            $oldUsers->take(10)->map(fn($u) => [
-                $u->id,
-                $u->prenom . ' ' . $u->nom,
-                $u->email ?: $u->phone,
-                $u->created_at->format('Y-m-d'),
-                $u->status ? '✅' : '❌',
-                $u->onesignal_player_id ?: '❌ Non défini',
-            ])
+            $oldUsers->take(10)->map(function($u) {
+                return [
+                    $u->id,
+                    $u->prenom . ' ' . $u->nom,
+                    $u->email ?: $u->phone,
+                    $u->created_at->format('Y-m-d'),
+                    $u->status ? '✅' : '❌',
+                    $u->onesignal_player_id ?: '❌ Non défini',
+                ];
+            })
         );
 
         if ($oldUsers->count() > 10) {
