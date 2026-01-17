@@ -54,9 +54,23 @@ class APIAuthController extends Controller
             return response::error('Votre compte n\'est pas encore activé', 403);
         }
 
+        // Marquer l'email/phone comme vérifié au premier login réussi
+        $needsSave = false;
+        if ($isEmail && !$client->email_verified_at) {
+            $client->email_verified_at = now();
+            $needsSave = true;
+        } elseif (!$isEmail && !$client->phone_verified_at) {
+            $client->phone_verified_at = now();
+            $needsSave = true;
+        }
+
         // Mise à jour de la plateforme
         if (isset($validated['platform'])) {
             $client->platform = $validated['platform'];
+            $needsSave = true;
+        }
+
+        if ($needsSave) {
             $client->save();
         }
 
