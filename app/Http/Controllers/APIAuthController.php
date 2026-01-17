@@ -810,23 +810,42 @@ class APIAuthController extends Controller
         DB::beginTransaction();
         try {
             $utilisateur = $codeRecord->utilisateur;
+            
+            // Vérifier que l'utilisateur existe bien
+            if (!$utilisateur) {
+                DB::rollBack();
+                Log::error('Password reset failed - user not found', [
+                    'code_record_id' => $codeRecord->id,
+                ]);
+                return response::error('Utilisateur introuvable', 404);
+            }
+
+            // Mettre à jour le mot de passe
             $utilisateur->password = bcrypt($validated['password']);
             $utilisateur->save();
 
+            // Révoquer tous les tokens existants pour forcer reconnexion
+            $utilisateur->tokens()->delete();
+
+            // Supprimer le code utilisé
             $codeRecord->delete();
             Cache::forget($cacheKey);
 
             DB::commit();
 
-            Log::info('Password reset successful', ['user_id' => $utilisateur->id]);
+            Log::info('Password reset successful', [
+                'user_id' => $utilisateur->id,
+                'identifier_type' => $isEmail ? 'email' : 'phone',
+            ]);
 
             return response::success([
-                'message' => 'Mot de passe réinitialisé avec succès',
+                'message' => 'Mot de passe réinitialisé avec succès. Veuillez vous reconnecter.',
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error resetting password', [
                 'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response::error('Une erreur est survenue', 500);
