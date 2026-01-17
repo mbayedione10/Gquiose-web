@@ -822,6 +822,13 @@ class APIAuthController extends Controller
 
             // Mettre à jour le mot de passe
             $utilisateur->password = bcrypt($validated['password']);
+            
+            // Activer le compte si pas encore actif (le reset confirme l'identité)
+            if (!$utilisateur->status) {
+                $utilisateur->status = true;
+                $utilisateur->email_verified_at = now();
+            }
+            
             $utilisateur->save();
 
             // Révoquer tous les tokens existants pour forcer reconnexion
