@@ -43,7 +43,7 @@ echo "   ID              : {$user->id}\n";
 echo "   Email           : " . ($user->email ?: 'N/A') . "\n";
 echo "   Téléphone       : " . ($user->phone ?: 'N/A') . "\n";
 echo "   Nom complet     : {$user->prenom} {$user->nom}\n";
-echo "   Compte actif    : " . ($user->statut ? '✅ OUI' : '❌ NON') . "\n";
+echo "   Compte actif    : " . ($user->status ? '✅ OUI' : '❌ NON') . "\n";
 echo "   Email vérifié   : " . ($user->email_verified_at ? '✅ OUI (' . $user->email_verified_at . ')' : '❌ NON') . "\n";
 echo "   Créé le         : {$user->created_at}\n";
 echo "\n";
