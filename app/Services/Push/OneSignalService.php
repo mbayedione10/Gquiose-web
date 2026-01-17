@@ -43,8 +43,25 @@ class OneSignalService
             ]);
 
             return true;
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            // 404 = Player ID invalide/expiré (app désinstallée ou réinstallée)
+            if ($e->getResponse()->getStatusCode() === 404) {
+                Log::warning('OneSignal player_id not found (expired/uninstalled)', [
+                    'player_id' => $playerId,
+                    'external_user_id' => $externalUserId,
+                    'action' => 'User needs to re-register player_id on next login',
+                ]);
+            } else {
+                Log::error('OneSignal setExternalUserId error: ' . $e->getMessage(), [
+                    'player_id' => $playerId,
+                    'external_user_id' => $externalUserId,
+                    'status_code' => $e->getResponse()->getStatusCode(),
+                ]);
+            }
+
+            return false;
         } catch (\Exception $e) {
-            Log::error('OneSignal setExternalUserId error: ' . $e->getMessage(), [
+            Log::error('OneSignal setExternalUserId unexpected error: ' . $e->getMessage(), [
                 'player_id' => $playerId,
                 'external_user_id' => $externalUserId,
             ]);
