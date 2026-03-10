@@ -193,8 +193,55 @@ class APIAuthController extends Controller
 
         // Vérifier unicité du phone (avec variantes)
         $phoneVariants = $this->getPhoneVariants($phone);
-        if (Utilisateur::whereIn('phone', $phoneVariants)->exists()) {
-            return response::error('Un compte existe déjà avec ce numéro. Connectez-vous ou réinitialisez votre mot de passe.', 409);
+        $existingUser = Utilisateur::whereIn('phone', $phoneVariants)->first();
+
+        if ($existingUser) {
+            // Compte confirmé → inviter à se connecter
+            if ($existingUser->status) {
+                return response()->json([
+                    'code' => 409,
+                    'message' => 'Un compte confirmé existe déjà avec ce numéro. Veuillez vous connecter ou réinitialiser votre mot de passe si vous l\'avez oublié.',
+                    'data' => [
+                        'account_status' => 'confirmed',
+                    ],
+                ], 409);
+            }
+
+            // Compte non confirmé → renvoyer le code OTP
+            $antiSpamKey = 'sms_sent_'.$phone;
+            if (Cache::has($antiSpamKey)) {
+                $remainingTime = Cache::get($antiSpamKey) - time();
+
+                return response::error("Veuillez patienter {$remainingTime} secondes avant de renvoyer un code", 429);
+            }
+
+            // Supprimer les anciens codes et en générer un nouveau
+            Code::where('utilisateur_id', $existingUser->id)->delete();
+            $codeValue = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+
+            Code::create([
+                'code' => $codeValue,
+                'utilisateur_id' => $existingUser->id,
+                'phone' => $existingUser->phone,
+            ]);
+
+            $smsService = new SMSService();
+            $smsSent = $smsService->sendVerificationCode($existingUser->phone, $codeValue);
+
+            if (! $smsSent) {
+                return response::error('Impossible d\'envoyer le SMS. Veuillez réessayer.', 500);
+            }
+
+            Cache::put($antiSpamKey, time() + 60, 60);
+
+            return response()->json([
+                'code' => 200,
+                'message' => 'Un compte avec ce numéro existe déjà mais n\'est pas encore confirmé. Un nouveau code de vérification a été envoyé.',
+                'data' => [
+                    'utilisateur' => $existingUser->only(['id', 'nom', 'prenom', 'sexe', 'anneedenaissance', 'provider', 'platform', 'onesignal_player_id']),
+                    'account_status' => 'unconfirmed',
+                ],
+            ], 200);
         }
 
         // Anti-spam : vérifier qu'on n'a pas envoyé de code récemment
@@ -254,7 +301,7 @@ class APIAuthController extends Controller
             return response::success([
                 'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'sexe', 'anneedenaissance', 'provider', 'platform', 'onesignal_player_id']),
                 'message' => 'Un code de vérification a été envoyé à votre numéro',
-                'verification_status' => 'pending_verification',
+                'account_status' => 'created',
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -268,7 +315,7 @@ class APIAuthController extends Controller
     private function registerByEmail(Request $request)
     {
         $validated = $request->validate([
-            'email' => 'required|email|unique:utilisateurs,email',
+            'email' => 'required|email',
             'phone' => 'nullable|string|regex:/^\+?[0-9]{8,15}$/',
             'sexe' => 'required|in:M,F,Autre',
             'anneedenaissance' => 'required|integer|min:'.(now()->year - 100).'|max:'.now()->year,
@@ -279,7 +326,6 @@ class APIAuthController extends Controller
             'platform' => 'required|in:android,ios',
             'ville_id' => 'nullable|exists:villes,id',
         ], [
-            'email.unique' => 'Un compte existe déjà avec cet email. Connectez-vous ou réinitialisez votre mot de passe.',
             'dob.min' => 'L\'âge ne peut pas dépasser 100 ans',
             'dob.max' => 'L\'année de naissance ne peut pas être dans le futur',
             'phone.regex' => 'Le numéro doit contenir entre 8 et 15 chiffres',
@@ -293,10 +339,69 @@ class APIAuthController extends Controller
             return response::error('Vous devez avoir au moins 13 ans pour vous inscrire', 400);
         }
 
+        // Vérifier si un compte existe déjà avec cet email
+        $existingUser = Utilisateur::where('email', $validated['email'])->first();
+
+        if ($existingUser) {
+            // Compte confirmé → inviter à se connecter
+            if ($existingUser->status) {
+                return response()->json([
+                    'code' => 409,
+                    'message' => 'Un compte confirmé existe déjà avec cet email. Veuillez vous connecter ou réinitialiser votre mot de passe si vous l\'avez oublié.',
+                    'data' => [
+                        'account_status' => 'confirmed',
+                    ],
+                ], 409);
+            }
+
+            // Compte non confirmé → renvoyer le code OTP
+            $antiSpamKey = 'email_sent_'.$validated['email'];
+            if (Cache::has($antiSpamKey)) {
+                $remainingTime = Cache::get($antiSpamKey) - time();
+
+                return response::error("Veuillez patienter {$remainingTime} secondes avant de renvoyer un code", 429);
+            }
+
+            // Supprimer les anciens codes et en générer un nouveau
+            Code::where('utilisateur_id', $existingUser->id)->delete();
+            $codeValue = str_pad(rand(0, 9999), 4, '0', STR_PAD_LEFT);
+
+            Code::create([
+                'code' => $codeValue,
+                'utilisateur_id' => $existingUser->id,
+                'email' => $existingUser->email,
+            ]);
+
+            $fullname = trim($existingUser->prenom.' '.$existingUser->nom) ?: 'Utilisateur';
+            $title = 'Confirmez votre compte GquiOse';
+            $content = "Bonjour {$fullname}, votre compte n'est pas encore confirmé. Utilisez le code ci-dessous pour activer votre compte.";
+
+            Mail::to($existingUser->email)->send(new SendCodeEmail($title, $content, $codeValue));
+
+            Cache::put($antiSpamKey, time() + 60, 60);
+
+            return response()->json([
+                'code' => 200,
+                'message' => 'Un compte avec cet email existe déjà mais n\'est pas encore confirmé. Un nouveau code de vérification a été envoyé.',
+                'data' => [
+                    'utilisateur' => $existingUser->only(['id', 'nom', 'prenom', 'email', 'sexe', 'anneedenaissance', 'ville_id', 'provider', 'platform', 'onesignal_player_id']),
+                    'account_status' => 'unconfirmed',
+                ],
+            ], 200);
+        }
+
         // Vérifier unicité du phone si fourni
         if (! empty($validated['phone'])) {
-            if (Utilisateur::where('phone', $validated['phone'])->exists()) {
-                return response::error('Un compte existe déjà avec ce numéro. Connectez-vous ou utilisez un autre numéro.', 409);
+            $phoneNormalized = $this->normalizePhoneNumber($validated['phone']);
+            $phoneVariants = $this->getPhoneVariants($phoneNormalized);
+            $existingPhoneUser = Utilisateur::whereIn('phone', $phoneVariants)->first();
+
+            if ($existingPhoneUser) {
+                if ($existingPhoneUser->status) {
+                    return response::error('Un compte confirmé existe déjà avec ce numéro. Veuillez vous connecter ou utiliser un autre numéro.', 409);
+                } else {
+                    return response::error('Un compte non confirmé existe déjà avec ce numéro. Veuillez d\'abord confirmer ce compte ou utiliser un autre numéro.', 409);
+                }
             }
         }
 
@@ -351,7 +456,7 @@ class APIAuthController extends Controller
             return response::success([
                 'utilisateur' => $utilisateur->only(['id', 'nom', 'prenom', 'email', 'sexe', 'anneedenaissance', 'ville_id', 'provider', 'platform', 'onesignal_player_id']),
                 'message' => 'Un code de vérification a été envoyé à votre email',
-                'verification_status' => 'pending_verification',
+                'account_status' => 'created',
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
