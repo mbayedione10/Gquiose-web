@@ -57,8 +57,10 @@ class APIAlertWorkflowController extends Controller
 
         // Créer une alerte en brouillon
         $alerte = new Alerte();
-        $alerte->ref = 'ALRT-'.date('Y').'-'.str_pad(Alerte::count() + 1, 6, '0', STR_PAD_LEFT);
-        $alerte->numero_suivi = 'VBG-'.date('Y').'-'.str_pad(Alerte::count() + 1, 6, '0', STR_PAD_LEFT);
+        $lastId = (int) Alerte::max('id');
+        $nextNumber = $lastId + 1;
+        $alerte->ref = 'ALRT-'.date('Y').'-'.str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+        $alerte->numero_suivi = 'VBG-'.date('Y').'-'.str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
         $alerte->utilisateur_id = $user->id;
         $alerte->type_alerte_id = $typeAlerte->id;
         $alerte->sous_type_violence_numerique_id = $request->sous_type_violence_numerique_id;

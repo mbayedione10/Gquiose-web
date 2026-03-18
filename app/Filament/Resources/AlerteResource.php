@@ -84,13 +84,19 @@ class AlerteResource extends Resource
                                     Grid::make(['default' => 1, 'sm' => 2])->schema([
                                         TextInput::make('ref')
                                             ->label('Référence')
-                                            ->default(fn () => 'ALRT-'.date('Y').'-'.str_pad(random_int(1, 9999), 4, '0', STR_PAD_LEFT))
+                                            ->default(function () {
+                                                $nextNumber = (int) Alerte::max('id') + 1;
+                                                return 'ALRT-'.date('Y').'-'.str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+                                            })
                                             ->required()
                                             ->unique(ignoreRecord: true),
 
                                         TextInput::make('numero_suivi')
                                             ->label('Numéro de suivi')
-                                            ->default(fn () => 'VBG-'.date('Y').'-'.str_pad(random_int(1, 999999), 6, '0', STR_PAD_LEFT))
+                                            ->default(function () {
+                                                $nextNumber = (int) Alerte::max('id') + 1;
+                                                return 'VBG-'.date('Y').'-'.str_pad($nextNumber, 6, '0', STR_PAD_LEFT);
+                                            })
                                             ->required()
                                             ->unique(ignoreRecord: true),
                                     ]),
