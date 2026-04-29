@@ -6,6 +6,7 @@
 /storage/*.key
 /vendor
 .env
+.env.old
 .env.backup
 .env.production
 .env.gmail.example
@@ -24,3 +25,4 @@ storage/app/apns/*.p8
 /attached_assets
 *.md
 run_tests.sh
+

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DeleteAccountController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -68,3 +69,17 @@ Route::get('admin/invitation/accept/{token}', [App\Http\Controllers\AdminInvitat
     ->name('admin.invitation.accept');
 Route::post('admin/invitation/accept/{token}', [App\Http\Controllers\AdminInvitationController::class, 'accept'])
     ->name('admin.invitation.accept.submit');
+
+// Cron endpoints (Infomaniak URL-based cron)
+Route::get('cron/{action}', function (string $action) {
+    $token = request('token');
+    if (! $token || $token !== config('app.cron_secret')) {
+        abort(403);
+    }
+    match ($action) {
+        'scheduler' => Artisan::call('schedule:run'),
+        'queue'     => Artisan::call('queue:work', ['--stop-when-empty' => true]),
+        default     => abort(404),
+    };
+    return response('OK', 200);
+})->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
