@@ -1095,14 +1095,19 @@ class APIAuthController extends Controller
             return response::error('Non authentifié', 401);
         }
 
-        $isSocialUser = ! empty($user->provider);
+        // Utilisateur social = a un provider (apple/google/facebook) OU n'a pas de mot de passe en DB
+        $isSocialUser = ! empty($user->provider) || is_null($user->password);
 
         $validated = $request->validate([
-            'password' => $isSocialUser ? 'nullable|string' : 'required|string',
+            'password' => 'nullable|string',
         ]);
 
         if (! $isSocialUser) {
-            if (! Hash::check($validated['password'] ?? '', $user->password)) {
+            if (empty($validated['password'])) {
+                return response::error('Le mot de passe est requis', 422);
+            }
+
+            if (! Hash::check($validated['password'], $user->password)) {
                 Log::warning('Account deletion failed - incorrect password', ['user_id' => $user->id]);
 
                 return response::error('Mot de passe incorrect', 400);
