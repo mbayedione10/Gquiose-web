@@ -473,6 +473,10 @@ class APIAuthController extends Controller
             'provider' => 'required|in:google,facebook,apple',
             'access_token' => 'required|string', // Token à vérifier
             'platform' => 'nullable|in:android,ios',
+            // Apple envoie le nom complet uniquement à la première connexion
+            'full_name' => 'nullable|array',
+            'full_name.given_name' => 'nullable|string|max:255',
+            'full_name.family_name' => 'nullable|string|max:255',
         ]);
 
         DB::beginTransaction();
@@ -489,13 +493,20 @@ class APIAuthController extends Controller
                 return response::error('Token invalide ou expiré', 401);
             }
 
-            // Vérifier si l'utilisateur existe déjà (par email ou provider_id)
-            $existingUser = Utilisateur::where('email', $socialData['email'])
-                ->orWhere(function ($query) use ($validated, $socialData) {
-                    $query->where('provider', $validated['provider'])
-                        ->where('provider_id', $socialData['provider_id']);
-                })
-                ->first();
+            // Vérifier si l'utilisateur existe déjà (par provider_id, ou par email si fourni)
+            // Apple peut ne pas fournir d'email (utilisateur ayant choisi de le cacher)
+            $existingUserQuery = Utilisateur::where('provider', $validated['provider'])
+                ->where('provider_id', $socialData['provider_id']);
+
+            if (! empty($socialData['email'])) {
+                $existingUserQuery = Utilisateur::where('email', $socialData['email'])
+                    ->orWhere(function ($query) use ($validated, $socialData) {
+                        $query->where('provider', $validated['provider'])
+                            ->where('provider_id', $socialData['provider_id']);
+                    });
+            }
+
+            $existingUser = $existingUserQuery->first();
 
             if ($existingUser) {
                 // Si l'utilisateur existe, on le connecte directement
@@ -521,20 +532,25 @@ class APIAuthController extends Controller
             }
 
             // Créer un nouveau compte avec les données du provider social
-            $nom = $socialData['family_name'] ?? '';
-            $prenom = $socialData['given_name'] ?? ($socialData['name'] ?? '');
+            // Pour Apple : le nom vient du paramètre full_name (uniquement à la 1ère connexion)
+            $nom = $socialData['family_name']
+                ?? $validated['full_name']['family_name']
+                ?? '';
+            $prenom = $socialData['given_name']
+                ?? $validated['full_name']['given_name']
+                ?? ($socialData['name'] ?? '');
 
             $utilisateur = Utilisateur::create([
                 'nom' => $nom,
                 'prenom' => $prenom,
-                'email' => $socialData['email'],
+                'email' => $socialData['email'] ?: null, // null si Apple relay ou caché
                 'phone' => null,
                 'provider' => $validated['provider'],
                 'provider_id' => $socialData['provider_id'],
                 'photo' => $socialData['picture'] ?? null,
                 'platform' => $validated['platform'] ?? null,
-                'status' => true, // Activé directement (email vérifié par le provider)
-                'email_verified_at' => $socialData['email_verified'] ?? false ? now() : null,
+                'status' => true, // Activé directement (identité vérifiée par le provider)
+                'email_verified_at' => ($socialData['email_verified'] ?? false) ? now() : null,
             ]);
 
             // Générer un token Sanctum
@@ -1068,6 +1084,8 @@ class APIAuthController extends Controller
 
     /**
      * Suppression du compte
+     * Pour les utilisateurs social login (Apple, Google, Facebook), pas de mot de passe requis :
+     * leur identité est déjà vérifiée par le Bearer token Sanctum.
      */
     public function deleteAccount(Request $request)
     {
@@ -1077,14 +1095,18 @@ class APIAuthController extends Controller
             return response::error('Non authentifié', 401);
         }
 
+        $isSocialUser = ! empty($user->provider);
+
         $validated = $request->validate([
-            'password' => 'required|string',
+            'password' => $isSocialUser ? 'nullable|string' : 'required|string',
         ]);
 
-        if (! Hash::check($validated['password'], $user->password)) {
-            Log::warning('Account deletion failed - incorrect password', ['user_id' => $user->id]);
+        if (! $isSocialUser) {
+            if (! Hash::check($validated['password'] ?? '', $user->password)) {
+                Log::warning('Account deletion failed - incorrect password', ['user_id' => $user->id]);
 
-            return response::error('Mot de passe incorrect', 400);
+                return response::error('Mot de passe incorrect', 400);
+            }
         }
 
         $userId = $user->id;
