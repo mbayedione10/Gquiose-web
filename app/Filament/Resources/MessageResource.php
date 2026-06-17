@@ -50,11 +50,15 @@ class MessageResource extends Resource
                             ->label('Utilisateur')
                             ->placeholder('Selectionnez un utilisateur')
                             ->relationship('utilisateur', 'email')
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->email ?? "Utilisateur #{$record->id}")
                             ->searchable()
                             ->required()
                             ->options(
                                 Utilisateur::where('status', true)
-                                    ->pluck('email', 'id')
+                                    ->get()
+                                    ->mapWithKeys(fn ($user) => [
+                                        $user->id => $user->email ?? "Utilisateur #{$user->id}",
+                                    ])
                             )
                             ->columnSpan([
                                 'default' => 12,
@@ -85,11 +89,15 @@ class MessageResource extends Resource
                             ->label('Utilisateur')
                             ->placeholder('Selectionnez un utilisateur')
                             ->relationship('utilisateur', 'email')
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->email ?? "Utilisateur #{$record->id}")
                             ->searchable()
                             ->required()
                             ->options(
                                 Utilisateur::where('status', true)
-                                    ->pluck('email', 'id')
+                                    ->get()
+                                    ->mapWithKeys(fn ($user) => [
+                                        $user->id => $user->email ?? "Utilisateur #{$user->id}",
+                                    ])
                             )
                             ->columnSpan([
                                 'default' => 12,
